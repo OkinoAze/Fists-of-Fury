@@ -1,0 +1,122 @@
+[gd_scene load_steps=10 format=3 uid="uid://ylrqp34rxwb0"]
+
+[ext_resource type="PackedScene" uid="uid://ej5chbmy7qdn" path="res://Scene/Prefab/Character.tscn" id="1_8kqy7"]
+[ext_resource type="Texture2D" uid="uid://84r0fw6sgvir" path="res://Art/Characters/player.png" id="2_f4tyx"]
+[ext_resource type="Script" uid="uid://dyihcpmc08x13" path="res://Script/Player.cs" id="2_oa1iy"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_oa1iy"]
+radius = 2.0
+height = 14.0
+
+[sub_resource type="Animation" id="Animation_f4tyx"]
+resource_name = "Idle"
+length = 0.4
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+
+[sub_resource type="Animation" id="Animation_oa1iy"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_kf0g2"]
+resource_name = "Walk"
+length = 0.8
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [10, 11, 12, 13, 14, 15, 16, 17]
+}
+
+[sub_resource type="Animation" id="Animation_mvokj"]
+resource_name = "Punch"
+length = 0.15
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [21, 22, 23]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.15),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0, false],
+"method": &"SwitchState"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mvokj"]
+_data = {
+&"Idle": SubResource("Animation_f4tyx"),
+&"Punch": SubResource("Animation_mvokj"),
+&"RESET": SubResource("Animation_oa1iy"),
+&"Walk": SubResource("Animation_kf0g2")
+}
+
+[node name="Player" instance=ExtResource("1_8kqy7")]
+collision_layer = 2
+collision_mask = 15
+script = ExtResource("2_oa1iy")
+metadata/_edit_horizontal_guides_ = [-33.0]
+
+[node name="CharacterSprite" parent="." index="1"]
+texture = ExtResource("2_f4tyx")
+centered = false
+offset = Vector2(-24, -48)
+hframes = 10
+vframes = 10
+
+[node name="CollisionShape" parent="." index="2"]
+rotation = -1.5708
+shape = SubResource("CapsuleShape2D_oa1iy")
+
+[node name="AnimationPlayer" parent="." index="3"]
+libraries = {
+&"": SubResource("AnimationLibrary_mvokj")
+}
+autoplay = "Idle"
