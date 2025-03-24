@@ -17,7 +17,10 @@ public partial class Player : Character
     public override void _Ready()
     {
         States = new IState[Enum.GetNames(typeof(State)).Length];
+
         AccessingResources();
+        DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+
         _ = new StateIdle(this);
         _ = new StateWalk(this);
         _ = new StateAttack(this);
@@ -26,17 +29,26 @@ public partial class Player : Character
         _ = new StateFall(this);
 
     }
+
+    private void OnDamageEmitter_AreaEntered(Area2D area)
+    {
+        (area as DamageReceiver)?.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage);
+    }
+
+
     public override void _PhysicsProcess(double delta)
     {
+
         Direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
         StateMachineUpdate(delta);
 
     }
+
     private partial class StateIdle : Node, IState
     {
-        Character Character;
+        Player Character;
         public int GetId { get; } = (int)State.Idle;
-        public StateIdle(Character character)
+        public StateIdle(Player character)
         {
             Character = character;
             character.States[GetId] = this;
@@ -71,9 +83,9 @@ public partial class Player : Character
     }
     private partial class StateWalk : Node, IState
     {
-        Character Character;
+        Player Character;
         public int GetId { get; } = (int)State.Walk;
-        public StateWalk(Character character)
+        public StateWalk(Player character)
         {
             Character = character;
             character.States[GetId] = this;
@@ -89,10 +101,12 @@ public partial class Player : Character
             if (Character.Direction.X < 0)
             {
                 Character.CharacterSprite.FlipH = true;
+                Character.DamageEmitter.Scale = new Vector2(-1, 1);
             }
             else if (Character.Direction.X > 0)
             {
                 Character.CharacterSprite.FlipH = false;
+                Character.DamageEmitter.Scale = new Vector2(1, 1);
             }
 
             Character.Velocity = Character.Direction * Character.Speed;
@@ -119,9 +133,9 @@ public partial class Player : Character
     }
     public partial class StateAttack : Node, IState
     {
-        protected Character Character;
+        Player Character;
         public int GetId { get; } = (int)State.Attack;
-        public StateAttack(Character character)
+        public StateAttack(Player character)
         {
             Character = character;
             character.States[GetId] = this;
@@ -149,9 +163,9 @@ public partial class Player : Character
     }
     private partial class StateSkill : Node, IState
     {
-        Character Character;
+        Player Character;
         public int GetId { get; } = (int)State.Skill;
-        public StateSkill(Character character)
+        public StateSkill(Player character)
         {
             Character = character;
             character.States[GetId] = this;
@@ -177,9 +191,9 @@ public partial class Player : Character
     }
     public partial class StateJump : Node, IState
     {
-        protected Character Character;
+        Player Character;
         public int GetId { get; } = (int)State.Jump;
-        public StateJump(Character character)
+        public StateJump(Player character)
         {
             Character = character;
             character.States[GetId] = this;
@@ -203,9 +217,9 @@ public partial class Player : Character
     }
     public partial class StateFall : Node, IState
     {
-        protected Character Character;
+        Player Character;
         public int GetId { get; } = (int)State.Fall;
-        public StateFall(Character character)
+        public StateFall(Player character)
         {
             Character = character;
             character.States[GetId] = this;

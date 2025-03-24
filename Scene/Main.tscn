@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cuvv6fyqwfmts" path="res://Script/Main.cs" id="1_djkur"]
 [ext_resource type="PackedScene" uid="uid://ylrqp34rxwb0" path="res://Scene/Prefab/Player.tscn" id="1_xhtwi"]
-[ext_resource type="PackedScene" uid="uid://xsms1sdmxewg" path="res://Scene/Prefab/Stage.tscn" id="2_djkur"]
+[ext_resource type="PackedScene" uid="uid://xsms1sdmxewg" path="res://Scene/Stage.tscn" id="2_djkur"]
 [ext_resource type="PackedScene" uid="uid://d2tpt0iu7ow7h" path="res://Scene/Prefab/Barrel.tscn" id="4_h175a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h175a"]

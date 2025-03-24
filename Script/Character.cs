@@ -14,8 +14,9 @@ public partial class Character : CharacterBody2D
 	public Vector2 Direction = Vector2.Zero;
 
 	public Sprite2D CharacterSprite;
-	public Sprite2D Shadow;
+	public Sprite2D ShadowSprite;
 	public AnimationPlayer AnimationPlayer;
+	public Area2D DamageEmitter;
 
 	public int StateID = 0;
 	public bool EnterEnd = false;
@@ -36,8 +37,10 @@ public partial class Character : CharacterBody2D
 	public void AccessingResources()
 	{
 		CharacterSprite = GetNode<Sprite2D>("CharacterSprite");
-		Shadow = GetNode<Sprite2D>("Shadow");
+		ShadowSprite = GetNode<Sprite2D>("ShadowSprite");
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+		DamageEmitter = GetNode<Area2D>("DamageEmitter");
+
 	}
 	public void StateMachineUpdate(double delta)
 	{
@@ -77,7 +80,7 @@ public partial class Character : CharacterBody2D
 	}
 	public partial class StateDefault : Node, IState
 	{
-		protected Character Character;
+		Character Character;
 		public int GetId { get; } = 0;
 		public StateDefault(Character character)
 		{

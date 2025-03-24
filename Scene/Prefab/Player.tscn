@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://ylrqp34rxwb0"]
+[gd_scene load_steps=11 format=3 uid="uid://ylrqp34rxwb0"]
 
 [ext_resource type="PackedScene" uid="uid://ej5chbmy7qdn" path="res://Scene/Prefab/Character.tscn" id="1_8kqy7"]
 [ext_resource type="Texture2D" uid="uid://84r0fw6sgvir" path="res://Art/Characters/player.png" id="2_f4tyx"]
@@ -7,6 +7,9 @@
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_oa1iy"]
 radius = 2.0
 height = 14.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oa1iy"]
+size = Vector2(10, 3.5)
 
 [sub_resource type="Animation" id="Animation_f4tyx"]
 resource_name = "Idle"
@@ -39,6 +42,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("DamageEmitter:monitoring")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
 }
 
 [sub_resource type="Animation" id="Animation_kf0g2"]
@@ -89,6 +104,18 @@ tracks/1/keys = {
 "method": &"SwitchState"
 }]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("DamageEmitter:monitoring")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.15),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_mvokj"]
 _data = {
@@ -115,8 +142,17 @@ vframes = 10
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_oa1iy")
 
-[node name="AnimationPlayer" parent="." index="3"]
+[node name="DamageEmitter" parent="." index="3"]
+collision_mask = 192
+
+[node name="CollisionShape2D" parent="DamageEmitter" index="0"]
+position = Vector2(11, -13.75)
+shape = SubResource("RectangleShape2D_oa1iy")
+
+[node name="AnimationPlayer" parent="." index="5"]
 libraries = {
 &"": SubResource("AnimationLibrary_mvokj")
 }
 autoplay = "Idle"
+
+[editable path="DamageEmitter"]

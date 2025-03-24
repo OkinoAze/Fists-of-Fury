@@ -1,16 +1,22 @@
-[gd_scene load_steps=3 format=3 uid="uid://ej5chbmy7qdn"]
+[gd_scene load_steps=5 format=3 uid="uid://ej5chbmy7qdn"]
 
 [ext_resource type="Script" uid="uid://ca6yp77y1hgt2" path="res://Script/Character.cs" id="1_8jy4q"]
 [ext_resource type="Texture2D" uid="uid://dvrrqsggg1kiy" path="res://Art/Characters/shadow.png" id="2_ok56b"]
+[ext_resource type="PackedScene" uid="uid://ovdl0lg8ghmf" path="res://Scene/Prefab/DamageEmitter.tscn" id="3_s4oq7"]
+[ext_resource type="PackedScene" uid="uid://wahn30yxqe0y" path="res://Scene/Prefab/DamageReceiver.tscn" id="4_chqrr"]
 
 [node name="Character" type="CharacterBody2D"]
 script = ExtResource("1_8jy4q")
 
-[node name="Shadow" type="Sprite2D" parent="."]
+[node name="ShadowSprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_ok56b")
 
 [node name="CharacterSprite" type="Sprite2D" parent="."]
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
+
+[node name="DamageEmitter" parent="." instance=ExtResource("3_s4oq7")]
+
+[node name="DamageReceiver" parent="." instance=ExtResource("4_chqrr")]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
