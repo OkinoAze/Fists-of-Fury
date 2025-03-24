@@ -19,5 +19,9 @@ public partial class Main : Node
             Camera.Position = new Vector2(Player.Position.X, Camera.Position.Y);
 
         }
+        if (Input.IsActionPressed("ui_filedialog_refresh"))
+        {
+            GetTree().ReloadCurrentScene();
+        }
     }
 }

@@ -32,7 +32,8 @@ public partial class Player : Character
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
-        (area as DamageReceiver)?.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage);
+        Vector2 direction = Vector2.Right * DamageEmitter.Scale.X;
+        (area as DamageReceiver)?.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage, direction);
     }
 
 

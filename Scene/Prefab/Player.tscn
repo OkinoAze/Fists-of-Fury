@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://ylrqp34rxwb0"]
+[gd_scene load_steps=14 format=3 uid="uid://ylrqp34rxwb0"]
 
 [ext_resource type="PackedScene" uid="uid://ej5chbmy7qdn" path="res://Scene/Prefab/Character.tscn" id="1_8kqy7"]
 [ext_resource type="Texture2D" uid="uid://84r0fw6sgvir" path="res://Art/Characters/player.png" id="2_f4tyx"]
@@ -9,7 +9,7 @@ radius = 2.0
 height = 14.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oa1iy"]
-size = Vector2(10, 3.5)
+size = Vector2(11, 3.5)
 
 [sub_resource type="Animation" id="Animation_f4tyx"]
 resource_name = "Idle"
@@ -117,11 +117,66 @@ tracks/2/keys = {
 "values": [true, false]
 }
 
+[sub_resource type="Animation" id="Animation_wwp2t"]
+resource_name = "TakeOff"
+length = 0.05
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [61]
+}
+
+[sub_resource type="Animation" id="Animation_qj2or"]
+resource_name = "Jump"
+length = 0.1
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [62]
+}
+
+[sub_resource type="Animation" id="Animation_jhprm"]
+resource_name = "Land"
+length = 0.05
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [60]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_mvokj"]
 _data = {
 &"Idle": SubResource("Animation_f4tyx"),
+&"Jump": SubResource("Animation_qj2or"),
+&"Land": SubResource("Animation_jhprm"),
 &"Punch": SubResource("Animation_mvokj"),
 &"RESET": SubResource("Animation_oa1iy"),
+&"TakeOff": SubResource("Animation_wwp2t"),
 &"Walk": SubResource("Animation_kf0g2")
 }
 
@@ -146,7 +201,7 @@ shape = SubResource("CapsuleShape2D_oa1iy")
 collision_mask = 192
 
 [node name="CollisionShape2D" parent="DamageEmitter" index="0"]
-position = Vector2(11, -13.75)
+position = Vector2(11.5, -13.75)
 shape = SubResource("RectangleShape2D_oa1iy")
 
 [node name="AnimationPlayer" parent="." index="5"]
