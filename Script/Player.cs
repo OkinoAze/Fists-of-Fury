@@ -20,7 +20,7 @@ public partial class Player : Character
         States = new IState[Enum.GetNames(typeof(State)).Length];
 
         AccessingResources();
-        DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+        _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         GetGravity();
         _ = new StateIdle(this);
         _ = new StateWalk(this);
@@ -34,9 +34,9 @@ public partial class Player : Character
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
-        Vector2 direction = Vector2.Right * DamageEmitter.Scale.X;
+        Vector2 direction = Vector2.Right * _DamageEmitter.Scale.X;
 
-        (area as DamageReceiver)?.EmitSignal("DamageReceived", Damage, direction);
+        (area as DamageReceiver)?.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage, direction);
     }
 
 
@@ -111,12 +111,12 @@ public partial class Player : Character
             if (Character.Direction.X < 0)
             {
                 Character.CharacterSprite.FlipH = true;
-                Character.DamageEmitter.Scale = new Vector2(-1, 1);
+                Character._DamageEmitter.Scale = new Vector2(-1, 1);
             }
             else if (Character.Direction.X > 0)
             {
                 Character.CharacterSprite.FlipH = false;
-                Character.DamageEmitter.Scale = new Vector2(1, 1);
+                Character._DamageEmitter.Scale = new Vector2(1, 1);
             }
 
             Character.Velocity = Character.Direction * Character.MoveSpeed;
@@ -317,7 +317,7 @@ public partial class Player : Character
         {
             if (Character.Height <= 0)
             {
-                Character.DamageEmitter.Monitoring = false;
+                Character._DamageEmitter.Monitoring = false;
                 Character.Height = 0;
                 Character.CharacterSprite.Position = Vector2.Zero;
                 return (int)State.Idle;

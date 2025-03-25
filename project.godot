@@ -33,6 +33,12 @@ project/assembly_name="Fists of Fury"
 
 script/search_in_file_extensions=PackedStringArray("cs", "gd", "gdshader")
 
+[global_group]
+
+Player=""
+Enemy=""
+Prop=""
+
 [input]
 
 attack={

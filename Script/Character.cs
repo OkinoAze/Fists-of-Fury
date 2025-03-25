@@ -21,8 +21,8 @@ public partial class Character : CharacterBody2D
 	public Sprite2D CharacterSprite;
 	public Sprite2D ShadowSprite;
 	public AnimationPlayer AnimationPlayer;
-	public Area2D DamageEmitter;
-	public Area2D DamageReceiver;
+	public Area2D _DamageEmitter;
+	public Area2D _DamageReceiver;
 
 	public int StateID = 0;
 	public bool EnterEnd = false;
@@ -45,8 +45,8 @@ public partial class Character : CharacterBody2D
 		CharacterSprite = GetNode<Sprite2D>("CharacterSprite");
 		ShadowSprite = GetNode<Sprite2D>("ShadowSprite");
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-		DamageEmitter = CharacterSprite.GetNode<Area2D>("DamageEmitter");
-		DamageReceiver = CharacterSprite.GetNode<Area2D>("DamageReceiver");
+		_DamageEmitter = CharacterSprite.GetNode<Area2D>("DamageEmitter");
+		_DamageReceiver = CharacterSprite.GetNode<Area2D>("DamageReceiver");
 
 	}
 	public void StateMachineUpdate(double delta)

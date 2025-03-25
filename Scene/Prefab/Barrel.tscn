@@ -11,7 +11,7 @@ height = 16.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bbkcx"]
 size = Vector2(10, 4)
 
-[node name="Barrel" type="StaticBody2D"]
+[node name="Barrel" type="StaticBody2D" groups=["Prop"]]
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("1_acjb0")

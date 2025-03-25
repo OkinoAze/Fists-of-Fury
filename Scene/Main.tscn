@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://bacl472jw6i6x"]
+[gd_scene load_steps=7 format=3 uid="uid://bacl472jw6i6x"]
 
 [ext_resource type="Script" uid="uid://cuvv6fyqwfmts" path="res://Script/Main.cs" id="1_djkur"]
 [ext_resource type="PackedScene" uid="uid://ylrqp34rxwb0" path="res://Scene/Prefab/Player.tscn" id="1_xhtwi"]
 [ext_resource type="PackedScene" uid="uid://xsms1sdmxewg" path="res://Scene/Stage.tscn" id="2_djkur"]
 [ext_resource type="PackedScene" uid="uid://d2tpt0iu7ow7h" path="res://Scene/Prefab/Barrel.tscn" id="4_h175a"]
+[ext_resource type="PackedScene" uid="uid://nneqhin7yi3j" path="res://Scene/Prefab/Enemy.tscn" id="4_togfq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h175a"]
 size = Vector2(5, 66)
@@ -41,16 +42,15 @@ y_sort_enabled = true
 
 [node name="Player" parent="ActorContainer" instance=ExtResource("1_xhtwi")]
 position = Vector2(28, 46)
-JumpSpeed = 100.0
+
+[node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(128, 44)
+
+[node name="Enemy3" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(168, 58)
+
+[node name="Enemy2" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(60, 59)
 
 [node name="Barrel" parent="ActorContainer" instance=ExtResource("4_h175a")]
 position = Vector2(63, 46)
-
-[node name="Barrel2" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(88, 57)
-
-[node name="Barrel3" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(108, 38)
-
-[node name="Barrel4" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(146, 50)
