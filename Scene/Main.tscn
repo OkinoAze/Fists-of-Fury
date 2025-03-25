@@ -41,6 +41,7 @@ y_sort_enabled = true
 
 [node name="Player" parent="ActorContainer" instance=ExtResource("1_xhtwi")]
 position = Vector2(28, 46)
+JumpSpeed = 100.0
 
 [node name="Barrel" parent="ActorContainer" instance=ExtResource("4_h175a")]
 position = Vector2(63, 46)

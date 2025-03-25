@@ -9,6 +9,7 @@ public partial class Barrel : StaticBody2D
     float Speed = 30f;
     float Height = 0f;
     float HeightSpeed = 0f;
+    float Gravity = 360;
     Vector2 Velocity = Vector2.Zero;
     Sprite2D Sprite;
     DamageReceiver DamageReceiver;
@@ -25,17 +26,18 @@ public partial class Barrel : StaticBody2D
         if (Destroyed)
         {
             Height += HeightSpeed * (float)delta;
-            Sprite.Position = Vector2.Up * Height;
-            Position += Velocity * (float)delta;
+
             if (Height < 0)
             {
                 QueueFree();
             }
             else
             {
-                HeightSpeed -= Speed * 12 * (float)delta;
+                HeightSpeed -= Gravity * (float)delta;
             }
 
+            Sprite.Position = Vector2.Up * Height;
+            Position += Velocity * (float)delta;
         }
     }
     private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction)

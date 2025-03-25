@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://wahn30yxqe0y"]
 
-[ext_resource type="Script" uid="uid://bvberhu8fef1w" path="res://Scene/Prefab/DamageReceiver.cs" id="1_hfedu"]
+[ext_resource type="Script" uid="uid://bvberhu8fef1w" path="res://Script/DamageReceiver.cs" id="1_hfedu"]
 
 [node name="DamageReceiver" type="Area2D"]
 collision_layer = 0

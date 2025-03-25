@@ -9,14 +9,20 @@ public partial class Character : CharacterBody2D
 	[Export]
 	public int Damage = 1;
 	[Export]
-	public float Speed = 35;
-
+	public float MoveSpeed = 35;
+	[Export]
+	public float JumpSpeed = 140;
+	public float HeightSpeed = 0;
+	public float Height = 0;
+	public float Gravity = 320;
+	public const float AttackRange = 5;
 	public Vector2 Direction = Vector2.Zero;
 
 	public Sprite2D CharacterSprite;
 	public Sprite2D ShadowSprite;
 	public AnimationPlayer AnimationPlayer;
 	public Area2D DamageEmitter;
+	public Area2D DamageReceiver;
 
 	public int StateID = 0;
 	public bool EnterEnd = false;
@@ -39,7 +45,8 @@ public partial class Character : CharacterBody2D
 		CharacterSprite = GetNode<Sprite2D>("CharacterSprite");
 		ShadowSprite = GetNode<Sprite2D>("ShadowSprite");
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-		DamageEmitter = GetNode<Area2D>("DamageEmitter");
+		DamageEmitter = CharacterSprite.GetNode<Area2D>("DamageEmitter");
+		DamageReceiver = CharacterSprite.GetNode<Area2D>("DamageReceiver");
 
 	}
 	public void StateMachineUpdate(double delta)
