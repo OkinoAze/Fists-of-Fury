@@ -12,6 +12,7 @@ public partial class Player : Character
         Fall,
         Skill,
         JumpKick,
+        Hurt,
 
     }
 
@@ -21,6 +22,7 @@ public partial class Player : Character
 
         AccessingResources();
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+        _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
         GetGravity();
         _ = new StateIdle(this);
         _ = new StateWalk(this);
@@ -32,11 +34,28 @@ public partial class Player : Character
 
     }
 
+    private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction)
+    {
+        Health = Mathf.Clamp(Health - damage, 0, MaxHealth);
+        if (Health <= 0)
+        {
+
+        }
+    }
+
+
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
-        Vector2 direction = Vector2.Right * _DamageEmitter.Scale.X;
+        if (area is DamageReceiver a)
+        {
+            if (AttackRange((a.Owner as Node2D).GlobalPosition))
+            {
+                Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
 
-        (area as DamageReceiver)?.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage, direction);
+                a.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage, direction);
+            }
+        }
+
     }
 
 
@@ -322,6 +341,31 @@ public partial class Player : Character
                 Character.CharacterSprite.Position = Vector2.Zero;
                 return (int)State.Idle;
             }
+            return GetId;
+        }
+    }
+    private partial class StateHurt : Node, IState
+    {
+        Player Character;
+        public int GetId { get; } = (int)State.Hurt;
+        public StateHurt(Player character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.Direction = Vector2.Zero;
+            Character.AnimationPlayer.Play("Hurt");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+            return Exit();
+        }
+        public int Exit()
+        {
             return GetId;
         }
     }

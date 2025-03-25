@@ -8,11 +8,7 @@ public partial class Main : Node
     [Export]
     Camera2D Camera;
 
-    public override void _Ready()
-    {
-
-    }
-    public override void _Process(double delta)
+    public override void _PhysicsProcess(double delta)
     {
         if (Player.Position.X > Camera.Position.X)
         {

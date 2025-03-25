@@ -4,7 +4,7 @@ using System;
 public partial class Barrel : StaticBody2D
 {
     [Export]
-    int Health = 10;
+    int Health = 1;
     [Export]
     float Speed = 30f;
     float Height = 0f;
@@ -14,10 +14,12 @@ public partial class Barrel : StaticBody2D
     Sprite2D Sprite;
     DamageReceiver DamageReceiver;
     bool Destroyed = false;
+    Player _Player;
 
     public override void _Ready()
     {
         Sprite = GetNode<Sprite2D>("Sprite2D");
+        _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
         DamageReceiver = GetNode<DamageReceiver>("DamageReceiver");
         DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
     }
@@ -42,12 +44,15 @@ public partial class Barrel : StaticBody2D
     }
     private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction)
     {
-        Destroyed = true;
-        Sprite.Frame = 1;
-        Sprite.FlipH = direction.X < 0;
-        HeightSpeed = Speed * 3;
-        Velocity = direction.Normalized() * Speed;
-
+        Health -= damage;
+        if (Health <= 0)
+        {
+            Destroyed = true;
+            Sprite.Frame = 1;
+            Sprite.FlipH = direction.X < 0;
+            HeightSpeed = Speed * 3;
+            Velocity = direction.Normalized() * Speed;
+        }
     }
 
 }

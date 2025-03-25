@@ -16,28 +16,42 @@ public partial class Enemy : Character
     {
         _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
         States = new IState[Enum.GetNames(typeof(State)).Length];
-
+        MaxHealth = 10;
+        Health = 5;
         AccessingResources();
 
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
-        (_DamageReceiver as DamageReceiver).DamageReceived += OnDamageReceiver_DamageReceived;
+        _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
 
         _ = new StateIdle(this);
         _ = new StateWalk(this);
+        _ = new StateHurt(this);
 
     }
 
     private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction)
     {
-        throw new NotImplementedException();
+        Direction = direction;
+        SwitchState((int)State.Hurt);
+        Health = Mathf.Clamp(Health - damage, 0, MaxHealth);
+        if (Health <= 0)
+        {
+            QueueFree();
+        }
     }
 
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
-        Vector2 direction = Vector2.Right * _DamageEmitter.Scale.X;
+        if (area is DamageReceiver a)
+        {
+            if (AttackRange((a.Owner as Node2D).GlobalPosition))
+            {
+                Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
 
-        (area as DamageReceiver)?.EmitSignal("DamageReceived", Damage, direction);
+                a.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage, direction);
+            }
+        }
 
     }
 
@@ -45,7 +59,10 @@ public partial class Enemy : Character
 
     public override void _PhysicsProcess(double delta)
     {
-        Direction = (_Player.Position - Position).Normalized();
+        if (StateID != (int)State.Hurt)
+        {
+            Direction = (_Player.Position - Position).Normalized();
+        }
         StateMachineUpdate(delta);
     }
 
@@ -132,13 +149,14 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-            Character.Direction = Vector2.Zero;
             Character.AnimationPlayer.Play("Hurt");
+            Character.Velocity = Character.Direction * Repel;
             return true;
         }
 
         public int Update(double delta)
         {
+            Character.MoveAndSlide();
             return Exit();
         }
         public int Exit()

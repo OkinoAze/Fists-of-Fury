@@ -8,7 +8,7 @@
 size = Vector2(0, 0)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uoh4s"]
-size = Vector2(9, 5)
+size = Vector2(9, 7)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uoh4s"]
 radius = 2.0
@@ -106,7 +106,7 @@ _data = {
 
 [node name="Enemy" groups=["Enemy"] instance=ExtResource("1_hcc6n")]
 collision_layer = 4
-collision_mask = 12
+collision_mask = 15
 script = ExtResource("2_uoh4s")
 
 [node name="CharacterSprite" parent="." index="1"]
@@ -126,7 +126,7 @@ shape = SubResource("RectangleShape2D_67ah2")
 collision_layer = 64
 
 [node name="CollisionShape2D" parent="CharacterSprite/DamageReceiver" index="0"]
-position = Vector2(0, -12)
+position = Vector2(0, -12.5)
 shape = SubResource("RectangleShape2D_uoh4s")
 
 [node name="CollisionShape" parent="." index="2"]
@@ -134,7 +134,6 @@ rotation = -1.5708
 shape = SubResource("CapsuleShape2D_uoh4s")
 
 [node name="AnimationPlayer" parent="." index="3"]
-callback_mode_process = 0
 libraries = {
 &"": SubResource("AnimationLibrary_ihm3i")
 }

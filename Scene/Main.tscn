@@ -40,17 +40,22 @@ shape = SubResource("RectangleShape2D_h175a")
 [node name="ActorContainer" type="Node2D" parent="."]
 y_sort_enabled = true
 
-[node name="Player" parent="ActorContainer" instance=ExtResource("1_xhtwi")]
-position = Vector2(28, 46)
-
 [node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
-position = Vector2(128, 44)
+position = Vector2(57, 57)
 
-[node name="Enemy3" parent="ActorContainer" instance=ExtResource("4_togfq")]
-position = Vector2(168, 58)
-
-[node name="Enemy2" parent="ActorContainer" instance=ExtResource("4_togfq")]
-position = Vector2(60, 59)
+[node name="Player" parent="ActorContainer" instance=ExtResource("1_xhtwi")]
+position = Vector2(36, 52)
+motion_mode = 0
 
 [node name="Barrel" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(63, 46)
+position = Vector2(64, 38)
+
+[node name="Barrel2" parent="ActorContainer" instance=ExtResource("4_h175a")]
+position = Vector2(80, 47)
+
+[node name="Barrel3" parent="ActorContainer" instance=ExtResource("4_h175a")]
+position = Vector2(102, 57)
+
+[editable path="ActorContainer/Enemy"]
+[editable path="ActorContainer/Enemy/CharacterSprite/DamageEmitter"]
+[editable path="ActorContainer/Enemy/CharacterSprite/DamageReceiver"]
