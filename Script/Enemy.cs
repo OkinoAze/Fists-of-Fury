@@ -4,6 +4,7 @@ using System;
 public partial class Enemy : Character
 {
     Player _Player;
+    EnemySolt Solt = null;
     enum State
     {
         Idle,
@@ -20,22 +21,49 @@ public partial class Enemy : Character
         Health = 5;
         AccessingResources();
 
+
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
 
         _ = new StateIdle(this);
         _ = new StateWalk(this);
         _ = new StateHurt(this);
+        _ = new StateAttack(this);
 
     }
 
-    private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction)
+    public override void _PhysicsProcess(double delta)
+    {
+        if (StateID != (int)State.Hurt && Solt != null)
+        {
+            if (Position.DistanceTo(_Player.Position) < 20)
+            {
+                Direction = Vector2.Zero;
+            }
+            else
+            {
+                if (GlobalPosition.DistanceTo(_Player.GlobalPosition) < 1)
+                {
+                    Direction = Vector2.Zero;
+                }
+                else
+                {
+                    Direction = (Solt.GlobalPosition - GlobalPosition).Normalized();
+                }
+
+            }
+        }
+        StateMachineUpdate(delta);
+    }
+
+    private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction, DamageReceiver.HitType hitType)
     {
         Direction = direction;
         SwitchState((int)State.Hurt);
         Health = Mathf.Clamp(Health - damage, 0, MaxHealth);
         if (Health <= 0)
         {
+            _Player.FreeSolt(this);
             QueueFree();
         }
     }
@@ -45,7 +73,7 @@ public partial class Enemy : Character
     {
         if (area is DamageReceiver a)
         {
-            if (AttackRange((a.Owner as Node2D).GlobalPosition))
+            if (AttackRange((a.Owner as Node2D).Position))
             {
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
 
@@ -53,17 +81,6 @@ public partial class Enemy : Character
             }
         }
 
-    }
-
-
-
-    public override void _PhysicsProcess(double delta)
-    {
-        if (StateID != (int)State.Hurt)
-        {
-            Direction = (_Player.Position - Position).Normalized();
-        }
-        StateMachineUpdate(delta);
     }
 
     private partial class StateIdle : Node, IState
@@ -79,6 +96,9 @@ public partial class Enemy : Character
         {
             Character.Direction = Vector2.Zero;
             Character.AnimationPlayer.Play("Idle");
+
+            Character.Solt ??= Character._Player.ReserveSlot(Character);
+
             return true;
         }
 
@@ -134,6 +154,10 @@ public partial class Enemy : Character
             {
                 return (int)State.Idle;
             }
+            if (Character.AttackRange(Character._Player.Position))
+            {
+                // return (int)State.Attack;
+            }
 
             return GetId;
         }
@@ -157,6 +181,30 @@ public partial class Enemy : Character
         public int Update(double delta)
         {
             Character.MoveAndSlide();
+            return Exit();
+        }
+        public int Exit()
+        {
+            return GetId;
+        }
+    }
+    private partial class StateAttack : Node, IState
+    {
+        Enemy Character;
+        public int GetId { get; } = (int)State.Attack;
+        public StateAttack(Enemy character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.AnimationPlayer.Play("Punch");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
             return Exit();
         }
         public int Exit()

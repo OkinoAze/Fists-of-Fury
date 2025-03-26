@@ -55,7 +55,7 @@ public partial class Character : CharacterBody2D
 	}
 	public bool AttackRange(Vector2 position)
 	{
-		if (position.Y > GlobalPosition.Y - _AttackRange && position.Y < GlobalPosition.Y + _AttackRange)
+		if (position.Y > Position.Y - _AttackRange && position.Y < Position.Y + _AttackRange)
 		{
 			return true;
 		}

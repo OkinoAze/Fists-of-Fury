@@ -1,8 +1,12 @@
 using Godot;
 using System;
+using Godot.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public partial class Player : Character
 {
+    List<EnemySolt> EnemySolts = [];
     enum State
     {
         Idle,
@@ -19,11 +23,17 @@ public partial class Player : Character
     public override void _Ready()
     {
         States = new IState[Enum.GetNames(typeof(State)).Length];
+        var solts = GetNodeOrNull("EnemySlots")?.GetChildren();
+        foreach (var item in solts)
+        {
+            EnemySolts.Add((EnemySolt)item);
+        }
 
         AccessingResources();
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
-        GetGravity();
+
+
         _ = new StateIdle(this);
         _ = new StateWalk(this);
         _ = new StateAttack(this);
@@ -34,7 +44,14 @@ public partial class Player : Character
 
     }
 
-    private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction)
+    public override void _PhysicsProcess(double delta)
+    {
+
+        Direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+        StateMachineUpdate(delta);
+
+    }
+    private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction, DamageReceiver.HitType hitType)
     {
         Health = Mathf.Clamp(Health - damage, 0, MaxHealth);
         if (Health <= 0)
@@ -43,12 +60,31 @@ public partial class Player : Character
         }
     }
 
+    public EnemySolt ReserveSlot(Enemy enemy)
+    {
+        var availableSlots = EnemySolts.Where(x => x.IsFree());
+        if (availableSlots.Count() == 0)
+        {
+            return null;
+        }
+        var solt = availableSlots.OrderBy(x => x.GlobalPosition.DistanceTo(enemy.GlobalPosition)).First();
+        solt.Occupy(enemy);
+        return solt;
+    }
+    public void FreeSolt(Enemy enemy)
+    {
+        var targetSlots = EnemySolts.Where(x => x.Occupant == enemy);
+        if (targetSlots.Count() == 1)
+        {
+            targetSlots.First().FreeUp();
+        }
+    }
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
         if (area is DamageReceiver a)
         {
-            if (AttackRange((a.Owner as Node2D).GlobalPosition))
+            if (AttackRange((a.Owner as Node2D).Position))
             {
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
 
@@ -57,16 +93,6 @@ public partial class Player : Character
         }
 
     }
-
-
-    public override void _PhysicsProcess(double delta)
-    {
-
-        Direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
-        StateMachineUpdate(delta);
-
-    }
-
     private partial class StateIdle : Node, IState
     {
         Player Character;
