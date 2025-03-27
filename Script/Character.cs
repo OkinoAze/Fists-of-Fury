@@ -18,7 +18,7 @@ public partial class Character : CharacterBody2D
 	public float Height = 0;
 	public float Gravity = 320;
 	public const float _AttackRange = 5;
-	public const float Repel = 50;
+	public float Repel = 50;
 	public Vector2 Direction = Vector2.Zero;
 
 	public Sprite2D CharacterSprite;
@@ -101,6 +101,7 @@ public partial class Character : CharacterBody2D
 		}
 
 	}
+
 	public partial class StateDefault : Node, IState
 	{
 		Character Character;

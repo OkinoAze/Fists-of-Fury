@@ -14,15 +14,14 @@ public partial class Barrel : StaticBody2D
     Sprite2D Sprite;
     DamageReceiver DamageReceiver;
     bool Destroyed = false;
-    Player _Player;
 
     public override void _Ready()
     {
         Sprite = GetNode<Sprite2D>("Sprite2D");
-        _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
         DamageReceiver = GetNode<DamageReceiver>("DamageReceiver");
         DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
     }
+
     public override void _Process(double delta)
     {
         if (Destroyed)
@@ -42,16 +41,16 @@ public partial class Barrel : StaticBody2D
             Position += Velocity * (float)delta;
         }
     }
-    private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction)
+    private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
     {
-        Health -= damage;
+        Health -= e.Damage;
         if (Health <= 0)
         {
             Destroyed = true;
             Sprite.Frame = 1;
-            Sprite.FlipH = direction.X < 0;
+            Sprite.FlipH = e.Direction.X < 0;
             HeightSpeed = Speed * 3;
-            Velocity = direction.Normalized() * Speed;
+            Velocity = e.Direction.Normalized() * Speed;
         }
     }
 

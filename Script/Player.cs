@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using Godot.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,6 +16,8 @@ public partial class Player : Character
         Skill,
         JumpKick,
         Hurt,
+        KnockDown,
+        CrouchDown,
 
     }
 
@@ -44,22 +45,15 @@ public partial class Player : Character
 
     }
 
+
+
     public override void _PhysicsProcess(double delta)
     {
 
         Direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
         StateMachineUpdate(delta);
-
+        var a = new List<int> { 1, 2, 3 }.Any(x => x == 1);
     }
-    private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction, DamageReceiver.HitType hitType)
-    {
-        Health = Mathf.Clamp(Health - damage, 0, MaxHealth);
-        if (Health <= 0)
-        {
-
-        }
-    }
-
     public EnemySolt ReserveSlot(Enemy enemy)
     {
         var availableSlots = EnemySolts.Where(x => x.IsFree());
@@ -79,6 +73,15 @@ public partial class Player : Character
             targetSlots.First().FreeUp();
         }
     }
+    private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
+    {
+        Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
+        if (e.Type == DamageReceiver.HitType.knockDown || Health <= 0)
+        {
+            SwitchState((int)State.KnockDown);
+        }
+    }
+
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
@@ -87,8 +90,15 @@ public partial class Player : Character
             if (AttackRange((a.Owner as Node2D).Position))
             {
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
-
-                a.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage, direction);
+                DamageReceiver.DamageReceivedEventArgs e;
+                if (StateID == (int)State.JumpKick)
+                {
+                    e = new(direction, 1, 80, 0, DamageReceiver.HitType.knockDown);
+                    a.DamageReceived(this, e);
+                    return;
+                }
+                e = new(direction);
+                a.DamageReceived(this, e);
             }
         }
 
@@ -392,6 +402,46 @@ public partial class Player : Character
         }
         public int Exit()
         {
+            return GetId;
+        }
+    }
+    public void knockDownEnd()
+    {
+        if (Health <= 0)
+        {
+            //TODO 角色死亡后续
+        }
+        else
+        {
+            SwitchState((int)State.Idle);
+        }
+    }
+    private partial class StateKnockDown : Node, IState
+    {
+        Player Character;
+        public int GetId { get; } = (int)State.KnockDown;
+        public StateKnockDown(Player character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.Direction = Vector2.Zero;
+            Character.AnimationPlayer.Play("KnockDown");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+            return Exit();
+        }
+        public int Exit()
+        {
+            if (Input.IsActionPressed("jump"))
+            {
+                //TODO 切换到蹲伏状态
+            }
             return GetId;
         }
     }

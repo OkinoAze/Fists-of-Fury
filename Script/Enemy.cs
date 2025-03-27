@@ -12,6 +12,11 @@ public partial class Enemy : Character
         Attack,
         Skill,
         Hurt,
+        CrouchDown,
+        KnockDown,
+        KnockFly,
+        KnockFall,
+
     }
     public override void _Ready()
     {
@@ -31,6 +36,9 @@ public partial class Enemy : Character
         _ = new StateAttack(this);
 
     }
+
+
+
 
     public override void _PhysicsProcess(double delta)
     {
@@ -56,19 +64,20 @@ public partial class Enemy : Character
         StateMachineUpdate(delta);
     }
 
-    private void OnDamageReceiver_DamageReceived(int damage, Vector2 direction, DamageReceiver.HitType hitType)
+
+
+    private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
     {
-        Direction = direction;
+        Direction = e.Direction;
+        Repel = e.Repel;
         SwitchState((int)State.Hurt);
-        Health = Mathf.Clamp(Health - damage, 0, MaxHealth);
+        Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
         if (Health <= 0)
         {
             _Player.FreeSolt(this);
             QueueFree();
         }
     }
-
-
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
         if (area is DamageReceiver a)
@@ -76,8 +85,8 @@ public partial class Enemy : Character
             if (AttackRange((a.Owner as Node2D).Position))
             {
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
-
-                a.EmitSignal(DamageReceiver.SignalName.DamageReceived, Damage, direction);
+                DamageReceiver.DamageReceivedEventArgs e = new(direction);
+                a.DamageReceived(this, e);
             }
         }
 
@@ -96,14 +105,12 @@ public partial class Enemy : Character
         {
             Character.Direction = Vector2.Zero;
             Character.AnimationPlayer.Play("Idle");
-
-            Character.Solt ??= Character._Player.ReserveSlot(Character);
-
             return true;
         }
 
         public int Update(double delta)
         {
+            Character.Solt ??= Character._Player.ReserveSlot(Character);
             return Exit();
         }
         public int Exit()
@@ -148,6 +155,7 @@ public partial class Enemy : Character
 
             return Exit();
         }
+
         public int Exit()
         {
             if (Character.Direction == Vector2.Zero)
@@ -174,7 +182,7 @@ public partial class Enemy : Character
         public bool Enter()
         {
             Character.AnimationPlayer.Play("Hurt");
-            Character.Velocity = Character.Direction * Repel;
+            Character.Velocity = Character.Direction * Character.Repel;
             return true;
         }
 
@@ -212,4 +220,106 @@ public partial class Enemy : Character
             return GetId;
         }
     }
+    private partial class StateKnockDown : Node, IState
+    {
+        Enemy Character;
+        public int GetId { get; } = (int)State.KnockDown;
+        public StateKnockDown(Enemy character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.AnimationPlayer.Play("KnockDown");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            return Exit();
+        }
+        public int Exit()
+        {
+            return GetId;
+        }
+    }
+    private partial class StateCrouchDown : Node, IState
+    {
+        Enemy Character;
+        public int GetId { get; } = (int)State.CrouchDown;
+        public StateCrouchDown(Enemy character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.AnimationPlayer.Play("CrouchDown");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            return Exit();
+        }
+        public int Exit()
+        {
+            return GetId;
+        }
+    }
+    private partial class StateKnockFly : Node, IState
+    {
+        Enemy Character;
+        public int GetId { get; } = (int)State.KnockFly;
+        public StateKnockFly(Enemy character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.AnimationPlayer.Play("KnockFly");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            return Exit();
+        }
+        public int Exit()
+        {
+
+            return GetId;
+        }
+    }
+    private partial class StateKnockFall : Node, IState
+    {
+        Enemy Character;
+        public int GetId { get; } = (int)State.KnockFall;
+        public StateKnockFall(Enemy character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.AnimationPlayer.Play("KnockFall");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+            return Exit();
+        }
+        public int Exit()
+        {
+
+            return GetId;
+        }
+    }
+
 }

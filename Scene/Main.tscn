@@ -41,20 +41,29 @@ shape = SubResource("RectangleShape2D_h175a")
 y_sort_enabled = true
 
 [node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
-position = Vector2(57, 57)
+position = Vector2(8, 45)
 
 [node name="Enemy2" parent="ActorContainer" instance=ExtResource("4_togfq")]
-position = Vector2(9, 36)
+position = Vector2(38, 36)
+
+[node name="Enemy3" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(26, 61)
+
+[node name="Enemy4" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(58, 53)
+
+[node name="Enemy5" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(96, 46)
 
 [node name="Player" parent="ActorContainer" instance=ExtResource("1_xhtwi")]
 position = Vector2(36, 52)
 motion_mode = 0
 
 [node name="Barrel" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(64, 38)
+position = Vector2(59, 40)
 
 [node name="Barrel2" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(80, 47)
+position = Vector2(73, 57)
 
 [node name="Barrel3" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(102, 57)
+position = Vector2(138, 57)
