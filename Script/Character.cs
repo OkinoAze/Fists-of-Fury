@@ -18,7 +18,7 @@ public partial class Character : CharacterBody2D
 	public float Height = 0;
 	public float Gravity = 320;
 	public const float _AttackRange = 5;
-	public float Repel = 50;
+	public float Repel = 0;
 	public Vector2 Direction = Vector2.Zero;
 
 	public Sprite2D CharacterSprite;
@@ -30,6 +30,7 @@ public partial class Character : CharacterBody2D
 	public int StateID = 0;
 	public bool EnterEnd = false;
 	public IState[] States = new IState[1];
+	public int[] InvincibleStates;
 
 	public override void _Ready()
 	{

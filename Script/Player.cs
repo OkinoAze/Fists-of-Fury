@@ -5,6 +5,10 @@ using System.Linq;
 
 public partial class Player : Character
 {
+    public int AttackID = 0;
+
+    public string[] AttackAnimationGroup = ["Punch", "Punch2", "Kick", "Kick2"];
+
     List<EnemySolt> EnemySolts = [];
     enum State
     {
@@ -12,12 +16,13 @@ public partial class Player : Character
         Walk,
         Attack,
         Jump,
-        Fall,
-        Skill,
         JumpKick,
+        Skill,
         Hurt,
-        KnockDown,
         CrouchDown,
+        KnockFly,
+        KnockFall,
+        KnockDown,
 
     }
 
@@ -40,12 +45,12 @@ public partial class Player : Character
         _ = new StateAttack(this);
         _ = new StateSkill(this);
         _ = new StateJump(this);
-        _ = new StateFall(this);
         _ = new StateJumpKick(this);
+        _ = new StateHurt(this);
+
+        _ = new StateKnockDown(this);
 
     }
-
-
 
     public override void _PhysicsProcess(double delta)
     {
@@ -54,6 +59,44 @@ public partial class Player : Character
         StateMachineUpdate(delta);
         var a = new List<int> { 1, 2, 3 }.Any(x => x == 1);
     }
+
+    private void OnDamageEmitter_AreaEntered(Area2D area)
+    {
+        //TODO 攻击切换动画
+        if (area is DamageReceiver a)
+        {
+            if (AttackRange((a.Owner as Node2D).Position))
+            {
+                AttackID++;
+                if (AttackID >= AttackAnimationGroup.Length)
+                {
+                    AttackID = 0;
+                }
+                Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
+                DamageReceiver.DamageReceivedEventArgs e;
+                if (StateID == (int)State.JumpKick)
+                {
+                    e = new(direction, 1, 100, 100, DamageReceiver.HitType.knockDown);
+                    a.DamageReceived(this, e);
+                    return;
+                }
+                e = new(direction);
+                a.DamageReceived(this, e);
+            }
+        }
+
+    }
+
+
+    private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
+    {
+        Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
+        if (e.Type == DamageReceiver.HitType.knockDown || Health <= 0)
+        {
+            SwitchState((int)State.KnockDown);
+        }
+    }
+
     public EnemySolt ReserveSlot(Enemy enemy)
     {
         var availableSlots = EnemySolts.Where(x => x.IsFree());
@@ -73,36 +116,7 @@ public partial class Player : Character
             targetSlots.First().FreeUp();
         }
     }
-    private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
-    {
-        Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
-        if (e.Type == DamageReceiver.HitType.knockDown || Health <= 0)
-        {
-            SwitchState((int)State.KnockDown);
-        }
-    }
 
-
-    private void OnDamageEmitter_AreaEntered(Area2D area)
-    {
-        if (area is DamageReceiver a)
-        {
-            if (AttackRange((a.Owner as Node2D).Position))
-            {
-                Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
-                DamageReceiver.DamageReceivedEventArgs e;
-                if (StateID == (int)State.JumpKick)
-                {
-                    e = new(direction, 1, 80, 0, DamageReceiver.HitType.knockDown);
-                    a.DamageReceived(this, e);
-                    return;
-                }
-                e = new(direction);
-                a.DamageReceived(this, e);
-            }
-        }
-
-    }
     private partial class StateIdle : Node, IState
     {
         Player Character;
@@ -115,7 +129,6 @@ public partial class Player : Character
         public bool Enter()
         {
             Character.Direction = Vector2.Zero;
-            Character.HeightSpeed = Character.JumpSpeed;
             Character.AnimationPlayer.Play("Idle");
             return true;
         }
@@ -156,7 +169,6 @@ public partial class Player : Character
         }
         public bool Enter()
         {
-            Character.HeightSpeed = Character.JumpSpeed;
             Character.AnimationPlayer.Play("Walk");
             return true;
         }
@@ -203,6 +215,7 @@ public partial class Player : Character
     public partial class StateAttack : Node, IState
     {
         Player Character;
+        int id = 0;
         public int GetId { get; } = (int)State.Attack;
         public StateAttack(Player character)
         {
@@ -212,7 +225,16 @@ public partial class Player : Character
         public bool Enter()
         {
             Character.Direction = Vector2.Zero;
-            Character.AnimationPlayer.Play("Punch");
+            if (Character.AttackID == id)
+            {
+                id = 0;
+                Character.AttackID = id;
+            }
+            else
+            {
+                id = Character.AttackID;
+            }
+            Character.AnimationPlayer.Play(Character.AttackAnimationGroup[id]);
             return true;
         }
 
@@ -250,7 +272,10 @@ public partial class Player : Character
         }
         public int Exit()
         {
-
+            if (true)
+            {
+                return (int)State.Idle;
+            }
             return GetId;
         }
     }
@@ -267,43 +292,7 @@ public partial class Player : Character
         public bool Enter()
         {
             Character.AnimationPlayer.Play("Jump");
-            return true;
-        }
-
-        public int Update(double delta)
-        {
-            Character.Height += Character.HeightSpeed * (float)delta;
-            Character.HeightSpeed -= Character.Gravity * (float)delta;
-            Character.CharacterSprite.Position = Vector2.Up * Character.Height;
-
-            Character.MoveAndSlide();
-            return Exit();
-        }
-        public int Exit()
-        {
-            if (Character.HeightSpeed <= 0)
-            {
-                return (int)State.Fall;
-            }
-            if (Input.IsActionJustPressed("attack"))
-            {
-                return (int)State.JumpKick;
-            }
-            return GetId;
-        }
-    }
-    public partial class StateFall : Node, IState
-    {
-        Player Character;
-        public int GetId { get; } = (int)State.Fall;
-        public StateFall(Player character)
-        {
-            Character = character;
-            character.States[GetId] = this;
-        }
-        public bool Enter()
-        {
-            Character.AnimationPlayer.Play("Jump");
+            Character.HeightSpeed = Character.JumpSpeed;
             return true;
         }
 
@@ -320,8 +309,8 @@ public partial class Player : Character
         {
             if (Character.Height <= 0)
             {
-                Character.Height = 0;
                 Character.CharacterSprite.Position = Vector2.Zero;
+                Character.Height = 0;
                 return (int)State.Idle;
             }
             if (Input.IsActionJustPressed("attack"))
@@ -332,18 +321,6 @@ public partial class Player : Character
         }
     }
 
-    public void JumpKickEnd()
-    {
-        if (HeightSpeed <= 0)
-        {
-            SwitchState((int)State.Fall);
-        }
-        else
-        {
-            SwitchState((int)State.Jump);
-        }
-
-    }
     public partial class StateJumpKick : Node, IState
     {
         Player Character;
