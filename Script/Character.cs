@@ -20,8 +20,9 @@ public partial class Character : CharacterBody2D
 	public const float _AttackRange = 5;
 	public float Repel = 0;
 	public Vector2 Direction = Vector2.Zero;
-
+	public int AttackID = 0;
 	public Sprite2D CharacterSprite;
+	public Sprite2D WeaponSprite;
 	public Sprite2D ShadowSprite;
 	public AnimationPlayer AnimationPlayer;
 	public Area2D _DamageEmitter;
@@ -49,6 +50,7 @@ public partial class Character : CharacterBody2D
 	{
 		CharacterSprite = GetNode<Sprite2D>("CharacterSprite");
 		ShadowSprite = GetNode<Sprite2D>("ShadowSprite");
+		WeaponSprite = GetNode<Sprite2D>("WeaponSprite");
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		_DamageEmitter = CharacterSprite.GetNode<Area2D>("DamageEmitter");
 		_DamageReceiver = CharacterSprite.GetNode<DamageReceiver>("DamageReceiver");

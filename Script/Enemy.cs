@@ -4,7 +4,10 @@ using System.Linq;
 public partial class Enemy : Character
 {
     Player _Player;
+    Timer AttackTimer;
     EnemySolt Solt = null;
+    public string[] AttackAnimationGroup = ["Punch", "Punch2"];
+
     enum State
     {
         Idle,
@@ -21,12 +24,15 @@ public partial class Enemy : Character
     public override void _Ready()
     {
         _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
+        AttackTimer = GetNode<Timer>("AttackTimer");
+
+        AttackTimer.WaitTime = GD.RandRange(2f, 5f);
         States = new IState[Enum.GetNames(typeof(State)).Length];
 
         InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
 
         MaxHealth = 10;
-        Health = 5;
+        Health = 10;
         AccessingResources();
 
 
@@ -57,6 +63,11 @@ public partial class Enemy : Character
         {
             if (AttackRange((a.Owner as Node2D).Position))
             {
+                AttackID++;
+                if (AttackID >= AttackAnimationGroup.Length)
+                {
+                    AttackID = 0;
+                }
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
                 DamageReceiver.DamageReceivedEventArgs e = new(direction);
                 a.DamageReceived(this, e);
@@ -110,6 +121,10 @@ public partial class Enemy : Character
         }
         public int Exit()
         {
+            if (Character.Position.DistanceTo(Character._Player.Position) < 15 && Character.AttackTimer.TimeLeft == 0 && Character.AttackRange(Character._Player.Position))
+            {
+                return (int)State.Attack;
+            }
             if (Character.Direction != Vector2.Zero)
             {
                 return (int)State.Walk;
@@ -143,11 +158,14 @@ public partial class Enemy : Character
             if (Character.Direction.X < 0)
             {
                 Character.CharacterSprite.FlipH = true;
+                Character.WeaponSprite.FlipH = true;
+
                 Character._DamageEmitter.Scale = new Vector2(-1, 1);
             }
             else if (Character.Direction.X > 0)
             {
                 Character.CharacterSprite.FlipH = false;
+                Character.WeaponSprite.FlipH = false;
                 Character._DamageEmitter.Scale = new Vector2(1, 1);
             }
 
@@ -159,6 +177,10 @@ public partial class Enemy : Character
 
         public int Exit()
         {
+            if (Character.Position.DistanceTo(Character._Player.Position) < 15 && Character.AttackTimer.TimeLeft == 0 && Character.AttackRange(Character._Player.Position))
+            {
+                return (int)State.Attack;
+            }
             if (Character.GlobalPosition.DistanceTo(Character.Solt.GlobalPosition) < 2)
             {
                 if (Character.Position.X < Character._Player.Position.X)
@@ -190,6 +212,8 @@ public partial class Enemy : Character
     private partial class StateAttack : Node, IState
     {
         Enemy Character;
+        int id;
+
         public int GetId { get; } = (int)State.Attack;
         public StateAttack(Enemy character)
         {
@@ -198,7 +222,17 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-            Character.AnimationPlayer.Play("Punch");
+            Character.AttackTimer.Start();
+            if (Character.AttackID == id)
+            {
+                id = 0;
+                Character.AttackID = id;
+            }
+            else
+            {
+                id = Character.AttackID;
+            }
+            Character.AnimationPlayer.Play(Character.AttackAnimationGroup[id]);
             return true;
         }
 
@@ -214,7 +248,7 @@ public partial class Enemy : Character
 
     public void HurtEnd()
     {
-        if (Health <= 0)
+        if (Health <= 0 || Height > 0)
         {
             SwitchState((int)State.KnockFall);
         }
@@ -234,6 +268,8 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
+            Character._DamageEmitter.Monitoring = false;
+            Character.AttackID = 0;
             Character.AnimationPlayer.Play("Hurt");
             Character.Velocity = Character.Direction * Character.Repel;
 
@@ -242,12 +278,7 @@ public partial class Enemy : Character
 
         public int Update(double delta)
         {
-            Character.CharacterSprite.Position = Vector2.Up * Character.Height;
-            if (Character.Height <= 0)
-            {
-                Character.CharacterSprite.Position = Vector2.Zero;
-                Character.Height = 0;
-            }
+
             Character.MoveAndSlide();
             return Exit();
         }
