@@ -32,7 +32,7 @@ public partial class Player : Character
 
         InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
         MaxHealth = 10;
-        Health = 5;
+        Health = 10;
 
         foreach (var item in solts)
         {
@@ -71,7 +71,6 @@ public partial class Player : Character
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
-        //TODO 攻击切换动画
         if (area is DamageReceiver a)
         {
             if (AttackRange((a.Owner as Node2D).Position))
@@ -104,7 +103,6 @@ public partial class Player : Character
 
     private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
     {
-        //TODO 受伤动画
         if (!InvincibleStates.Contains(StateID))
         {
             Direction = e.Direction;

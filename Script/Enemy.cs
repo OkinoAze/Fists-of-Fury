@@ -26,13 +26,13 @@ public partial class Enemy : Character
         _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
         AttackTimer = GetNode<Timer>("AttackTimer");
 
-        AttackTimer.WaitTime = GD.RandRange(2f, 5f);
+        AttackTimer.WaitTime = GD.RandRange(3f, 6f);
         States = new IState[Enum.GetNames(typeof(State)).Length];
 
         InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
 
         MaxHealth = 10;
-        Health = 10;
+        Health = 5;
         AccessingResources();
 
 
@@ -77,7 +77,6 @@ public partial class Enemy : Character
     }
     private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
     {
-        //TODO 切换敌人的受伤方式
         if (!InvincibleStates.Contains(StateID))
         {
             Direction = e.Direction;

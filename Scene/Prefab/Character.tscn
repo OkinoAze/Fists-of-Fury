@@ -18,9 +18,9 @@ texture = ExtResource("2_ok56b")
 
 [node name="DamageReceiver" parent="CharacterSprite" instance=ExtResource("4_chqrr")]
 
-[node name="CollisionShape" type="CollisionShape2D" parent="."]
-
 [node name="WeaponSprite" type="Sprite2D" parent="."]
+
+[node name="CollisionShape" type="CollisionShape2D" parent="."]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 callback_mode_process = 0

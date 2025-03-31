@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://bacl472jw6i6x"]
+[gd_scene load_steps=8 format=3 uid="uid://bacl472jw6i6x"]
 
 [ext_resource type="Script" uid="uid://cuvv6fyqwfmts" path="res://Script/Main.cs" id="1_djkur"]
 [ext_resource type="PackedScene" uid="uid://ylrqp34rxwb0" path="res://Scene/Prefab/Player.tscn" id="1_xhtwi"]
 [ext_resource type="PackedScene" uid="uid://xsms1sdmxewg" path="res://Scene/Stage.tscn" id="2_djkur"]
+[ext_resource type="Script" uid="uid://btn0avr1vn85k" path="res://Script/ActorContainer.cs" id="3_aan6j"]
 [ext_resource type="PackedScene" uid="uid://d2tpt0iu7ow7h" path="res://Scene/Prefab/Barrel.tscn" id="4_h175a"]
 [ext_resource type="PackedScene" uid="uid://nneqhin7yi3j" path="res://Scene/Prefab/Enemy.tscn" id="4_togfq"]
 
@@ -19,6 +20,8 @@ Camera = NodePath("Camera")
 [node name="Camera" type="Camera2D" parent="."]
 position = Vector2(50, 32)
 process_callback = 0
+position_smoothing_enabled = true
+position_smoothing_speed = 4.0
 
 [node name="InvisibleWalls" type="Node2D" parent="Camera"]
 position = Vector2(-50, -32)
@@ -39,6 +42,7 @@ shape = SubResource("RectangleShape2D_h175a")
 
 [node name="ActorContainer" type="Node2D" parent="."]
 y_sort_enabled = true
+script = ExtResource("3_aan6j")
 
 [node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
 position = Vector2(8, 45)

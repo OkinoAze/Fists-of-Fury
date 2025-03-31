@@ -1,6 +1,4 @@
 using Godot;
-using System;
-using System.Dynamic;
 
 public partial class Character : CharacterBody2D
 {
@@ -31,6 +29,7 @@ public partial class Character : CharacterBody2D
 	public int StateID = 0;
 	public bool EnterEnd = false;
 	public IState[] States = new IState[1];
+	public Prop Weapon;
 	public int[] InvincibleStates;
 
 	public override void _Ready()
@@ -63,6 +62,10 @@ public partial class Character : CharacterBody2D
 			return true;
 		}
 		return false;
+	}
+	public virtual void PickUpProp(Prop item)
+	{
+
 	}
 	public void StateMachineUpdate(double delta)
 	{

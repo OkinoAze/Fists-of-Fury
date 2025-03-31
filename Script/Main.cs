@@ -4,15 +4,16 @@ using System;
 public partial class Main : Node
 {
     [Export]
-    CharacterBody2D Player;
+    public Player _Player;
     [Export]
-    Camera2D Camera;
+    public Camera2D Camera;
+
 
     public override void _PhysicsProcess(double delta)
     {
-        if (Player.Position.X > Camera.Position.X)
+        if (_Player.Position.X > Camera.Position.X)
         {
-            Camera.Position = new Vector2(Player.Position.X, Camera.Position.Y);
+            Camera.Position = new Vector2(_Player.Position.X, Camera.Position.Y);
 
         }
         if (Input.IsActionPressed("ui_filedialog_refresh"))
