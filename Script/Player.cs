@@ -22,6 +22,8 @@ public partial class Player : Character
         KnockFly,
         KnockFall,
         KnockDown,
+        MeleeWeaponAttack,
+        RangedWeaponAttack,
 
     }
 
@@ -80,19 +82,28 @@ public partial class Player : Character
                 DamageReceiver.DamageReceivedEventArgs e;
                 if (StateID == (int)State.JumpKick)
                 {
+                    PlayAudio("hit-2");
                     e = new(direction, 1, 100, 100, DamageReceiver.HitType.knockDown);
                     a.DamageReceived(this, e);
                     return;
                 }
-                AttackID++;
+                if (Weapon == null)
+                {
+                    AttackID++;
+                }
+                else
+                {
+                    AttackID = 0;
+                }
                 if (AttackID >= AttackAnimationGroup.Length)
                 {
+                    PlayAudio("hit-2");
                     AttackID = 0;
                     e = new(direction, 1, 100, 100, DamageReceiver.HitType.knockDown);
                     a.DamageReceived(this, e);
                     return;
                 }
-
+                PlayAudio("hit-1");
                 e = new(direction);
                 a.DamageReceived(this, e);
             }
@@ -165,7 +176,18 @@ public partial class Player : Character
         {
             if (Input.IsActionJustPressed("attack"))
             {
-                return (int)State.Attack;
+                if (Character.Weapon == null)
+                {
+                    return (int)State.Attack;
+                }
+                else if (Character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                {
+                    return (int)State.MeleeWeaponAttack;
+                }
+                else if (Character.Weapon.Propertie == Prop.Properties.RangedWeapon)
+                {
+                    return (int)State.RangedWeaponAttack;
+                }
             }
             if (Input.IsActionJustPressed("skill"))
             {
@@ -202,11 +224,13 @@ public partial class Player : Character
             if (Character.Direction.X < 0)
             {
                 Character.CharacterSprite.FlipH = true;
+                Character.WeaponSprite.FlipH = true;
                 Character._DamageEmitter.Scale = new Vector2(-1, 1);
             }
             else if (Character.Direction.X > 0)
             {
                 Character.CharacterSprite.FlipH = false;
+                Character.WeaponSprite.FlipH = false;
                 Character._DamageEmitter.Scale = new Vector2(1, 1);
             }
 
@@ -249,14 +273,18 @@ public partial class Player : Character
         public bool Enter()
         {
             Character.Direction = Vector2.Zero;
-            if (Character.AttackID == id)
+
+            if (true)
             {
-                id = 0;
-                Character.AttackID = id;
-            }
-            else
-            {
-                id = Character.AttackID;
+                if (Character.AttackID == id)
+                {
+                    id = 0;
+                    Character.AttackID = id;
+                }
+                else
+                {
+                    id = Character.AttackID;
+                }
             }
             Character.AnimationPlayer.Play(Character.AttackAnimationGroup[id]);
             return true;
@@ -552,6 +580,57 @@ public partial class Player : Character
         public int Update(double delta)
         {
 
+            return Exit();
+        }
+        public int Exit()
+        {
+            return GetId;
+        }
+    }
+    private partial class StateMeleeWeaponAttack : Node, IState
+    {
+        Player Character;
+        public int GetId { get; } = (int)State.Idle;
+        public StateMeleeWeaponAttack(Player character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.Direction = Vector2.Zero;
+            Character.AnimationPlayer.Play("KinfeAttack");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+            return Exit();
+        }
+        public int Exit()
+        {
+
+            return GetId;
+        }
+    }
+    private partial class StateRangedWeaponAttack : Node, IState
+    {
+        Player Character;
+        public int GetId { get; } = (int)State.Idle;
+        public StateRangedWeaponAttack(Player character)
+        {
+            Character = character;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            Character.Direction = Vector2.Zero;
+            Character.AnimationPlayer.Play("GunShoot");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
             return Exit();
         }
         public int Exit()

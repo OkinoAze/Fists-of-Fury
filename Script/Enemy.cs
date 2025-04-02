@@ -63,6 +63,7 @@ public partial class Enemy : Character
         {
             if (AttackRange((a.Owner as Node2D).Position))
             {
+                PlayAudio("hit-1");
                 AttackID++;
                 if (AttackID >= AttackAnimationGroup.Length)
                 {

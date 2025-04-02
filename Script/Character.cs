@@ -26,6 +26,8 @@ public partial class Character : CharacterBody2D
 	public Area2D _DamageEmitter;
 	public DamageReceiver _DamageReceiver;
 
+	public AudioStreamPlayer AudioPlayer;
+
 	public int StateID = 0;
 	public bool EnterEnd = false;
 	public IState[] States = new IState[1];
@@ -53,6 +55,7 @@ public partial class Character : CharacterBody2D
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		_DamageEmitter = CharacterSprite.GetNode<Area2D>("DamageEmitter");
 		_DamageReceiver = CharacterSprite.GetNode<DamageReceiver>("DamageReceiver");
+		AudioPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
 
 	}
 	public bool AttackRange(Vector2 position)
@@ -66,6 +69,11 @@ public partial class Character : CharacterBody2D
 	public virtual void PickUpProp(Prop item)
 	{
 
+	}
+	public void PlayAudio(string name)
+	{
+		AudioPlayer.Stream = ResourceLoader.Load<AudioStreamWav>("res://Music/SFX/" + name + ".wav");
+		AudioPlayer.Play();
 	}
 	public void StateMachineUpdate(double delta)
 	{

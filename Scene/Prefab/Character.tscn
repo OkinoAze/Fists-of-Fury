@@ -25,5 +25,7 @@ texture = ExtResource("2_ok56b")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 callback_mode_process = 0
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
 [editable path="CharacterSprite/DamageEmitter"]
 [editable path="CharacterSprite/DamageReceiver"]

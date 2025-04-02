@@ -10,9 +10,9 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h175a"]
 size = Vector2(5, 66)
 
-[node name="Main" type="Node" node_paths=PackedStringArray("Player", "Camera")]
+[node name="Main" type="Node" node_paths=PackedStringArray("_Player", "Camera")]
 script = ExtResource("1_djkur")
-Player = NodePath("ActorContainer/Player")
+_Player = NodePath("ActorContainer/Player")
 Camera = NodePath("Camera")
 
 [node name="Stage" parent="." instance=ExtResource("2_djkur")]

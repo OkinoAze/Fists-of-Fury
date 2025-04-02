@@ -628,7 +628,7 @@ collision_layer = 32
 position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_kf0g2")
 
-[node name="CollisionShape" parent="." index="2"]
+[node name="CollisionShape" parent="." index="3"]
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_oa1iy")
 

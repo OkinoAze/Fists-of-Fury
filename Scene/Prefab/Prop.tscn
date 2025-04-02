@@ -1,7 +1,9 @@
 [gd_scene format=3 uid="uid://duogckgw1pxm0"]
 
-[node name="Item" type="Sprite2D"]
+[node name="Prop" type="Sprite2D"]
 
 [node name="PickupRange" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PickupRange"]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
