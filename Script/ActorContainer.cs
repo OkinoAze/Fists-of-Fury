@@ -25,5 +25,12 @@ public partial class ActorContainer : Node2D
             enemy.PickUpProp(item);
         }
     }
+    public void GenerateBullet(Node2D node)
+    {
+        var path = "res://Scene/Prefab/Bullet.tscn";
+        PackedScene bulletScene = ResourceLoader.Load<PackedScene>(path);
+        var bullet = bulletScene.Instantiate<Bullet>();
+        AddChild(bullet);
+    }
 
 }

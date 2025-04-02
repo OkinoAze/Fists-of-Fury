@@ -4,8 +4,9 @@
 
 [resource]
 script = ExtResource("1_mwvdy")
-ID = 0
+ID = 1
 Propertie = 0
-RestoreHelath = 0
+RestoreHelath = 2
 Damage = 0
 Durability = 0
+ShootPosition = Vector2(0, 0)

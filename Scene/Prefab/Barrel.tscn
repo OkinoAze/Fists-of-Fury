@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://d2tpt0iu7ow7h"]
+[gd_scene load_steps=7 format=3 uid="uid://d2tpt0iu7ow7h"]
 
 [ext_resource type="Script" uid="uid://b0o1umbqcblsa" path="res://Script/Barrel.cs" id="1_acjb0"]
 [ext_resource type="Texture2D" uid="uid://fkoddoxehocp" path="res://Art/Props/barrel.png" id="1_u30hi"]
+[ext_resource type="Texture2D" uid="uid://dvrrqsggg1kiy" path="res://Art/Characters/shadow.png" id="2_0rxdo"]
 [ext_resource type="PackedScene" uid="uid://wahn30yxqe0y" path="res://Scene/Prefab/DamageReceiver.tscn" id="2_bbkcx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bbkcx"]
@@ -15,6 +16,9 @@ size = Vector2(10, 4)
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("1_acjb0")
+
+[node name="ShadowSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_0rxdo")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_u30hi")
@@ -32,5 +36,7 @@ collision_layer = 128
 [node name="CollisionShape2D" parent="DamageReceiver" index="0"]
 position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_bbkcx")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 
 [editable path="DamageReceiver"]

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bkpcoue6obung"]
+
+[ext_resource type="Script" uid="uid://bsfh4c388b0ni" path="res://Script/Prop.cs" id="1_cc1fv"]
+
+[resource]
+script = ExtResource("1_cc1fv")
+ID = 2
+Propertie = 1
+RestoreHelath = 0
+Damage = 2
+Durability = 0
+ShootPosition = Vector2(0, 0)

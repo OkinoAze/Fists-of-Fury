@@ -1,0 +1,35 @@
+[gd_scene load_steps=7 format=3 uid="uid://bl7bayipj3w2g"]
+
+[ext_resource type="Texture2D" uid="uid://b6u8qrmygda0t" path="res://Art/UI/1x1.png" id="1_4e88b"]
+[ext_resource type="Script" uid="uid://d08q1wrcyqr0m" path="res://Script/Bullet.cs" id="1_uy3ua"]
+[ext_resource type="Texture2D" uid="uid://c1f648xc6xb63" path="res://Art/Props/prop-shadow.png" id="2_3tycu"]
+[ext_resource type="PackedScene" uid="uid://ovdl0lg8ghmf" path="res://Scene/Prefab/DamageEmitter.tscn" id="2_uy3ua"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3tycu"]
+size = Vector2(7, 2)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5770a"]
+size = Vector2(7, 2)
+
+[node name="Bullet" type="StaticBody2D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_uy3ua")
+
+[node name="ShadowSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_3tycu")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(7, 2)
+texture = ExtResource("1_4e88b")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_3tycu")
+
+[node name="DamageEmitter" parent="." instance=ExtResource("2_uy3ua")]
+collision_mask = 240
+
+[node name="CollisionShape2D" parent="DamageEmitter" index="0"]
+shape = SubResource("RectangleShape2D_5770a")
+
+[editable path="DamageEmitter"]

@@ -36,6 +36,8 @@ public partial class Player : Character
         MaxHealth = 10;
         Health = 10;
 
+        AvatarName = "Player";
+
         foreach (var item in solts)
         {
             EnemySolts.Add((EnemySolt)item);
@@ -57,6 +59,9 @@ public partial class Player : Character
         _ = new StateKnockFall(this);
         _ = new StateKnockDown(this);
         _ = new StateCrouchDown(this);
+        _ = new StateMeleeWeaponAttack(this);
+        _ = new StateRangedWeaponAttack(this);
+
 
     }
 
@@ -80,30 +85,35 @@ public partial class Player : Character
 
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
                 DamageReceiver.DamageReceivedEventArgs e;
-                if (StateID == (int)State.JumpKick)
+                if (StateID == (int)State.JumpKick || AttackID == AttackAnimationGroup.Length - 1)
                 {
-                    PlayAudio("hit-2");
-                    e = new(direction, 1, 100, 100, DamageReceiver.HitType.knockDown);
+                    AttackID = 0;
+                    e = new(direction, 2, 100, 100, DamageReceiver.HitType.knockDown);
                     a.DamageReceived(this, e);
                     return;
                 }
                 if (Weapon == null)
                 {
                     AttackID++;
+                    if (AttackID >= AttackAnimationGroup.Length)
+                    {
+                        AttackID = 0;
+                    }
                 }
                 else
                 {
                     AttackID = 0;
+                    if (Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                    {
+                        e = new(direction, 3);
+                        a.DamageReceived(this, e);
+                        return;
+                    }
+                    else if (Weapon.Propertie == Prop.Properties.RangedWeapon)
+                    {
+                        return;
+                    }
                 }
-                if (AttackID >= AttackAnimationGroup.Length)
-                {
-                    PlayAudio("hit-2");
-                    AttackID = 0;
-                    e = new(direction, 1, 100, 100, DamageReceiver.HitType.knockDown);
-                    a.DamageReceived(this, e);
-                    return;
-                }
-                PlayAudio("hit-1");
                 e = new(direction);
                 a.DamageReceived(this, e);
             }
@@ -122,13 +132,21 @@ public partial class Player : Character
             if (e.Type == DamageReceiver.HitType.Normal)
             {
                 SwitchState((int)State.Hurt);
-
             }
             else if (e.Type == DamageReceiver.HitType.knockDown)
             {
                 SwitchState((int)State.KnockFly);
             }
             Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
+        }
+    }
+
+    new public void PickUpProp(Prop prop)
+    {
+        Health = Mathf.Clamp(Health + prop.RestoreHelath, 0, MaxHealth);
+        if (prop.Propertie == Prop.Properties.MeleeWeapon || prop.Propertie == Prop.Properties.RangedWeapon)
+        {
+            Weapon = prop;
         }
     }
 
@@ -154,17 +172,17 @@ public partial class Player : Character
 
     private partial class StateIdle : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.Idle;
-        public StateIdle(Player character)
+        public StateIdle(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.Direction = Vector2.Zero;
-            Character.AnimationPlayer.Play("Idle");
+            character.Direction = Vector2.Zero;
+            character.AnimationPlayer.Play("Idle");
             return true;
         }
 
@@ -176,15 +194,15 @@ public partial class Player : Character
         {
             if (Input.IsActionJustPressed("attack"))
             {
-                if (Character.Weapon == null)
+                if (character.Weapon == null)
                 {
                     return (int)State.Attack;
                 }
-                else if (Character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                else if (character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
                 {
                     return (int)State.MeleeWeaponAttack;
                 }
-                else if (Character.Weapon.Propertie == Prop.Properties.RangedWeapon)
+                else if (character.Weapon.Propertie == Prop.Properties.RangedWeapon)
                 {
                     return (int)State.RangedWeaponAttack;
                 }
@@ -193,14 +211,19 @@ public partial class Player : Character
             {
                 return (int)State.Skill;
             }
-            if (Input.IsActionJustPressed("jump"))
+            if (Input.IsActionJustPressed("jump") || character.Height > 0)
             {
-                if (Character.Weapon == null || Character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                if (character.Weapon == null || character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
                 {
                     return (int)State.Jump;
                 }
+                else
+                {
+                    character.Height = 0;
+                    character.CharacterSprite.Position = Vector2.Up * character.Height;
+                }
             }
-            if (Character.Direction != Vector2.Zero)
+            if (character.Direction != Vector2.Zero)
             {
                 return (int)State.Walk;
             }
@@ -209,36 +232,36 @@ public partial class Player : Character
     }
     private partial class StateWalk : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.Walk;
-        public StateWalk(Player character)
+        public StateWalk(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.AnimationPlayer.Play("Walk");
+            character.AnimationPlayer.Play("Walk");
             return true;
         }
 
         public int Update(double delta)
         {
-            if (Character.Direction.X < 0)
+            if (character.Direction.X < 0)
             {
-                Character.CharacterSprite.FlipH = true;
-                Character.WeaponSprite.FlipH = true;
-                Character._DamageEmitter.Scale = new Vector2(-1, 1);
+                character.CharacterSprite.FlipH = true;
+                character.WeaponSprite.FlipH = true;
+                character._DamageEmitter.Scale = new Vector2(-1, 1);
             }
-            else if (Character.Direction.X > 0)
+            else if (character.Direction.X > 0)
             {
-                Character.CharacterSprite.FlipH = false;
-                Character.WeaponSprite.FlipH = false;
-                Character._DamageEmitter.Scale = new Vector2(1, 1);
+                character.CharacterSprite.FlipH = false;
+                character.WeaponSprite.FlipH = false;
+                character._DamageEmitter.Scale = new Vector2(1, 1);
             }
 
-            Character.Velocity = Character.Direction * Character.MoveSpeed;
-            Character.MoveAndSlide();
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
 
             return Exit();
         }
@@ -246,15 +269,15 @@ public partial class Player : Character
         {
             if (Input.IsActionJustPressed("attack"))
             {
-                if (Character.Weapon == null)
+                if (character.Weapon == null)
                 {
                     return (int)State.Attack;
                 }
-                else if (Character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                else if (character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
                 {
                     return (int)State.MeleeWeaponAttack;
                 }
-                else if (Character.Weapon.Propertie == Prop.Properties.RangedWeapon)
+                else if (character.Weapon.Propertie == Prop.Properties.RangedWeapon)
                 {
                     return (int)State.RangedWeaponAttack;
                 }
@@ -265,12 +288,12 @@ public partial class Player : Character
             }
             if (Input.IsActionJustPressed("jump"))
             {
-                if (Character.Weapon == null || Character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                if (character.Weapon == null || character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
                 {
                     return (int)State.Jump;
                 }
             }
-            if (Character.Direction == Vector2.Zero)
+            if (character.Direction == Vector2.Zero)
             {
                 return (int)State.Idle;
             }
@@ -279,31 +302,31 @@ public partial class Player : Character
     }
     public partial class StateAttack : Node, IState
     {
-        Player Character;
+        Player character;
         int id = 0;
         public int GetId { get; } = (int)State.Attack;
-        public StateAttack(Player character)
+        public StateAttack(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.Direction = Vector2.Zero;
+            character.Direction = Vector2.Zero;
 
             if (true)
             {
-                if (Character.AttackID == id)
+                if (character.AttackID == id)
                 {
                     id = 0;
-                    Character.AttackID = id;
+                    character.AttackID = id;
                 }
                 else
                 {
-                    id = Character.AttackID;
+                    id = character.AttackID;
                 }
             }
-            Character.AnimationPlayer.Play(Character.AttackAnimationGroup[id]);
+            character.AnimationPlayer.Play(character.AttackAnimationGroup[id]);
             return true;
         }
 
@@ -319,17 +342,17 @@ public partial class Player : Character
     }
     private partial class StateSkill : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.Skill;
-        public StateSkill(Player character)
+        public StateSkill(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.Direction = Vector2.Zero;
-            Character.AnimationPlayer.Play("Idle");
+            character.Direction = Vector2.Zero;
+            character.AnimationPlayer.Play("Idle");
             return true;
         }
 
@@ -351,35 +374,35 @@ public partial class Player : Character
 
     public partial class StateJump : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.Jump;
-        public StateJump(Player character)
+        public StateJump(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.AnimationPlayer.Play("Jump");
-            Character.HeightSpeed = Character.JumpSpeed;
+            character.AnimationPlayer.Play("Jump");
+            character.HeightSpeed = character.JumpSpeed;
             return true;
         }
 
         public int Update(double delta)
         {
-            Character.Height += Character.HeightSpeed * (float)delta;
-            Character.HeightSpeed -= Character.Gravity * (float)delta;
-            Character.CharacterSprite.Position = Vector2.Up * Character.Height;
+            character.Height += character.HeightSpeed * (float)delta;
+            character.HeightSpeed -= Gravity * (float)delta;
+            character.CharacterSprite.Position = Vector2.Up * character.Height;
 
-            Character.MoveAndSlide();
+            character.MoveAndSlide();
             return Exit();
         }
         public int Exit()
         {
-            if (Character.Height <= 0)
+            if (character.Height <= 0)
             {
-                Character.CharacterSprite.Position = Vector2.Zero;
-                Character.Height = 0;
+                character.CharacterSprite.Position = Vector2.Zero;
+                character.Height = 0;
                 return (int)State.Idle;
             }
             if (Input.IsActionJustPressed("attack"))
@@ -392,35 +415,35 @@ public partial class Player : Character
 
     public partial class StateJumpKick : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.JumpKick;
-        public StateJumpKick(Player character)
+        public StateJumpKick(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.AnimationPlayer.Play("JumpKick");
+            character.AnimationPlayer.Play("JumpKick");
             return true;
         }
 
         public int Update(double delta)
         {
-            Character.Height += Character.HeightSpeed * (float)delta;
-            Character.HeightSpeed -= Character.Gravity * (float)delta;
-            Character.CharacterSprite.Position = Vector2.Up * Character.Height;
+            character.Height += character.HeightSpeed * (float)delta;
+            character.HeightSpeed -= Character.Gravity * (float)delta;
+            character.CharacterSprite.Position = Vector2.Up * character.Height;
 
-            Character.MoveAndSlide();
+            character.MoveAndSlide();
             return Exit();
         }
         public int Exit()
         {
-            if (Character.Height <= 0)
+            if (character.Height <= 0)
             {
-                Character._DamageEmitter.Monitoring = false;
-                Character.Height = 0;
-                Character.CharacterSprite.Position = Vector2.Zero;
+                character._DamageEmitter.Monitoring = false;
+                character.Height = 0;
+                character.CharacterSprite.Position = Vector2.Zero;
                 return (int)State.Idle;
             }
             return GetId;
@@ -439,19 +462,20 @@ public partial class Player : Character
     }
     private partial class StateHurt : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.Hurt;
-        public StateHurt(Player character)
+        public StateHurt(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character._DamageEmitter.Monitoring = false;
-            Character.AttackID = 0;
-            Character.AnimationPlayer.Play("Hurt");
-            Character.Velocity = Character.Direction * Character.Repel;
+            character._DamageEmitter.Monitoring = false;
+            character.AttackID = 0;
+            character.AnimationPlayer.Play("Hurt");
+            character.PlayAudio("hit-1");
+            character.Velocity = character.Direction * character.Repel;
 
             return true;
         }
@@ -460,7 +484,7 @@ public partial class Player : Character
         {
 
 
-            Character.MoveAndSlide();
+            character.MoveAndSlide();
 
             return Exit();
         }
@@ -471,31 +495,32 @@ public partial class Player : Character
     }
     private partial class StateKnockFly : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.KnockFly;
-        public StateKnockFly(Player character)
+        public StateKnockFly(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.AnimationPlayer.Play("KnockFly");
-            Character.Velocity = Character.Direction * Character.Repel;
+            character.AnimationPlayer.Play("KnockFly");
+            character.PlayAudio("hit-2");
+            character.Velocity = character.Direction * character.Repel;
             return true;
         }
 
         public int Update(double delta)
         {
-            Character.Velocity += Character.Direction * Character.Repel * (float)delta;
-            Character.MoveAndSlide();
+            character.Velocity += character.Direction * character.Repel * (float)delta;
+            character.MoveAndSlide();
             return Exit();
         }
         public int Exit()
         {
-            if (Character.IsOnWall())
+            if (character.IsOnWall())
             {
-                Character.Direction *= -1;
+                character.Direction *= -1;
                 return (int)State.KnockFall;
             }
             return GetId;
@@ -503,36 +528,36 @@ public partial class Player : Character
     }
     private partial class StateKnockFall : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.KnockFall;
-        public StateKnockFall(Player character)
+        public StateKnockFall(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.Velocity = Character.Direction * Character.Repel / 10;
-            Character.AnimationPlayer.Play("KnockFall");
+            character.Velocity = character.Direction * character.Repel / 10;
+            character.AnimationPlayer.Play("KnockFall");
             return true;
         }
 
         public int Update(double delta)
         {
-            Character.Height += Character.HeightSpeed * (float)delta;
-            Character.HeightSpeed -= Character.Gravity * (float)delta;
-            Character.CharacterSprite.Position = Vector2.Up * Character.Height;
+            character.Height += character.HeightSpeed * (float)delta;
+            character.HeightSpeed -= Gravity * (float)delta;
+            character.CharacterSprite.Position = Vector2.Up * character.Height;
 
 
-            Character.MoveAndSlide();
+            character.MoveAndSlide();
             return Exit();
         }
         public int Exit()
         {
-            if (Character.Height <= 0)
+            if (character.Height <= 0)
             {
-                Character.CharacterSprite.Position = Vector2.Zero;
-                Character.Height = 0;
+                character.CharacterSprite.Position = Vector2.Zero;
+                character.Height = 0;
                 return (int)State.KnockDown;
             }
             return GetId;
@@ -551,17 +576,17 @@ public partial class Player : Character
     }
     private partial class StateKnockDown : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.KnockDown;
-        public StateKnockDown(Player character)
+        public StateKnockDown(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.Direction = Vector2.Zero;
-            Character.AnimationPlayer.Play("KnockDown");
+            character.Direction = Vector2.Zero;
+            character.AnimationPlayer.Play("KnockDown");
             return true;
         }
 
@@ -580,17 +605,17 @@ public partial class Player : Character
     }
     private partial class StateCrouchDown : Node, IState
     {
-        Player Character;
+        Player character;
         public int GetId { get; } = (int)State.CrouchDown;
-        public StateCrouchDown(Player character)
+        public StateCrouchDown(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.AnimationPlayer.Play("CrouchDown");
-            Character.Velocity = Vector2.Zero;
+            character.AnimationPlayer.Play("CrouchDown");
+            character.Velocity = Vector2.Zero;
             return true;
         }
 
@@ -606,17 +631,17 @@ public partial class Player : Character
     }
     private partial class StateMeleeWeaponAttack : Node, IState
     {
-        Player Character;
-        public int GetId { get; } = (int)State.Idle;
-        public StateMeleeWeaponAttack(Player character)
+        Player character;
+        public int GetId { get; } = (int)State.MeleeWeaponAttack;
+        public StateMeleeWeaponAttack(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.Direction = Vector2.Zero;
-            Character.AnimationPlayer.Play("KinfeAttack");
+            character.Direction = Vector2.Zero;
+            character.AnimationPlayer.Play("KinfeAttack");
             return true;
         }
 
@@ -632,17 +657,18 @@ public partial class Player : Character
     }
     private partial class StateRangedWeaponAttack : Node, IState
     {
-        Player Character;
-        public int GetId { get; } = (int)State.Idle;
-        public StateRangedWeaponAttack(Player character)
+        Player character;
+        public int GetId { get; } = (int)State.RangedWeaponAttack;
+        public StateRangedWeaponAttack(Player c)
         {
-            Character = character;
+            character = c;
             character.States[GetId] = this;
         }
         public bool Enter()
         {
-            Character.Direction = Vector2.Zero;
-            Character.AnimationPlayer.Play("GunShoot");
+            character.Direction = Vector2.Zero;
+            character.AnimationPlayer.Play("GunShot");
+            character.PlayAudio("gunshot");
             return true;
         }
 

@@ -8,7 +8,7 @@ public partial class Prop : Sprite2D
     [Export]
     public int ID = 0;
     [Export]
-    public Properties Propertie = Properties.Restore;
+    public Properties Propertie = 0;
     public enum Properties
     {
         Restore,

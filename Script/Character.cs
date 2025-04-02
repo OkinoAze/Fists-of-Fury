@@ -14,7 +14,7 @@ public partial class Character : CharacterBody2D
 	public float JumpSpeed = 140;
 	public float HeightSpeed = 0;
 	public float Height = 0;
-	public float Gravity = 320;
+	public const float Gravity = 320;
 	public const float _AttackRange = 5;
 	public float Repel = 0;
 	public Vector2 Direction = Vector2.Zero;
@@ -33,6 +33,7 @@ public partial class Character : CharacterBody2D
 	public IState[] States = new IState[1];
 	public Prop Weapon;
 	public int[] InvincibleStates;
+	public string AvatarName = null;
 
 	public override void _Ready()
 	{
@@ -69,6 +70,10 @@ public partial class Character : CharacterBody2D
 	public virtual void PickUpProp(Prop item)
 	{
 
+	}
+	public string GetAvatarPath(string name)
+	{
+		return "res://Art/UI/Avatar/avatar_" + name + ".png";
 	}
 	public void PlayAudio(string name)
 	{
@@ -118,11 +123,11 @@ public partial class Character : CharacterBody2D
 
 	public partial class StateDefault : Node, IState
 	{
-		Character Character;
+		Character character;
 		public int GetId { get; } = 0;
-		public StateDefault(Character character)
+		public StateDefault(Character c)
 		{
-			Character = character;
+			character = c;
 			character.States[GetId] = this;
 		}
 		public bool Enter()
