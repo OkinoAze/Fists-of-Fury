@@ -195,7 +195,10 @@ public partial class Player : Character
             }
             if (Input.IsActionJustPressed("jump"))
             {
-                return (int)State.Jump;
+                if (Character.Weapon == null || Character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                {
+                    return (int)State.Jump;
+                }
             }
             if (Character.Direction != Vector2.Zero)
             {
@@ -243,7 +246,18 @@ public partial class Player : Character
         {
             if (Input.IsActionJustPressed("attack"))
             {
-                return (int)State.Attack;
+                if (Character.Weapon == null)
+                {
+                    return (int)State.Attack;
+                }
+                else if (Character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                {
+                    return (int)State.MeleeWeaponAttack;
+                }
+                else if (Character.Weapon.Propertie == Prop.Properties.RangedWeapon)
+                {
+                    return (int)State.RangedWeaponAttack;
+                }
             }
             if (Input.IsActionJustPressed("skill"))
             {
@@ -251,7 +265,10 @@ public partial class Player : Character
             }
             if (Input.IsActionJustPressed("jump"))
             {
-                return (int)State.Jump;
+                if (Character.Weapon == null || Character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                {
+                    return (int)State.Jump;
+                }
             }
             if (Character.Direction == Vector2.Zero)
             {
