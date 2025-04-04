@@ -5,7 +5,6 @@ public partial class Barrel : StaticObject
 {
     [Export]
     int Health = 1;
-    Vector2 Velocity = Vector2.Zero;
     Sprite2D Sprite;
     DamageReceiver DamageReceiver;
     AudioStreamPlayer AudioPlayer;
@@ -32,7 +31,7 @@ public partial class Barrel : StaticObject
     {
         StateMachineUpdate(delta);
     }
-    private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
+    private void OnDamageReceiver_DamageReceived(Node2D sender, DamageReceiver.DamageReceivedEventArgs e)
     {
         Health -= e.Damage;
         if (e.Type == DamageReceiver.HitType.knockDown)
@@ -49,7 +48,7 @@ public partial class Barrel : StaticObject
             Sprite.FlipH = e.Direction.X < 0;
             HeightSpeed = MoveSpeed * 3;
             Velocity = e.Direction.Normalized() * MoveSpeed;
-            //SwitchState((int)State.Destroyed);
+            SwitchState((int)State.Destroyed);
         }
     }
     public void PlayAudio(string name)

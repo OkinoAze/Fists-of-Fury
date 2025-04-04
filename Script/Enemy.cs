@@ -25,21 +25,8 @@ public partial class Enemy : Character
     }
     public override void _Ready()
     {
-        _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
-        AttackTimer = GetNode<Timer>("AttackTimer");
-
-        AttackTimer.WaitTime = GD.RandRange(3f, 6f);
         States = new IState[Enum.GetNames(typeof(State)).Length];
-
         InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
-
-        MaxHealth = 10;
-        Health = 5;
-        AccessingResources();
-
-
-        _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
-        _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
 
         _ = new StateIdle(this);
         _ = new StateWalk(this);
@@ -51,6 +38,23 @@ public partial class Enemy : Character
         _ = new StateCrouchDown(this);
         _ = new StateMeleeWeaponAttack(this);
         _ = new StateRangedWeaponAttack(this);
+
+
+        _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
+        AttackTimer = GetNode<Timer>("AttackTimer");
+
+        AttackTimer.WaitTime = GD.RandRange(3f, 6f);
+
+
+        MaxHealth = 10;
+        Health = 5;
+        AccessingResources();
+
+
+        _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+        _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
+
+
 
     }
 

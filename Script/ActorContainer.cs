@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Threading.Tasks;
 
 public partial class ActorContainer : Node2D
 {
@@ -7,30 +8,41 @@ public partial class ActorContainer : Node2D
     public override void _Ready()
     {
         EntityManager.Instance.GenerateActor += OnGenerateActor;
-        EntityManager.Instance.GenerateBullet += OnGenerateBullet;
+        EntityManager.Instance.GenerateBullet += OnGenerateBulletAsync;
+
     }
 
-    void OnGenerateActor(object sender, EntityManager.GenerateActorEventArgs e)
+    private void OnGenerateBulletAsync(Character sender, int damage, Vector2 direction, Vector2 position, Vector2 shotPosition)
     {
-        var path = "res://Scene/Prefab/" + Enum.GetName(e.Type) + ".tscn";
-        PackedScene characterScene = ResourceLoader.Load<PackedScene>(path);
+        var path = "res://Scene/Prefab/Bullet.tscn";
+        var bulletScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);
+        Bullet bullet = bulletScene.Instantiate<Bullet>();
+
+
+        bullet.Damage = damage;
+        bullet.Position = position;
+        bullet.Direction = direction;
+        AddChild(bullet);
+        bullet.Sprite.Position = shotPosition;
+        bullet.Visible = false;
+
+    }
+
+
+    private void OnGenerateActor(EntityManager.EnemyType type, Vector2 position, float height, float heightSpeed, Prop[] props)
+    {
+        var path = "res://Scene/Prefab/" + Enum.GetName(type) + ".tscn";
+        var characterScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);
         Enemy enemy = characterScene.Instantiate<Enemy>();
+        enemy.Position = position;
+        enemy.Height = height;
+        enemy.HeightSpeed = heightSpeed;
         AddChild(enemy);
-        enemy.Position = e.Position;
-        enemy.Height = e.Height;
-        enemy.HeightSpeed = e.HeightSpeed;
-        foreach (var item in e.Props)
+        foreach (var item in props)
         {
             enemy.PickUpProp(item);
         }
     }
-    void OnGenerateBullet(object sender, EntityManager.GenerateBulletEventArgs e)
-    {
-        var path = "res://Scene/Prefab/Bullet.tscn";
-        PackedScene bulletScene = ResourceLoader.Load<PackedScene>(path);
-        var bullet = bulletScene.Instantiate<Bullet>();
-        AddChild(bullet);
-        bullet.Position = e.Position;
-    }
+
 
 }

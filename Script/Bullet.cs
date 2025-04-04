@@ -3,12 +3,12 @@ using System;
 
 public partial class Bullet : StaticObject
 {
-    public int Damage = 3;
-
+    public int Damage = 1;
     public const float _AttackRange = 5;
-
+    new public float MoveSpeed = 100;
     public Area2D _DamageEmitter;
-
+    public Sprite2D Sprite;
+    public VisibleOnScreenNotifier2D OnScreen;
 
     enum State
     {
@@ -20,13 +20,18 @@ public partial class Bullet : StaticObject
     public override void _Ready()
     {
         States = new IState[Enum.GetNames(typeof(State)).Length];
-
-        _DamageEmitter = GetNode<Area2D>("DamageEmitter");
-        _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
-
         _ = new StateIdle(this);
         _ = new StateMoving(this);
         _ = new StateDestroyed(this);
+
+        OnScreen = GetNode<VisibleOnScreenNotifier2D>("VisibleOnScreenNotifier2D");
+        Sprite = GetNode<Sprite2D>("Sprite2D");
+        _DamageEmitter = Sprite.GetNode<Area2D>("DamageEmitter");
+
+
+        _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+
+
     }
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
@@ -38,9 +43,10 @@ public partial class Bullet : StaticObject
 
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
                 DamageReceiver.DamageReceivedEventArgs e;
-                e = new(direction);
+                e = new(direction, Damage, 30);
                 a.DamageReceived(this, e);
 
+                SwitchState((int)State.Destroyed);
             }
         }
     }
@@ -48,8 +54,10 @@ public partial class Bullet : StaticObject
 
     public override void _PhysicsProcess(double delta)
     {
-        base._PhysicsProcess(delta);
+        Velocity = Direction * MoveSpeed;
+        StateMachineUpdate(delta);
     }
+
     public bool AttackRange(Vector2 position)
     {
         if (position.Y > Position.Y - _AttackRange && position.Y < Position.Y + _AttackRange)
@@ -58,6 +66,7 @@ public partial class Bullet : StaticObject
         }
         return false;
     }
+
     public partial class StateIdle : Node, IState
     {
         Bullet character;
@@ -69,6 +78,7 @@ public partial class Bullet : StaticObject
         }
         public bool Enter()
         {
+            character.Visible = true;
             return true;
         }
 
@@ -102,6 +112,7 @@ public partial class Bullet : StaticObject
 
         public int Update(double delta)
         {
+            character.Position += character.Velocity * (float)delta;
             return Exit();
         }
         public int Exit()
@@ -109,6 +120,10 @@ public partial class Bullet : StaticObject
             if (character.Direction == Vector2.Zero)
             {
                 return (int)State.Idle;
+            }
+            if (character.OnScreen.IsOnScreen() == false)
+            {
+                return (int)State.Destroyed;
             }
             return GetId;
         }
@@ -124,7 +139,7 @@ public partial class Bullet : StaticObject
         }
         public bool Enter()
         {
-            QueueFree();
+            character.QueueFree();
             return true;
         }
 

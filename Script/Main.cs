@@ -18,6 +18,9 @@ public partial class Main : Node
         }
         if (Input.IsActionPressed("ui_filedialog_refresh"))
         {
+            EntityManager.Instance.GenerateBullet = null;
+            EntityManager.Instance.GenerateActor = null;
+            EntityManager.Instance.GenerateProp = null;
             GetTree().ReloadCurrentScene();
         }
     }

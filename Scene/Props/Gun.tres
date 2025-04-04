@@ -9,4 +9,4 @@ Property = 2
 RestoreHealth = 0
 Damage = 3
 Durability = 5
-ShootPosition = Vector2(22, -14)
+ShotPosition = Vector2(22, -15)

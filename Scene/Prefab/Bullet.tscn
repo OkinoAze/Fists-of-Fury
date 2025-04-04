@@ -5,10 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://c1f648xc6xb63" path="res://Art/Props/prop-shadow.png" id="2_3tycu"]
 [ext_resource type="PackedScene" uid="uid://ovdl0lg8ghmf" path="res://Scene/Prefab/DamageEmitter.tscn" id="2_uy3ua"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3tycu"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5770a"]
 size = Vector2(7, 2)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5770a"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3tycu"]
 size = Vector2(7, 2)
 
 [node name="Bullet" type="StaticBody2D"]
@@ -23,13 +23,17 @@ texture = ExtResource("2_3tycu")
 scale = Vector2(7, 2)
 texture = ExtResource("1_4e88b")
 
+[node name="DamageEmitter" parent="Sprite2D" instance=ExtResource("2_uy3ua")]
+scale = Vector2(0.142857, 0.5)
+collision_mask = 240
+monitoring = true
+
+[node name="CollisionShape2D" parent="Sprite2D/DamageEmitter" index="0"]
+shape = SubResource("RectangleShape2D_5770a")
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_3tycu")
 
-[node name="DamageEmitter" parent="." instance=ExtResource("2_uy3ua")]
-collision_mask = 240
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 
-[node name="CollisionShape2D" parent="DamageEmitter" index="0"]
-shape = SubResource("RectangleShape2D_5770a")
-
-[editable path="DamageEmitter"]
+[editable path="Sprite2D/DamageEmitter"]

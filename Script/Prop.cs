@@ -24,6 +24,6 @@ public partial class Prop : Resource
     [Export]
     public int Durability = 0;
     [Export]
-    public Vector2 ShootPosition = Vector2.Zero;
+    public Vector2 ShotPosition = Vector2.Zero;
 
 }

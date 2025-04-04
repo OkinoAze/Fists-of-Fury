@@ -54,7 +54,7 @@ public partial class MoveObject : CharacterBody2D
 	public partial class StateDefault : Node, IState
 	{
 		MoveObject character;
-		public int GetId { get; } = 0;
+		public int GetId { get; } = 0;//默认状态
 		public StateDefault(MoveObject c)
 		{
 			character = c;

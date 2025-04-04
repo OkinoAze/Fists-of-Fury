@@ -3,10 +3,12 @@ using Godot;
 
 public partial class Character : MoveObject
 {
-	public delegate void AttackBlockedReceived(Character character, AttackBlockedStates blockedState);
-	public delegate void PickUpPropReceived(Prop prop);
-	public AttackBlockedReceived AttackBlocked;
-	public PickUpPropReceived PickUpProp;
+	public delegate void AttackBlockedReceiver(Character character, AttackBlockedStates blockedState);
+	public delegate void PickUpPropReceiver(Prop prop);
+	public delegate void DropWeaponReceiver();
+	public AttackBlockedReceiver AttackBlocked;
+	public PickUpPropReceiver PickUpProp;
+	public DropWeaponReceiver DropWeapon;
 	public enum AttackBlockedStates
 	{
 		Defense,
@@ -65,7 +67,7 @@ public partial class Character : MoveObject
 	}
 	public void PlayAudio(string name)
 	{
-		AudioPlayer.Stream = ResourceLoader.Load<AudioStreamWav>("res://Music/SFX/" + name + ".wav");
+		AudioPlayer.Stream = ResourceLoader.Load<AudioStreamWav>("res://Music/SFX/" + name + ".wav", null, ResourceLoader.CacheMode.Reuse);
 		AudioPlayer.Play();
 	}
 

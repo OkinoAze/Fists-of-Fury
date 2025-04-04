@@ -9,6 +9,7 @@ public partial class StaticObject : StaticBody2D
 	public float Height = 0;
 	public const float Gravity = 320;
 	public Vector2 Direction = Vector2.Zero;
+	public Vector2 Velocity = Vector2.Zero;
 	public int StateID = 0;
 	public bool EnterEnd = false;
 	public IState[] States;
@@ -54,7 +55,7 @@ public partial class StaticObject : StaticBody2D
 	public partial class StateDefault : Node, IState
 	{
 		StaticObject character;
-		public int GetId { get; } = 0;
+		public int GetId { get; } = 0;//默认状态
 		public StateDefault(StaticObject c)
 		{
 			character = c;

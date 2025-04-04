@@ -1,10 +1,16 @@
 using Godot;
 using System;
+using System.Reflection;
 
 public partial class EntityManager : Node
 {
-    public event EventHandler<GenerateActorEventArgs> GenerateActor;
-    public event EventHandler<GenerateBulletEventArgs> GenerateBullet;
+    public delegate void GenerateActorReceiver(EnemyType type, Vector2 position, float height, float heightSpeed, Prop[] props);
+    public delegate void GenerateBulletReceiver(Character sender, int damage, Vector2 direction, Vector2 position, Vector2 shotPosition);
+    public delegate void GeneratePropReceiver(Character sender, Vector2 position);
+    public GenerateActorReceiver GenerateActor;
+    public GenerateBulletReceiver GenerateBullet;
+    public GeneratePropReceiver GenerateProp;
+
 
     public static EntityManager Instance { get; private set; }
     public enum EnemyType
@@ -17,19 +23,6 @@ public partial class EntityManager : Node
     EntityManager()
     {
         Instance = this;
-    }
-
-    public class GenerateActorEventArgs(EnemyType type, Vector2 position, float height, float heightSpeed, Prop[] props)
-    {
-        public EnemyType Type = type;
-        public Vector2 Position = position;
-        public float Height = height;
-        public float HeightSpeed = heightSpeed;
-        public Prop[] Props = props;
-    }
-    public class GenerateBulletEventArgs(Vector2 position)
-    {
-        public Vector2 Position = position;
     }
 
 }

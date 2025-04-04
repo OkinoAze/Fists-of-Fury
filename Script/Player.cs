@@ -29,25 +29,9 @@ public partial class Player : Character
 
     public override void _Ready()
     {
-        States = new IState[Enum.GetNames(typeof(State)).Length];
-        var slots = GetNodeOrNull("EnemySlots")?.GetChildren();
-
         InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
-        MaxHealth = 10;
-        Health = 10;
 
-        AvatarName = "Player";
-
-        foreach (var item in slots)
-        {
-            EnemySlots.Add((EnemySlot)item);
-        }
-
-        AccessingResources();
-        _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
-        _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
-        PickUpProp += OnPickUpProp;
-
+        States = new IState[Enum.GetNames(typeof(State)).Length];
 
         _ = new StateIdle(this);
         _ = new StateWalk(this);
@@ -62,6 +46,26 @@ public partial class Player : Character
         _ = new StateCrouchDown(this);
         _ = new StateMeleeWeaponAttack(this);
         _ = new StateRangedWeaponAttack(this);
+
+
+        MaxHealth = 10;
+        Health = 10;
+
+        AvatarName = "Player";
+
+
+        AccessingResources();
+        _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+        _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
+        PickUpProp += OnPickUpProp;
+        DropWeapon += OnDropWeapon;
+
+        var slots = GetNodeOrNull("EnemySlots")?.GetChildren();
+        foreach (var item in slots)
+        {
+            EnemySlots.Add((EnemySlot)item);
+        }
+
 
         Prop p = ResourceLoader.Load<Prop>("res://Scene/Props/Gun.tres");
         PickUpProp(p);
@@ -160,6 +164,12 @@ public partial class Player : Character
             WeaponSprite.Visible = true;
         }
     }
+
+    private void OnDropWeapon()
+    {
+
+    }
+
 
     public EnemySlot ReserveSlot(Enemy enemy)
     {
@@ -679,6 +689,9 @@ public partial class Player : Character
             character.Direction = Vector2.Zero;
             character.AnimationPlayer.Play("GunShot");
             character.PlayAudio("gunshot");
+            var d = (Vector2.Right * character._DamageEmitter.Scale.X).Normalized();
+            var p = new Vector2(character.Weapon.ShotPosition.X * d.X, character.Weapon.ShotPosition.Y);
+            EntityManager.Instance.GenerateBullet(character, character.Weapon.Damage, d, new Vector2(character.Position.X + p.X, character.Position.Y), new Vector2(0, p.Y));
             return true;
         }
 
