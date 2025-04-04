@@ -31,7 +31,7 @@ public partial class Enemy : Character
         AttackTimer.WaitTime = GD.RandRange(3f, 6f);
         States = new IState[Enum.GetNames(typeof(State)).Length];
 
-        InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
+        InvincibleStates = [(int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
 
         MaxHealth = 10;
         Health = 5;
@@ -89,13 +89,19 @@ public partial class Enemy : Character
             HeightSpeed = e.HeightSpeed;
             if (e.Type == DamageReceiver.HitType.Normal)
             {
+                AnimationPlayer.Stop();
                 SwitchState((int)State.Hurt);
             }
             else if (e.Type == DamageReceiver.HitType.knockDown)
             {
+                AnimationPlayer.Stop();
                 SwitchState((int)State.KnockFly);
             }
             Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
+        }
+        else
+        {
+            (sender as Character).AttackBlocked(this, new EventArgs());
         }
     }
     private partial class StateIdle : Node, IState

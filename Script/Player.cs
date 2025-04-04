@@ -130,10 +130,12 @@ public partial class Player : Character
             HeightSpeed = e.HeightSpeed;
             if (e.Type == DamageReceiver.HitType.Normal)
             {
+                AnimationPlayer.Stop();
                 SwitchState((int)State.Hurt);
             }
             else if (e.Type == DamageReceiver.HitType.knockDown)
             {
+                AnimationPlayer.Stop();
                 SwitchState((int)State.KnockFly);
             }
             Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
@@ -430,7 +432,7 @@ public partial class Player : Character
         public int Update(double delta)
         {
             character.Height += character.HeightSpeed * (float)delta;
-            character.HeightSpeed -= Character.Gravity * (float)delta;
+            character.HeightSpeed -= Gravity * (float)delta;
             character.CharacterSprite.Position = Vector2.Up * character.Height;
 
             character.MoveAndSlide();

@@ -1,7 +1,10 @@
+using System;
 using Godot;
 
 public partial class Character : CharacterBody2D
 {
+	public EventHandler AttackBlocked;
+
 	[Export]
 	public int MaxHealth = 1;
 	[Export]
@@ -102,6 +105,7 @@ public partial class Character : CharacterBody2D
 		EnterEnd = enter;
 		StateID = id;
 	}
+
 	public interface IState
 	{
 		public int GetId { get; }
@@ -144,4 +148,7 @@ public partial class Character : CharacterBody2D
 			return GetId;
 		}
 	}
+
+
+
 }
