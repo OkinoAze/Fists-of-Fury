@@ -46,6 +46,7 @@ public partial class Player : Character
         AccessingResources();
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
+        PickUpProp += OnPickUpProp;
 
 
         _ = new StateIdle(this);
@@ -62,6 +63,9 @@ public partial class Player : Character
         _ = new StateMeleeWeaponAttack(this);
         _ = new StateRangedWeaponAttack(this);
 
+        Prop p = ResourceLoader.Load<Prop>("res://Scene/Props/Gun.tres");
+        PickUpProp(p);
+
     }
 
     public override void _PhysicsProcess(double delta)
@@ -72,7 +76,6 @@ public partial class Player : Character
 
         }
         StateMachineUpdate(delta);
-        var a = new List<int> { 1, 2, 3 }.Any(x => x == 1);
     }
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
@@ -86,22 +89,13 @@ public partial class Player : Character
                 DamageReceiver.DamageReceivedEventArgs e;
                 if (StateID == (int)State.JumpKick || AttackID == AttackAnimationGroup.Length - 1)
                 {
-                    AttackID = 0;
                     e = new(direction, 2, 100, 100, DamageReceiver.HitType.knockDown);
                     a.DamageReceived(this, e);
                     return;
                 }
-                if (Weapon == null)
+
+                if (Weapon != null)
                 {
-                    AttackID++;
-                    if (AttackID >= AttackAnimationGroup.Length)
-                    {
-                        AttackID = 0;
-                    }
-                }
-                else
-                {
-                    AttackID = 0;
                     if (Weapon.Property == Prop.Properties.MeleeWeapon)
                     {
                         e = new(direction, 3);
@@ -121,7 +115,7 @@ public partial class Player : Character
     }
 
 
-    private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
+    private void OnDamageReceiver_DamageReceived(Node2D sender, DamageReceiver.DamageReceivedEventArgs e)
     {
         if (!InvincibleStates.Contains(StateID))
         {
@@ -140,14 +134,30 @@ public partial class Player : Character
             }
             Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
         }
+        else
+        {
+            if (sender.Owner is Character c)
+            {
+                c.AttackBlocked(this, AttackBlockedStates.Invincible);
+            }
+        }
     }
 
-    new public void PickUpProp(Prop prop)
+    void OnPickUpProp(Prop prop)
     {
         Health = Mathf.Clamp(Health + prop.RestoreHealth, 0, MaxHealth);
         if (prop.Property == Prop.Properties.MeleeWeapon || prop.Property == Prop.Properties.RangedWeapon)
         {
             Weapon = prop;
+            if (prop.ID == 2)
+            {
+                WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/player_knife.png");
+            }
+            else if (prop.ID == 3)
+            {
+                WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/player_gun.png");
+            }
+            WeaponSprite.Visible = true;
         }
     }
 
@@ -304,7 +314,6 @@ public partial class Player : Character
     public partial class StateAttack : Node, IState
     {
         Player character;
-        int id = 0;
         public int GetId { get; } = (int)State.Attack;
         public StateAttack(Player c)
         {
@@ -314,20 +323,21 @@ public partial class Player : Character
         public bool Enter()
         {
             character.Direction = Vector2.Zero;
-
-            if (true)
+            if (character.AttackBufferTimer.TimeLeft > 0)
             {
-                if (character.AttackID == id)
+                character.AttackID++;
+                if (character.AttackID >= character.AttackAnimationGroup.Length)
                 {
-                    id = 0;
-                    character.AttackID = id;
-                }
-                else
-                {
-                    id = character.AttackID;
+                    character.AttackID = 0;
                 }
             }
-            character.AnimationPlayer.Play(character.AttackAnimationGroup[id]);
+            else
+            {
+                character.AttackID = 0;
+            }
+            character.AnimationPlayer.Play(character.AttackAnimationGroup[character.AttackID]);
+            character.AttackBufferTimer.Start();
+
             return true;
         }
 
@@ -473,7 +483,6 @@ public partial class Player : Character
         public bool Enter()
         {
             character._DamageEmitter.Monitoring = false;
-            character.AttackID = 0;
             character.AnimationPlayer.Play("Hurt");
             character.PlayAudio("hit-1");
             character.Velocity = character.Direction * character.Repel;

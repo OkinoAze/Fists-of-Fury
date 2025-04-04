@@ -31,7 +31,7 @@ public partial class Enemy : Character
         AttackTimer.WaitTime = GD.RandRange(3f, 6f);
         States = new IState[Enum.GetNames(typeof(State)).Length];
 
-        InvincibleStates = [(int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
+        InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
 
         MaxHealth = 10;
         Health = 5;
@@ -66,13 +66,6 @@ public partial class Enemy : Character
         {
             if (AttackRange((a.Owner as Node2D).Position))
             {
-                PlayAudio("hit-1");
-
-                AttackID++;
-                if (AttackID >= AttackAnimationGroup.Length)
-                {
-                    AttackID = 0;
-                }
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
                 DamageReceiver.DamageReceivedEventArgs e = new(direction);
                 a.DamageReceived(this, e);
@@ -80,7 +73,7 @@ public partial class Enemy : Character
         }
 
     }
-    private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
+    private void OnDamageReceiver_DamageReceived(Node2D sender, DamageReceiver.DamageReceivedEventArgs e)
     {
         if (!InvincibleStates.Contains(StateID))
         {
@@ -101,7 +94,10 @@ public partial class Enemy : Character
         }
         else
         {
-            (sender as Character).AttackBlocked(this, new EventArgs());
+            if (sender.Owner is Character c)
+            {
+                c.AttackBlocked(this, AttackBlockedStates.Invincible);
+            }
         }
     }
     private partial class StateIdle : Node, IState
@@ -222,7 +218,6 @@ public partial class Enemy : Character
     private partial class StateAttack : Node, IState
     {
         Enemy character;
-        int id;
 
         public int GetId { get; } = (int)State.Attack;
         public StateAttack(Enemy c)
@@ -233,16 +228,22 @@ public partial class Enemy : Character
         public bool Enter()
         {
             character.AttackTimer.Start();
-            if (character.AttackID == id)
+
+            if (character.AttackBufferTimer.TimeLeft > 0)
             {
-                id = 0;
-                character.AttackID = id;
+                character.AttackID++;
+                if (character.AttackID >= character.AttackAnimationGroup.Length)
+                {
+                    character.AttackID = 0;
+                }
             }
             else
             {
-                id = character.AttackID;
+                character.AttackID = 0;
             }
-            character.AnimationPlayer.Play(character.AttackAnimationGroup[id]);
+            character.AnimationPlayer.Play(character.AttackAnimationGroup[character.AttackID]);
+            character.AttackBufferTimer.Start();
+
             return true;
         }
 
@@ -279,7 +280,6 @@ public partial class Enemy : Character
         public bool Enter()
         {
             character._DamageEmitter.Monitoring = false;
-            character.AttackID = 0;
             character.AnimationPlayer.Play("Hurt");
             character.PlayAudio("hit-1");
             character.Velocity = character.Direction * character.Repel;

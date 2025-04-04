@@ -3,7 +3,8 @@ using System;
 
 public partial class DamageReceiver : Area2D
 {
-    public EventHandler<DamageReceivedEventArgs> DamageReceived;
+    public delegate void Received(Node2D sender, DamageReceivedEventArgs e);
+    public Received DamageReceived;
 
     public enum HitType
     {
@@ -11,7 +12,7 @@ public partial class DamageReceiver : Area2D
         knockDown,
         Power,
     }
-    public class DamageReceivedEventArgs(Vector2 direction, int damage = 1, float repel = 5, float heightSpeed = 20, HitType type = 0) : EventArgs
+    public class DamageReceivedEventArgs(Vector2 direction, int damage = 1, float repel = 5, float heightSpeed = 20, HitType type = 0)
     {
         public readonly HitType Type = type;
         public readonly int Damage = damage;

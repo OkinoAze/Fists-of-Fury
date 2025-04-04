@@ -1,47 +1,36 @@
 using Godot;
 using System;
 
-public partial class Barrel : StaticBody2D
+public partial class Barrel : StaticObject
 {
     [Export]
     int Health = 1;
-    [Export]
-    float Speed = 30f;
-    float Height = 0f;
-    float HeightSpeed = 0f;
-    float Gravity = 360;
     Vector2 Velocity = Vector2.Zero;
     Sprite2D Sprite;
     DamageReceiver DamageReceiver;
     AudioStreamPlayer AudioPlayer;
-    bool Destroyed = false;
-
+    enum State
+    {
+        Idle,
+        Destroyed
+    }
     public override void _Ready()
     {
+        States = new IState[Enum.GetNames(typeof(State)).Length];
+
         Sprite = GetNode<Sprite2D>("Sprite2D");
         AudioPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
         DamageReceiver = GetNode<DamageReceiver>("DamageReceiver");
+
         DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
+
+        _ = new StateIdle(this);
+        _ = new StateDestroyed(this);
     }
 
-    public override void _Process(double delta)
+    public override void _PhysicsProcess(double delta)
     {
-        if (Destroyed)
-        {
-            Height += HeightSpeed * (float)delta;
-
-            if (Height < 0)
-            {
-                QueueFree();
-            }
-            else
-            {
-                HeightSpeed -= Gravity * (float)delta;
-            }
-
-            Sprite.Position = Vector2.Up * Height;
-            Position += Velocity * (float)delta;
-        }
+        StateMachineUpdate(delta);
     }
     private void OnDamageReceiver_DamageReceived(object sender, DamageReceiver.DamageReceivedEventArgs e)
     {
@@ -56,16 +45,75 @@ public partial class Barrel : StaticBody2D
         }
         if (Health <= 0)
         {
-            Destroyed = true;
             Sprite.Frame = 1;
             Sprite.FlipH = e.Direction.X < 0;
-            HeightSpeed = Speed * 3;
-            Velocity = e.Direction.Normalized() * Speed;
+            HeightSpeed = MoveSpeed * 3;
+            Velocity = e.Direction.Normalized() * MoveSpeed;
+            //SwitchState((int)State.Destroyed);
         }
     }
     public void PlayAudio(string name)
     {
         AudioPlayer.Stream = ResourceLoader.Load<AudioStreamWav>("res://Music/SFX/" + name + ".wav");
         AudioPlayer.Play();
+    }
+    public partial class StateIdle : Node, IState
+    {
+        Barrel character;
+        public int GetId { get; } = (int)State.Idle;
+        public StateIdle(Barrel c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+            return Exit();
+        }
+        public int Exit()
+        {
+            return GetId;
+        }
+    }
+    public partial class StateDestroyed : Node, IState
+    {
+        Barrel character;
+        public int GetId { get; } = (int)State.Destroyed;
+        public StateDestroyed(Barrel c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+            character.Height += character.HeightSpeed * (float)delta;
+
+            if (character.Height < 0)
+            {
+                character.QueueFree();
+            }
+            else
+            {
+                character.HeightSpeed -= Gravity * (float)delta;
+            }
+
+            character.Sprite.Position = Vector2.Up * character.Height;
+            character.Position += character.Velocity * (float)delta;
+            return Exit();
+        }
+        public int Exit()
+        {
+            return GetId;
+        }
     }
 }

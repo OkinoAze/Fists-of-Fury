@@ -1,18 +1,14 @@
 using Godot;
 using System;
 
-public partial class Bullet : StaticBody2D
+public partial class Bullet : StaticObject
 {
     public int Damage = 3;
-    public float MoveSpeed = 100;
-    public float JumpSpeed = 0;
-    public float HeightSpeed = 0;
-    public float Height = 0;
-    public const float Gravity = 320;
+
     public const float _AttackRange = 5;
-    public Vector2 Direction = Vector2.Zero;
+
     public Area2D _DamageEmitter;
-    public IState[] States = new IState[Enum.GetNames(typeof(State)).Length];
+
 
     enum State
     {
@@ -23,33 +19,45 @@ public partial class Bullet : StaticBody2D
 
     public override void _Ready()
     {
+        States = new IState[Enum.GetNames(typeof(State)).Length];
+
+        _DamageEmitter = GetNode<Area2D>("DamageEmitter");
+        _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+
         _ = new StateIdle(this);
         _ = new StateMoving(this);
         _ = new StateDestroyed(this);
     }
+
+    private void OnDamageEmitter_AreaEntered(Area2D area)
+    {
+        if (area is DamageReceiver a)
+        {
+            if (AttackRange((a.Owner as Node2D).Position))
+            {
+
+                Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
+                DamageReceiver.DamageReceivedEventArgs e;
+                e = new(direction);
+                a.DamageReceived(this, e);
+
+            }
+        }
+    }
+
+
     public override void _PhysicsProcess(double delta)
     {
         base._PhysicsProcess(delta);
     }
-    public interface IState
+    public bool AttackRange(Vector2 position)
     {
-        public int GetId { get; }
-
-        public bool Enter()
+        if (position.Y > Position.Y - _AttackRange && position.Y < Position.Y + _AttackRange)
         {
             return true;
         }
-        public int Update(double delta)
-        {
-            return Exit();
-        }
-        public int Exit()
-        {
-            return GetId;
-        }
-
+        return false;
     }
-
     public partial class StateIdle : Node, IState
     {
         Bullet character;
@@ -116,6 +124,7 @@ public partial class Bullet : StaticBody2D
         }
         public bool Enter()
         {
+            QueueFree();
             return true;
         }
 

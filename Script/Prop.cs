@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class Prop : Sprite2D
+public partial class Prop : Resource
 {
 
     [ExportGroup("物品属性")]
