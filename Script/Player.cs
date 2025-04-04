@@ -8,7 +8,7 @@ public partial class Player : Character
 
     public string[] AttackAnimationGroup = ["Punch", "Punch2", "Kick", "Kick2"];
     public int[] CanNotInputStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall];
-    List<EnemySolt> EnemySolts = [];
+    List<EnemySlot> EnemySlots = [];
     enum State
     {
         Idle,
@@ -30,7 +30,7 @@ public partial class Player : Character
     public override void _Ready()
     {
         States = new IState[Enum.GetNames(typeof(State)).Length];
-        var solts = GetNodeOrNull("EnemySlots")?.GetChildren();
+        var slots = GetNodeOrNull("EnemySlots")?.GetChildren();
 
         InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
         MaxHealth = 10;
@@ -38,9 +38,9 @@ public partial class Player : Character
 
         AvatarName = "Player";
 
-        foreach (var item in solts)
+        foreach (var item in slots)
         {
-            EnemySolts.Add((EnemySolt)item);
+            EnemySlots.Add((EnemySlot)item);
         }
 
         AccessingResources();
@@ -150,9 +150,9 @@ public partial class Player : Character
         }
     }
 
-    public EnemySolt ReserveSlot(Enemy enemy)
+    public EnemySlot ReserveSlot(Enemy enemy)
     {
-        var availableSlots = EnemySolts.Where(x => x.IsFree());
+        var availableSlots = EnemySlots.Where(x => x.IsFree());
         if (availableSlots.Count() == 0)
         {
             return null;
@@ -161,9 +161,9 @@ public partial class Player : Character
         solt.Occupy(enemy);
         return solt;
     }
-    public void FreeSolt(Enemy enemy)
+    public void FreeSlot(Enemy enemy)
     {
-        var targetSlots = EnemySolts.Where(x => x.Occupant == enemy);
+        var targetSlots = EnemySlots.Where(x => x.Occupant == enemy);
         if (targetSlots.Count() == 1)
         {
             targetSlots.First().FreeUp();

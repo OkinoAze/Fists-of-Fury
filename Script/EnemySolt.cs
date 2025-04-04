@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class EnemySolt : Node2D
+public partial class EnemySlot : Node2D
 {
     public Enemy Occupant = null;
     public bool IsFree()

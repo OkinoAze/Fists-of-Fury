@@ -4,33 +4,33 @@ using System;
 public partial class ActorContainer : Node2D
 {
     //TODO 角色生成
-    public enum EnemyType
+    public override void _Ready()
     {
-        Punk,
-        Goon,
-        Thug,
-        Boss,
+        EntityManager.Instance.GenerateActor += OnGenerateActor;
+        EntityManager.Instance.GenerateBullet += OnGenerateBullet;
     }
-    public void GenerateActor(EnemyType type, Vector2 position, float height, float heightSpeed, Prop[] props)
+
+    void OnGenerateActor(object sender, EntityManager.GenerateActorEventArgs e)
     {
-        var path = "res://Scene/Prefab/" + Enum.GetName(type) + ".tscn";
+        var path = "res://Scene/Prefab/" + Enum.GetName(e.Type) + ".tscn";
         PackedScene characterScene = ResourceLoader.Load<PackedScene>(path);
         Enemy enemy = characterScene.Instantiate<Enemy>();
         AddChild(enemy);
-        enemy.Position = position;
-        enemy.Height = height;
-        enemy.HeightSpeed = heightSpeed;
-        foreach (var item in props)
+        enemy.Position = e.Position;
+        enemy.Height = e.Height;
+        enemy.HeightSpeed = e.HeightSpeed;
+        foreach (var item in e.Props)
         {
             enemy.PickUpProp(item);
         }
     }
-    public void GenerateBullet(Node2D node)
+    void OnGenerateBullet(object sender, EntityManager.GenerateBulletEventArgs e)
     {
         var path = "res://Scene/Prefab/Bullet.tscn";
         PackedScene bulletScene = ResourceLoader.Load<PackedScene>(path);
         var bullet = bulletScene.Instantiate<Bullet>();
         AddChild(bullet);
+        bullet.Position = e.Position;
     }
 
 }

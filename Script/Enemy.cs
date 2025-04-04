@@ -5,7 +5,7 @@ public partial class Enemy : Character
 {
     Player _Player;
     Timer AttackTimer;
-    EnemySolt Solt = null;
+    EnemySlot Slot = null;
     public string[] AttackAnimationGroup = ["Punch", "Punch2"];
 
     enum State
@@ -116,10 +116,10 @@ public partial class Enemy : Character
 
         public int Update(double delta)
         {
-            character.Solt ??= character._Player.ReserveSlot(character);
-            if (character.Solt != null && character.Position.DistanceTo(character._Player.Position) > 20)
+            character.Slot ??= character._Player.ReserveSlot(character);
+            if (character.Slot != null && character.Position.DistanceTo(character._Player.Position) > 20)
             {
-                character.Direction = (character.Solt.GlobalPosition - character.GlobalPosition).Normalized();
+                character.Direction = (character.Slot.GlobalPosition - character.GlobalPosition).Normalized();
             }
             return Exit();
         }
@@ -153,9 +153,9 @@ public partial class Enemy : Character
 
         public int Update(double delta)
         {
-            if (character.Solt != null)
+            if (character.Slot != null)
             {
-                character.Direction = (character.Solt.GlobalPosition - character.GlobalPosition).Normalized();
+                character.Direction = (character.Slot.GlobalPosition - character.GlobalPosition).Normalized();
 
 
             }
@@ -185,7 +185,7 @@ public partial class Enemy : Character
             {
                 return (int)State.Attack;
             }
-            if (character.GlobalPosition.DistanceTo(character.Solt.GlobalPosition) < 2)
+            if (character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) < 2)
             {
                 if (character.Position.X < character._Player.Position.X)
                 {
@@ -394,7 +394,7 @@ public partial class Enemy : Character
     {
         if (Health <= 0)
         {
-            _Player.FreeSolt(this);
+            _Player.FreeSlot(this);
             QueueFree();
         }
         else
