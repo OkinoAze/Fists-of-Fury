@@ -62,7 +62,6 @@ public partial class Player : Character
         _ = new StateMeleeWeaponAttack(this);
         _ = new StateRangedWeaponAttack(this);
 
-
     }
 
     public override void _PhysicsProcess(double delta)
@@ -103,13 +102,13 @@ public partial class Player : Character
                 else
                 {
                     AttackID = 0;
-                    if (Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                    if (Weapon.Property == Prop.Properties.MeleeWeapon)
                     {
                         e = new(direction, 3);
                         a.DamageReceived(this, e);
                         return;
                     }
-                    else if (Weapon.Propertie == Prop.Properties.RangedWeapon)
+                    else if (Weapon.Property == Prop.Properties.RangedWeapon)
                     {
                         return;
                     }
@@ -143,8 +142,8 @@ public partial class Player : Character
 
     new public void PickUpProp(Prop prop)
     {
-        Health = Mathf.Clamp(Health + prop.RestoreHelath, 0, MaxHealth);
-        if (prop.Propertie == Prop.Properties.MeleeWeapon || prop.Propertie == Prop.Properties.RangedWeapon)
+        Health = Mathf.Clamp(Health + prop.RestoreHealth, 0, MaxHealth);
+        if (prop.Property == Prop.Properties.MeleeWeapon || prop.Property == Prop.Properties.RangedWeapon)
         {
             Weapon = prop;
         }
@@ -157,9 +156,9 @@ public partial class Player : Character
         {
             return null;
         }
-        var solt = availableSlots.OrderBy(x => x.GlobalPosition.DistanceTo(enemy.GlobalPosition)).First();
-        solt.Occupy(enemy);
-        return solt;
+        var slot = availableSlots.OrderBy(x => x.GlobalPosition.DistanceTo(enemy.GlobalPosition)).First();
+        slot.Occupy(enemy);
+        return slot;
     }
     public void FreeSlot(Enemy enemy)
     {
@@ -198,11 +197,11 @@ public partial class Player : Character
                 {
                     return (int)State.Attack;
                 }
-                else if (character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                else if (character.Weapon.Property == Prop.Properties.MeleeWeapon)
                 {
                     return (int)State.MeleeWeaponAttack;
                 }
-                else if (character.Weapon.Propertie == Prop.Properties.RangedWeapon)
+                else if (character.Weapon.Property == Prop.Properties.RangedWeapon)
                 {
                     return (int)State.RangedWeaponAttack;
                 }
@@ -213,7 +212,7 @@ public partial class Player : Character
             }
             if (Input.IsActionJustPressed("jump") || character.Height > 0)
             {
-                if (character.Weapon == null || character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                if (character.Weapon == null || character.Weapon.Property == Prop.Properties.MeleeWeapon)
                 {
                     return (int)State.Jump;
                 }
@@ -273,11 +272,11 @@ public partial class Player : Character
                 {
                     return (int)State.Attack;
                 }
-                else if (character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                else if (character.Weapon.Property == Prop.Properties.MeleeWeapon)
                 {
                     return (int)State.MeleeWeaponAttack;
                 }
-                else if (character.Weapon.Propertie == Prop.Properties.RangedWeapon)
+                else if (character.Weapon.Property == Prop.Properties.RangedWeapon)
                 {
                     return (int)State.RangedWeaponAttack;
                 }
@@ -288,7 +287,7 @@ public partial class Player : Character
             }
             if (Input.IsActionJustPressed("jump"))
             {
-                if (character.Weapon == null || character.Weapon.Propertie == Prop.Properties.MeleeWeapon)
+                if (character.Weapon == null || character.Weapon.Property == Prop.Properties.MeleeWeapon)
                 {
                     return (int)State.Jump;
                 }
@@ -641,7 +640,7 @@ public partial class Player : Character
         public bool Enter()
         {
             character.Direction = Vector2.Zero;
-            character.AnimationPlayer.Play("KinfeAttack");
+            character.AnimationPlayer.Play("KnifeAttack");
             return true;
         }
 

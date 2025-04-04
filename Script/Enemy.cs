@@ -440,7 +440,7 @@ public partial class Enemy : Character
         public bool Enter()
         {
             character.Direction = Vector2.Zero;
-            character.AnimationPlayer.Play("KinfeAttack");
+            character.AnimationPlayer.Play("KnifeAttack");
             return true;
         }
 

@@ -8,7 +8,7 @@ public partial class Prop : Sprite2D
     [Export]
     public int ID = 0;
     [Export]
-    public Properties Propertie = 0;
+    public Properties Property = 0;
     public enum Properties
     {
         Restore,
@@ -17,7 +17,7 @@ public partial class Prop : Sprite2D
     }
     [ExportGroup("拾取增益")]
     [Export]
-    public int RestoreHelath = 0;
+    public int RestoreHealth = 0;
     [ExportGroup("武器属性")]
     [Export]
     public int Damage = 0;
