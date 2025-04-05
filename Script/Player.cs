@@ -56,7 +56,9 @@ public partial class Player : Character
 
         AccessingResources();
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+        _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
+
         PickUpProp += OnPickUpProp;
         DropWeapon += OnDropWeapon;
 
@@ -72,6 +74,7 @@ public partial class Player : Character
 
     }
 
+
     public override void _PhysicsProcess(double delta)
     {
         if (!CanNotInputStates.Contains(StateID))
@@ -80,6 +83,12 @@ public partial class Player : Character
 
         }
         StateMachineUpdate(delta);
+    }
+
+
+    private void OnDamageEmitter_AttackSuccess()
+    {
+
     }
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
@@ -94,7 +103,7 @@ public partial class Player : Character
                 if (StateID == (int)State.JumpKick || AttackID == AttackAnimationGroup.Length - 1)
                 {
                     e = new(direction, 2, 100, 100, DamageReceiver.HitType.knockDown);
-                    a.DamageReceived(this, e);
+                    a.DamageReceived(_DamageEmitter, e);
                     return;
                 }
 
@@ -103,7 +112,7 @@ public partial class Player : Character
                     if (Weapon.Property == Prop.Properties.MeleeWeapon)
                     {
                         e = new(direction, 3);
-                        a.DamageReceived(this, e);
+                        a.DamageReceived(_DamageEmitter, e);
                         return;
                     }
                     else if (Weapon.Property == Prop.Properties.RangedWeapon)
@@ -112,14 +121,14 @@ public partial class Player : Character
                     }
                 }
                 e = new(direction);
-                a.DamageReceived(this, e);
+                a.DamageReceived(_DamageEmitter, e);
             }
         }
 
     }
 
 
-    private void OnDamageReceiver_DamageReceived(Node2D sender, DamageReceiver.DamageReceivedEventArgs e)
+    private void OnDamageReceiver_DamageReceived(DamageEmitter emitter, DamageReceiver.DamageReceivedEventArgs e)
     {
         if (!InvincibleStates.Contains(StateID))
         {
@@ -137,13 +146,7 @@ public partial class Player : Character
                 SwitchState((int)State.KnockFly);
             }
             Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
-        }
-        else
-        {
-            if (sender.Owner is Character c)
-            {
-                c.AttackBlocked(this, AttackBlockedStates.Invincible);
-            }
+            emitter?.AttackSuccess();
         }
     }
 
@@ -165,9 +168,14 @@ public partial class Player : Character
         }
     }
 
-    private void OnDropWeapon()
+    void OnDropWeapon()
     {
-
+        if (Weapon != null)
+        {
+            WeaponSprite.Texture = null;
+            WeaponSprite.Visible = false;
+            Weapon = null;
+        }
     }
 
 
@@ -346,6 +354,7 @@ public partial class Player : Character
                 character.AttackID = 0;
             }
             character.AnimationPlayer.Play(character.AttackAnimationGroup[character.AttackID]);
+            character.PlayAudio("miss");
             character.AttackBufferTimer.Start();
 
             return true;
@@ -405,6 +414,7 @@ public partial class Player : Character
         public bool Enter()
         {
             character.AnimationPlayer.Play("Jump");
+            character.PlayAudio("miss");
             character.HeightSpeed = character.JumpSpeed;
             return true;
         }
@@ -446,6 +456,7 @@ public partial class Player : Character
         public bool Enter()
         {
             character.AnimationPlayer.Play("JumpKick");
+            character.PlayAudio("miss");
             return true;
         }
 
@@ -494,9 +505,17 @@ public partial class Player : Character
         {
             character._DamageEmitter.Monitoring = false;
             character.AnimationPlayer.Play("Hurt");
-            character.PlayAudio("hit-1");
+            if (character.Health <= 0)
+            {
+                character.PlayAudio("hit-2");
+                //TODO 摇晃动画,粒子特效
+            }
+            else
+            {
+                character.PlayAudio("hit-1");
+            }
             character.Velocity = character.Direction * character.Repel;
-
+            character.OnDropWeapon();
             return true;
         }
 
@@ -526,7 +545,10 @@ public partial class Player : Character
         {
             character.AnimationPlayer.Play("KnockFly");
             character.PlayAudio("hit-2");
+            //TODO 摇晃动画,粒子特效
+
             character.Velocity = character.Direction * character.Repel;
+            character.OnDropWeapon();
             return true;
         }
 
@@ -662,6 +684,7 @@ public partial class Player : Character
         {
             character.Direction = Vector2.Zero;
             character.AnimationPlayer.Play("KnifeAttack");
+            character.PlayAudio("miss");
             return true;
         }
 
@@ -688,7 +711,7 @@ public partial class Player : Character
         {
             character.Direction = Vector2.Zero;
             character.AnimationPlayer.Play("GunShot");
-            character.PlayAudio("gunshot");
+            character.PlayAudio("click");
             var d = (Vector2.Right * character._DamageEmitter.Scale.X).Normalized();
             var p = new Vector2(character.Weapon.ShotPosition.X * d.X, character.Weapon.ShotPosition.Y);
             EntityManager.Instance.GenerateBullet(character, character.Weapon.Damage, d, new Vector2(character.Position.X + p.X, character.Position.Y), new Vector2(0, p.Y));

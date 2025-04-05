@@ -3,18 +3,13 @@ using Godot;
 
 public partial class Character : MoveObject
 {
-	public delegate void AttackBlockedReceiver(Character character, AttackBlockedStates blockedState);
+
 	public delegate void PickUpPropReceiver(Prop prop);
 	public delegate void DropWeaponReceiver();
-	public AttackBlockedReceiver AttackBlocked;
+
 	public PickUpPropReceiver PickUpProp;
 	public DropWeaponReceiver DropWeapon;
-	public enum AttackBlockedStates
-	{
-		Defense,
-		Invincible,
-		Miss,
-	}
+
 	[Export]
 	public new float MoveSpeed = 35;
 	[Export]
@@ -31,8 +26,10 @@ public partial class Character : MoveObject
 	public Sprite2D CharacterSprite;
 	public Sprite2D WeaponSprite;
 	public Sprite2D ShadowSprite;
+	public AnimatedSprite2D Particle;
+
 	public AnimationPlayer AnimationPlayer;
-	public Area2D _DamageEmitter;
+	public DamageEmitter _DamageEmitter;
 	public DamageReceiver _DamageReceiver;
 
 	public AudioStreamPlayer AudioPlayer;
@@ -45,13 +42,13 @@ public partial class Character : MoveObject
 	{
 		CharacterSprite = GetNode<Sprite2D>("CharacterSprite");
 		ShadowSprite = GetNode<Sprite2D>("ShadowSprite");
-		WeaponSprite = GetNode<Sprite2D>("WeaponSprite");
+		WeaponSprite = CharacterSprite.GetNode<Sprite2D>("WeaponSprite");
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-		_DamageEmitter = CharacterSprite.GetNode<Area2D>("DamageEmitter");
+		_DamageEmitter = CharacterSprite.GetNode<DamageEmitter>("DamageEmitter");
 		_DamageReceiver = CharacterSprite.GetNode<DamageReceiver>("DamageReceiver");
 		AudioPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
 		AttackBufferTimer = GetNode<Timer>("AttackBufferTimer");
-
+		Particle = GetNode<AnimatedSprite2D>("Particle");
 	}
 	public bool AttackRange(Vector2 position)
 	{

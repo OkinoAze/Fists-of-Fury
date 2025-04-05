@@ -3,7 +3,7 @@ using System;
 
 public partial class DamageReceiver : Area2D
 {
-    public delegate void Received(Node2D sender, DamageReceivedEventArgs e);
+    public delegate void Received(DamageEmitter emitter, DamageReceivedEventArgs e);
     public Received DamageReceived;
 
     public enum HitType

@@ -6,7 +6,7 @@ public partial class EntityManager : Node
 {
     public delegate void GenerateActorReceiver(EnemyType type, Vector2 position, float height, float heightSpeed, Prop[] props);
     public delegate void GenerateBulletReceiver(Character sender, int damage, Vector2 direction, Vector2 position, Vector2 shotPosition);
-    public delegate void GeneratePropReceiver(Character sender, Vector2 position);
+    public delegate void GeneratePropReceiver(Character sender, Prop prop, Vector2 position);
     public GenerateActorReceiver GenerateActor;
     public GenerateBulletReceiver GenerateBullet;
     public GeneratePropReceiver GenerateProp;

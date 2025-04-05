@@ -2,6 +2,8 @@
 
 [node name="Prop" type="Sprite2D"]
 
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
 [node name="PickupRange" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PickupRange"]

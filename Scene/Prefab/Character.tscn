@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://ej5chbmy7qdn"]
+[gd_scene load_steps=6 format=3 uid="uid://ej5chbmy7qdn"]
 
 [ext_resource type="Script" uid="uid://o51q13tru0r1" path="res://Script/Character.cs" id="1_8jy4q"]
 [ext_resource type="Texture2D" uid="uid://dvrrqsggg1kiy" path="res://Art/Characters/shadow.png" id="2_ok56b"]
 [ext_resource type="PackedScene" uid="uid://ovdl0lg8ghmf" path="res://Scene/Prefab/DamageEmitter.tscn" id="3_s4oq7"]
 [ext_resource type="PackedScene" uid="uid://wahn30yxqe0y" path="res://Scene/Prefab/DamageReceiver.tscn" id="4_chqrr"]
+[ext_resource type="PackedScene" uid="uid://dnn3cawehq8m7" path="res://Scene/Prefab/Particle.tscn" id="5_chqrr"]
 
 [node name="Character" type="CharacterBody2D"]
 motion_mode = 1
@@ -18,7 +19,7 @@ texture = ExtResource("2_ok56b")
 
 [node name="DamageReceiver" parent="CharacterSprite" instance=ExtResource("4_chqrr")]
 
-[node name="WeaponSprite" type="Sprite2D" parent="."]
+[node name="WeaponSprite" type="Sprite2D" parent="CharacterSprite"]
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
 
@@ -30,6 +31,15 @@ callback_mode_process = 0
 [node name="AttackBufferTimer" type="Timer" parent="."]
 wait_time = 0.5
 one_shot = true
+
+[node name="PikUpCheck" type="Area2D" parent="."]
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PikUpCheck"]
+debug_color = Color(0.694531, 0.7, 0, 0.42)
+
+[node name="Particle" parent="." instance=ExtResource("5_chqrr")]
+visible = false
 
 [editable path="CharacterSprite/DamageEmitter"]
 [editable path="CharacterSprite/DamageReceiver"]

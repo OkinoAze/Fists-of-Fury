@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://nneqhin7yi3j"]
+[gd_scene load_steps=21 format=3 uid="uid://nneqhin7yi3j"]
 
 [ext_resource type="PackedScene" uid="uid://ej5chbmy7qdn" path="res://Scene/Prefab/Character.tscn" id="1_hcc6n"]
 [ext_resource type="Script" uid="uid://bgdu5cehktg1f" path="res://Script/Enemy.cs" id="2_uoh4s"]
@@ -79,7 +79,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("WeaponSprite:frame")
+tracks/2/path = NodePath("CharacterSprite/WeaponSprite:frame")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -140,7 +140,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("WeaponSprite:frame")
+tracks/1/path = NodePath("CharacterSprite/WeaponSprite:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -219,7 +219,7 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("WeaponSprite:frame")
+tracks/5/path = NodePath("CharacterSprite/WeaponSprite:frame")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -480,6 +480,30 @@ tracks/3/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("CharacterSprite/WeaponSprite:frame")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [12]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_2dswq"]
 resource_name = "Walk"
@@ -501,7 +525,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("WeaponSprite:frame")
+tracks/1/path = NodePath("CharacterSprite/WeaponSprite:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -511,9 +535,53 @@ tracks/1/keys = {
 "values": [10, 11, 12, 13, 14, 15, 16, 17]
 }
 
+[sub_resource type="Animation" id="Animation_u1gpw"]
+resource_name = "Death"
+length = 1.8
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [52]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1.8),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"DeathEnd"
+}]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ihm3i"]
 _data = {
 &"CrouchDown": SubResource("Animation_vcx27"),
+&"Death": SubResource("Animation_u1gpw"),
 &"GunShot": SubResource("Animation_mkka3"),
 &"Hurt": SubResource("Animation_ihm3i"),
 &"Idle": SubResource("Animation_uoh4s"),
@@ -552,24 +620,25 @@ collision_layer = 64
 position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_uoh4s")
 
-[node name="WeaponSprite" parent="." index="2"]
+[node name="WeaponSprite" parent="CharacterSprite" index="2"]
+visible = true
 centered = false
 offset = Vector2(-24, -48)
 hframes = 10
 vframes = 10
-frame = 31
+frame = 12
 
-[node name="CollisionShape" parent="." index="3"]
+[node name="CollisionShape" parent="." index="2"]
 rotation = -1.5708
 shape = SubResource("CapsuleShape2D_uoh4s")
 
-[node name="AnimationPlayer" parent="." index="4"]
+[node name="AnimationPlayer" parent="." index="3"]
 libraries = {
 &"": SubResource("AnimationLibrary_ihm3i")
 }
 autoplay = "Idle"
 
-[node name="AttackTimer" type="Timer" parent="." index="7"]
+[node name="AttackTimer" type="Timer" parent="." index="6"]
 process_callback = 0
 wait_time = 2.0
 one_shot = true

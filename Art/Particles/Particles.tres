@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" load_steps=6 format=3 uid="uid://dqbuknmlrhaqs"]
+
+[ext_resource type="Texture2D" uid="uid://dulubj00hlnog" path="res://Art/Particles/spark.png" id="1_004bq"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3l8t2"]
+atlas = ExtResource("1_004bq")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eefq8"]
+atlas = ExtResource("1_004bq")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0w64e"]
+atlas = ExtResource("1_004bq")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7rcfj"]
+atlas = ExtResource("1_004bq")
+region = Rect2(144, 0, 48, 48)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3l8t2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eefq8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0w64e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7rcfj")
+}],
+"loop": true,
+"name": &"Spark",
+"speed": 10.0
+}]

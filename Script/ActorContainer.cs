@@ -8,11 +8,18 @@ public partial class ActorContainer : Node2D
     public override void _Ready()
     {
         EntityManager.Instance.GenerateActor += OnGenerateActor;
-        EntityManager.Instance.GenerateBullet += OnGenerateBulletAsync;
+        EntityManager.Instance.GenerateBullet += OnGenerateBullet;
+        EntityManager.Instance.GenerateProp += OnGenerateProp;
 
     }
 
-    private void OnGenerateBulletAsync(Character sender, int damage, Vector2 direction, Vector2 position, Vector2 shotPosition)
+    private void OnGenerateProp(Character sender, Prop prop, Vector2 position)
+    {
+
+    }
+
+
+    private void OnGenerateBullet(Character sender, int damage, Vector2 direction, Vector2 position, Vector2 shotPosition)
     {
         var path = "res://Scene/Prefab/Bullet.tscn";
         var bulletScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);

@@ -1,14 +1,9 @@
 using Godot;
 using System;
 
-public partial class Bullet : StaticObject
+public partial class Bullet : ShotObject
 {
-    public int Damage = 1;
-    public const float _AttackRange = 5;
-    new public float MoveSpeed = 100;
-    public Area2D _DamageEmitter;
-    public Sprite2D Sprite;
-    public VisibleOnScreenNotifier2D OnScreen;
+    new public float MoveSpeed = 150;
 
     enum State
     {
@@ -24,13 +19,15 @@ public partial class Bullet : StaticObject
         _ = new StateMoving(this);
         _ = new StateDestroyed(this);
 
-        OnScreen = GetNode<VisibleOnScreenNotifier2D>("VisibleOnScreenNotifier2D");
-        Sprite = GetNode<Sprite2D>("Sprite2D");
-        _DamageEmitter = Sprite.GetNode<Area2D>("DamageEmitter");
-
+        AccessingResources();
 
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+        _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
 
+    }
+
+    private void OnDamageEmitter_AttackSuccess()
+    {
 
     }
 
@@ -44,8 +41,7 @@ public partial class Bullet : StaticObject
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
                 DamageReceiver.DamageReceivedEventArgs e;
                 e = new(direction, Damage, 30);
-                a.DamageReceived(this, e);
-
+                a.DamageReceived(_DamageEmitter, e);
                 SwitchState((int)State.Destroyed);
             }
         }
@@ -58,14 +54,6 @@ public partial class Bullet : StaticObject
         StateMachineUpdate(delta);
     }
 
-    public bool AttackRange(Vector2 position)
-    {
-        if (position.Y > Position.Y - _AttackRange && position.Y < Position.Y + _AttackRange)
-        {
-            return true;
-        }
-        return false;
-    }
 
     public partial class StateIdle : Node, IState
     {

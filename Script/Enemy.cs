@@ -21,12 +21,13 @@ public partial class Enemy : Character
         KnockDown,
         MeleeWeaponAttack,
         RangedWeaponAttack,
+        Death,
 
     }
     public override void _Ready()
     {
         States = new IState[Enum.GetNames(typeof(State)).Length];
-        InvincibleStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
+        InvincibleStates = [(int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown, (int)State.Death];
 
         _ = new StateIdle(this);
         _ = new StateWalk(this);
@@ -38,6 +39,7 @@ public partial class Enemy : Character
         _ = new StateCrouchDown(this);
         _ = new StateMeleeWeaponAttack(this);
         _ = new StateRangedWeaponAttack(this);
+        _ = new StateDeath(this);
 
 
         _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
@@ -52,6 +54,7 @@ public partial class Enemy : Character
 
 
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
+        _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
 
 
@@ -60,8 +63,12 @@ public partial class Enemy : Character
 
     public override void _PhysicsProcess(double delta)
     {
-
         StateMachineUpdate(delta);
+    }
+
+    private void OnDamageEmitter_AttackSuccess()
+    {
+
     }
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
@@ -72,12 +79,12 @@ public partial class Enemy : Character
             {
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
                 DamageReceiver.DamageReceivedEventArgs e = new(direction);
-                a.DamageReceived(this, e);
+                a.DamageReceived(_DamageEmitter, e);
             }
         }
 
     }
-    private void OnDamageReceiver_DamageReceived(Node2D sender, DamageReceiver.DamageReceivedEventArgs e)
+    private void OnDamageReceiver_DamageReceived(DamageEmitter emitter, DamageReceiver.DamageReceivedEventArgs e)
     {
         if (!InvincibleStates.Contains(StateID))
         {
@@ -95,13 +102,7 @@ public partial class Enemy : Character
                 SwitchState((int)State.KnockFly);
             }
             Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
-        }
-        else
-        {
-            if (sender.Owner is Character c)
-            {
-                c.AttackBlocked(this, AttackBlockedStates.Invincible);
-            }
+            emitter?.AttackSuccess();
         }
     }
     private partial class StateIdle : Node, IState
@@ -405,7 +406,7 @@ public partial class Enemy : Character
         if (Health <= 0)
         {
             _Player.FreeSlot(this);
-            QueueFree();
+            SwitchState((int)State.Death);
         }
         else
         {
@@ -478,6 +479,35 @@ public partial class Enemy : Character
             character.Direction = Vector2.Zero;
             character.AnimationPlayer.Play("GunShot");
             character.PlayAudio("gunshot");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+            return Exit();
+        }
+        public int Exit()
+        {
+            return GetId;
+        }
+    }
+    public void DeathEnd()
+    {
+        QueueFree();
+    }
+    private partial class StateDeath : Node, IState
+    {
+        Enemy character;
+        public int GetId { get; } = (int)State.Death;
+        public StateDeath(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            character.Direction = Vector2.Zero;
+            character.AnimationPlayer.Play("Death");
             return true;
         }
 
