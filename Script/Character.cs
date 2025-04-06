@@ -35,6 +35,7 @@ public partial class Character : MoveObject
 	public AudioStreamPlayer AudioPlayer;
 	public Timer AttackBufferTimer;
 	public Prop Weapon;
+	public Area2D PickUpCheck;
 	public int[] InvincibleStates;
 	public string AvatarName = null;
 
@@ -48,6 +49,7 @@ public partial class Character : MoveObject
 		_DamageReceiver = CharacterSprite.GetNode<DamageReceiver>("DamageReceiver");
 		AudioPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
 		AttackBufferTimer = GetNode<Timer>("AttackBufferTimer");
+		PickUpCheck = GetNode<Area2D>("PickUpCheck");
 		Particle = GetNode<AnimatedSprite2D>("Particle");
 	}
 	public bool AttackRange(Vector2 position)
