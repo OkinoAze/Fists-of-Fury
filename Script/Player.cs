@@ -84,6 +84,10 @@ public partial class Player : Character
 
     private void OnDamageEmitter_AttackSuccess()
     {
+        if (Weapon?.Property == Prop.Properties.MeleeWeapon)
+        {
+            Weapon.Durability--;
+        }
 
     }
 
@@ -331,7 +335,6 @@ public partial class Player : Character
         if (AttackID == 1 && CanPickUpProp != null)
         {
             AttackID = 0;
-            //TODO 拾取物品
             SwitchState((int)State.CrouchDown);
             PickUpProp(CanPickUpProp);
             CanPickUpProp.QueueFree();
@@ -689,13 +692,22 @@ public partial class Player : Character
         public bool Enter()
         {
             character.Direction = Vector2.Zero;
-            character.AnimationPlayer.Play("KnifeAttack");
-            character.PlayAudio("miss");
+            if (character.Weapon.Durability > 0)
+            {
+                character.AnimationPlayer.Play("KnifeAttack");
+                character.PlayAudio("miss");
+            }
+            else
+            {
+                character.DropWeapon();
+                character.SwitchState((int)State.Idle);
+            }
             return true;
         }
 
         public int Update(double delta)
         {
+
             return Exit();
         }
         public int Exit()
@@ -728,6 +740,7 @@ public partial class Player : Character
             else
             {
                 character.DropWeapon();
+                character.SwitchState((int)State.Idle);
             }
             return true;
         }

@@ -3,7 +3,6 @@ using System;
 
 public partial class ActorContainer : Node2D
 {
-    //TODO 角色生成
     public override void _Ready()
     {
         EntityManager.Instance.GenerateActor += OnGenerateActor;

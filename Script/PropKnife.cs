@@ -72,7 +72,7 @@ public partial class PropKnife : Prop
         {
             character.Height += character.HeightSpeed * (float)delta;
             character.HeightSpeed -= Gravity * (float)delta;
-            character.Sprite.Position = new Vector2(0, -4) + Vector2.Up * character.Height;
+            character.Sprite.Position = new Vector2(0, -2) + Vector2.Up * character.Height;
             return Exit();
         }
         public int Exit()

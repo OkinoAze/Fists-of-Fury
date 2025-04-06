@@ -1,0 +1,167 @@
+[gd_scene load_steps=11 format=3 uid="uid://qby2darmqbhy"]
+
+[ext_resource type="PackedScene" uid="uid://duogckgw1pxm0" path="res://Scene/Prefab/Prop.tscn" id="1_3fyc8"]
+[ext_resource type="Script" uid="uid://ci7j2qygoif70" path="res://Script/PropKnife.cs" id="2_3fyc8"]
+[ext_resource type="Texture2D" uid="uid://dvrrqsggg1kiy" path="res://Art/Characters/shadow.png" id="3_sxefv"]
+[ext_resource type="Texture2D" uid="uid://bg3h7da7rumuh" path="res://Art/Props/knife.png" id="4_3fyc8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w87n5"]
+size = Vector2(14, 2)
+
+[sub_resource type="Animation" id="Animation_r6hpd"]
+resource_name = "Destroyed"
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"DestroyedEnd"
+}]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -2)]
+}
+
+[sub_resource type="Animation" id="Animation_32wqt"]
+resource_name = "PropFall"
+length = 0.4
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0.0, 1.5708, 3.14159, 4.71239, 6.28319]
+}
+
+[sub_resource type="Animation" id="Animation_w87n5"]
+resource_name = "Idle"
+length = 0.1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -2)]
+}
+
+[sub_resource type="Animation" id="Animation_wiw1o"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -2)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_r6hpd"]
+_data = {
+&"Destroyed": SubResource("Animation_r6hpd"),
+&"Fall": SubResource("Animation_32wqt"),
+&"Idle": SubResource("Animation_w87n5"),
+&"RESET": SubResource("Animation_wiw1o")
+}
+
+[node name="PropKnife" instance=ExtResource("1_3fyc8")]
+script = ExtResource("2_3fyc8")
+Property = 1
+Damage = 2
+Durability = 5
+
+[node name="ShadowSprite" parent="." index="0"]
+texture = ExtResource("3_sxefv")
+
+[node name="Sprite2D" parent="." index="1"]
+position = Vector2(0, -2)
+texture = ExtResource("4_3fyc8")
+
+[node name="CollisionShape2D" parent="PickUpArea" index="0"]
+shape = SubResource("RectangleShape2D_w87n5")
+
+[node name="AnimationPlayer" parent="." index="3"]
+libraries = {
+&"": SubResource("AnimationLibrary_r6hpd")
+}
+autoplay = "Idle"

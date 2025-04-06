@@ -31,9 +31,10 @@ public partial class Barrel : StaticObject
     {
         StateMachineUpdate(delta);
     }
-    private void OnDamageReceiver_DamageReceived(Node2D sender, DamageReceiver.DamageReceivedEventArgs e)
+    private void OnDamageReceiver_DamageReceived(DamageEmitter emitter, DamageReceiver.DamageReceivedEventArgs e)
     {
         Health -= e.Damage;
+        emitter?.AttackSuccess();
         if (e.Type == DamageReceiver.HitType.knockDown)
         {
             PlayAudio("hit-2");

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bacl472jw6i6x"]
+[gd_scene load_steps=10 format=3 uid="uid://bacl472jw6i6x"]
 
 [ext_resource type="Script" uid="uid://cuvv6fyqwfmts" path="res://Script/Main.cs" id="1_djkur"]
 [ext_resource type="PackedScene" uid="uid://ylrqp34rxwb0" path="res://Scene/Prefab/Player.tscn" id="1_xhtwi"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://d2tpt0iu7ow7h" path="res://Scene/Prefab/Barrel.tscn" id="4_h175a"]
 [ext_resource type="PackedScene" uid="uid://nneqhin7yi3j" path="res://Scene/Prefab/Enemy.tscn" id="4_togfq"]
 [ext_resource type="PackedScene" uid="uid://h0g8bvb80hc5" path="res://Scene/Prefab/PropGun.tscn" id="7_h3nmf"]
+[ext_resource type="PackedScene" uid="uid://qby2darmqbhy" path="res://Scene/Prefab/PropKnife.tscn" id="8_hueuk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h175a"]
 size = Vector2(5, 66)
@@ -62,5 +63,10 @@ position = Vector2(73, 57)
 position = Vector2(138, 57)
 
 [node name="PropGun" parent="ActorContainer" instance=ExtResource("7_h3nmf")]
-modulate = Color(1, 1, 1, 1)
 position = Vector2(53, 55)
+
+[node name="PropKnife" parent="ActorContainer" instance=ExtResource("8_hueuk")]
+position = Vector2(21, 53)
+
+[node name="Enemy2" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(15, 45)
