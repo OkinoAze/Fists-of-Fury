@@ -331,10 +331,9 @@ public partial class Player : Character
         {
             AttackID = 0;
             //TODO 拾取物品
-            PickUpProp(CanPickUpProp.Instance);
             SwitchState((int)State.CrouchDown);
+            PickUpProp(CanPickUpProp.Instance);
             CanPickUpProp.QueueFree();
-            CanPickUpProp = null;
         }
         else
         {
@@ -650,10 +649,6 @@ public partial class Player : Character
         }
         public int Exit()
         {
-            if (Input.IsActionPressed("jump"))
-            {
-                //TODO 切换到蹲伏状态
-            }
             return GetId;
         }
     }
@@ -670,7 +665,6 @@ public partial class Player : Character
         {
             character.Velocity = Vector2.Zero;
             character.AnimationPlayer.Play("CrouchDown");
-            GD.Print("CrouchDown");
             return true;
         }
 

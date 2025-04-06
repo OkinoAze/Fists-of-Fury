@@ -45,6 +45,18 @@ tracks/1/keys = {
 "method": &"SwitchState"
 }]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CharacterSprite/WeaponSprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [70]
+}
 
 [sub_resource type="Animation" id="Animation_u1gpw"]
 resource_name = "Death"

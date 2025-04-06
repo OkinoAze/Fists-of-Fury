@@ -56,10 +56,6 @@ public partial class Enemy : Character
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
-        PickUpCheck.AreaEntered += OnPickUpCheck_AreaEntered;
-        PickUpCheck.AreaExited += OnPickUpCheck_AreaExited;
-
-
 
     }
 
