@@ -62,4 +62,4 @@ position = Vector2(73, 57)
 position = Vector2(138, 57)
 
 [node name="PropGun" parent="ActorContainer" instance=ExtResource("7_h3nmf")]
-position = Vector2(12, 57)
+position = Vector2(73, 57)

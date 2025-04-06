@@ -56,10 +56,15 @@ public partial class Enemy : Character
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
+        PickUpCheck.AreaEntered += OnPickUpCheck_AreaEntered;
+        PickUpCheck.AreaExited += OnPickUpCheck_AreaExited;
 
 
 
     }
+
+
+
 
     public override void _PhysicsProcess(double delta)
     {
@@ -70,7 +75,16 @@ public partial class Enemy : Character
     {
 
     }
+    private void OnPickUpCheck_AreaExited(Area2D area)
+    {
 
+    }
+
+
+    private void OnPickUpCheck_AreaEntered(Area2D area)
+    {
+
+    }
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
         if (area is DamageReceiver a)
@@ -237,6 +251,7 @@ public partial class Enemy : Character
             if (character.AttackBufferTimer.TimeLeft > 0)
             {
                 character.AttackID++;
+
                 if (character.AttackID >= character.AttackAnimationGroup.Length)
                 {
                     character.AttackID = 0;
@@ -286,7 +301,14 @@ public partial class Enemy : Character
         {
             character._DamageEmitter.Monitoring = false;
             character.AnimationPlayer.Play("Hurt");
-            character.PlayAudio("hit-1");
+            if (character.Health <= 0)
+            {
+                character.PlayAudio("hit-2");
+            }
+            else
+            {
+                character.PlayAudio("hit-1");
+            }
             character.Velocity = character.Direction * character.Repel;
 
             return true;

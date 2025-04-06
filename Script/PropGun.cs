@@ -12,13 +12,18 @@ public partial class PropGun : PropInstance
     public override void _Ready()
     {
         States = new IState[Enum.GetNames(typeof(State)).Length];
-        _ = new StateFall(this);
         _ = new StateIdle(this);
+        _ = new StateFall(this);
         _ = new StateDestroyed(this);
 
         AccessingResources();
 
+        Instance = EntityManager.Instance.GetProp(EntityManager.Props.Gun);
         SwitchState((int)State.Fall);
+    }
+    public override void _PhysicsProcess(double delta)
+    {
+        StateMachineUpdate(delta);
     }
     public partial class StateIdle : Node, IState
     {
@@ -31,6 +36,7 @@ public partial class PropGun : PropInstance
         }
         public bool Enter()
         {
+            character.PickUpArea.Monitorable = true;
             character.AnimationPlayer.Play("Idle");
             return true;
         }
@@ -55,8 +61,8 @@ public partial class PropGun : PropInstance
         }
         public bool Enter()
         {
+            character.PickUpArea.Monitorable = false;
             character.AnimationPlayer.Play("Fall");
-            character.HeightSpeed = 90;
             return true;
         }
 
@@ -91,6 +97,7 @@ public partial class PropGun : PropInstance
         }
         public bool Enter()
         {
+            character.PickUpArea.Monitorable = false;
             character.AnimationPlayer.Play("Destroyed");
             return true;
         }

@@ -35,9 +35,11 @@ public partial class Character : MoveObject
 	public AudioStreamPlayer AudioPlayer;
 	public Timer AttackBufferTimer;
 	public Prop Weapon;
+	public Prop CanPickUpProp;
+
 	public Area2D PickUpCheck;
 	public int[] InvincibleStates;
-	public string AvatarName = null;
+	public string AvatarName;
 
 	public void AccessingResources()
 	{
@@ -51,7 +53,24 @@ public partial class Character : MoveObject
 		AttackBufferTimer = GetNode<Timer>("AttackBufferTimer");
 		PickUpCheck = GetNode<Area2D>("PickUpCheck");
 		Particle = GetNode<AnimatedSprite2D>("Particle");
+
+		PickUpCheck.AreaEntered += OnPickUpCheck_AreaEntered;
+		PickUpCheck.AreaExited += OnPickUpCheck_AreaExited;
+
 	}
+	public void OnPickUpCheck_AreaExited(Area2D area)
+	{
+		CanPickUpProp = null;
+	}
+
+	public void OnPickUpCheck_AreaEntered(Area2D area)
+	{
+		if (area.Owner is PropInstance p)
+		{
+			CanPickUpProp = p.Instance;
+		}
+	}
+
 	public bool AttackRange(Vector2 position)
 	{
 		if (position.Y > Position.Y - _AttackRange && position.Y < Position.Y + _AttackRange)

@@ -3,8 +3,9 @@ using System;
 
 public partial class PropInstance : Node2D
 {
-    public float Height = 0;
-    public float HeightSpeed = 0;
+    public Prop Instance;
+    public float Height = 10;
+    public float HeightSpeed = 60;
     public const float Gravity = 320;
     public int StateID = 0;
     public bool EnterEnd = false;

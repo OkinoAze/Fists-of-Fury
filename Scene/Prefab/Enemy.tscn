@@ -596,7 +596,7 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2dswq"]
-size = Vector2(14, 4)
+size = Vector2(4, 4)
 
 [node name="Enemy" groups=["Enemy"] instance=ExtResource("1_hcc6n")]
 collision_layer = 4

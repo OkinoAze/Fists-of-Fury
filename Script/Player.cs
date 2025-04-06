@@ -5,7 +5,6 @@ using System.Linq;
 
 public partial class Player : Character
 {
-
     public string[] AttackAnimationGroup = ["Punch", "Punch2", "Kick", "Kick2"];
     public int[] CanNotInputStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall];
     List<EnemySlot> EnemySlots = [];
@@ -62,15 +61,12 @@ public partial class Player : Character
         PickUpProp += OnPickUpProp;
         DropWeapon += OnDropWeapon;
 
+
         var slots = GetNodeOrNull("EnemySlots")?.GetChildren();
         foreach (var item in slots)
         {
             EnemySlots.Add((EnemySlot)item);
         }
-
-
-        Prop p = ResourceLoader.Load<Prop>("res://Scene/Props/Gun.tres");
-        PickUpProp(p);
 
     }
 
@@ -83,6 +79,7 @@ public partial class Player : Character
 
         }
         StateMachineUpdate(delta);
+        GD.Print(CanPickUpProp);
     }
 
 
@@ -344,6 +341,12 @@ public partial class Player : Character
             if (character.AttackBufferTimer.TimeLeft > 0)
             {
                 character.AttackID++;
+                if (character.AttackID == 1 && character.CanPickUpProp != null)
+                {
+                    character.AttackID = 0;
+                    //TODO 拾取物品
+                    character.SwitchState((int)State.CrouchDown);
+                }
                 if (character.AttackID >= character.AttackAnimationGroup.Length)
                 {
                     character.AttackID = 0;
@@ -656,8 +659,8 @@ public partial class Player : Character
         }
         public bool Enter()
         {
-            character.AnimationPlayer.Play("CrouchDown");
             character.Velocity = Vector2.Zero;
+            character.AnimationPlayer.Play("CrouchDown");
             return true;
         }
 
