@@ -32,10 +32,12 @@ callback_mode_process = 0
 wait_time = 0.5
 one_shot = true
 
-[node name="PikUpCheck" type="Area2D" parent="."]
+[node name="PickUpCheck" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PikUpCheck"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickUpCheck"]
 debug_color = Color(0.694531, 0.7, 0, 0.42)
 
 [node name="Particle" parent="." instance=ExtResource("5_chqrr")]

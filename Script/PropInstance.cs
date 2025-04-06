@@ -16,7 +16,7 @@ public partial class PropInstance : Node2D
 
     public void AccessingResources()
     {
-        Sprite = GetNode<Sprite2D>("Sprite");
+        Sprite = GetNode<Sprite2D>("Sprite2D");
         ShadowSprite = GetNode<Sprite2D>("ShadowSprite");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         PickUpArea = GetNode<Area2D>("PickUpArea");

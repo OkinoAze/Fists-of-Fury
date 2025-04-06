@@ -160,11 +160,11 @@ public partial class Enemy : Character
 
         public int Update(double delta)
         {
+
             if (character.Slot != null)
             {
                 character.Direction = (character.Slot.GlobalPosition - character.GlobalPosition).Normalized();
-
-
+                //TODO 碰到障碍增加角度离开障碍后恢复原方向
             }
             if (character.Direction.X < 0)
             {

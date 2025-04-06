@@ -786,7 +786,7 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mvokj"]
-size = Vector2(10, 6)
+size = Vector2(12, 4)
 
 [node name="Player" groups=["Player"] instance=ExtResource("1_8kqy7")]
 collision_layer = 2
@@ -832,7 +832,7 @@ libraries = {
 }
 autoplay = "Idle"
 
-[node name="CollisionShape2D" parent="PikUpCheck" index="0"]
+[node name="CollisionShape2D" parent="PickUpCheck" index="0"]
 shape = SubResource("RectangleShape2D_mvokj")
 
 [node name="EnemySlots" type="Node2D" parent="." index="7"]

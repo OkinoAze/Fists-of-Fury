@@ -37,7 +37,6 @@ public partial class Bullet : ShotObject
         {
             if (AttackRange((a.Owner as Node2D).Position))
             {
-
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
                 DamageReceiver.DamageReceivedEventArgs e;
                 e = new(direction, Damage, 30);
