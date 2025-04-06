@@ -4,10 +4,10 @@ using System;
 public partial class ShotObject : StaticObject
 {
     public int Damage = 1;
-    public const float _AttackRange = 5;
+    protected const float _AttackRange = 5;
     public DamageEmitter _DamageEmitter;
     public Sprite2D Sprite;
-    public VisibleOnScreenNotifier2D OnScreen;
+    protected VisibleOnScreenNotifier2D OnScreen;
 
 
     private void OnDamageEmitter_AttackSuccess()

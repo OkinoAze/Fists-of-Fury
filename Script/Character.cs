@@ -10,36 +10,29 @@ public partial class Character : MoveObject
 	public PickUpPropReceiver PickUpProp;
 	public DropWeaponReceiver DropWeapon;
 
-	[Export]
-	public new float MoveSpeed = 35;
-	[Export]
-	public new float JumpSpeed = 140;
-	[Export]
 	public int MaxHealth = 1;
-	[Export]
 	public int Health = 1;
-	[Export]
 	public int Damage = 1;
-	public const float _AttackRange = 5;
-	public float Repel = 0;
-	public int AttackID = 0;
-	public Sprite2D CharacterSprite;
-	public Sprite2D WeaponSprite;
-	public Sprite2D ShadowSprite;
-	public AnimatedSprite2D Particle;
+	protected const float _AttackRange = 5;
+	protected float Repel = 0;
+	public int AttackID { get; protected set; } = 0;
+	protected Sprite2D CharacterSprite;
+	protected Sprite2D WeaponSprite;
+	protected Sprite2D ShadowSprite;
+	protected AnimatedSprite2D Particle;
 
-	public AnimationPlayer AnimationPlayer;
+	protected AnimationPlayer AnimationPlayer;
 	public DamageEmitter _DamageEmitter;
 	public DamageReceiver _DamageReceiver;
 
-	public AudioStreamPlayer AudioPlayer;
-	public Timer AttackBufferTimer;
-	public Prop Weapon;
-	public Prop CanPickUpProp;
+	protected AudioStreamPlayer AudioPlayer;
+	protected Timer AttackBufferTimer;
+	protected Prop Weapon;
+	protected PropInstance CanPickUpProp;
 
-	public Area2D PickUpCheck;
-	public int[] InvincibleStates;
-	public string AvatarName;
+	protected Area2D PickUpCheck;
+	protected int[] InvincibleStates;
+	public string AvatarName { get; protected set; }
 
 	public void AccessingResources()
 	{
@@ -58,20 +51,20 @@ public partial class Character : MoveObject
 		PickUpCheck.AreaExited += OnPickUpCheck_AreaExited;
 
 	}
-	public void OnPickUpCheck_AreaExited(Area2D area)
+	protected void OnPickUpCheck_AreaExited(Area2D area)
 	{
 		CanPickUpProp = null;
 	}
 
-	public void OnPickUpCheck_AreaEntered(Area2D area)
+	protected void OnPickUpCheck_AreaEntered(Area2D area)
 	{
 		if (area.Owner is PropInstance p)
 		{
-			CanPickUpProp = p.Instance;
+			CanPickUpProp = p;
 		}
 	}
 
-	public bool AttackRange(Vector2 position)
+	protected bool AttackRange(Vector2 position)
 	{
 		if (position.Y > Position.Y - _AttackRange && position.Y < Position.Y + _AttackRange)
 		{
@@ -79,11 +72,11 @@ public partial class Character : MoveObject
 		}
 		return false;
 	}
-	public string GetAvatarPath(string name)
+	protected string GetAvatarPath(string name)
 	{
 		return "res://Art/UI/Avatar/avatar_" + name + ".png";
 	}
-	public void PlayAudio(string name)
+	protected void PlayAudio(string name)
 	{
 		AudioPlayer.Stream = ResourceLoader.Load<AudioStreamWav>("res://Music/SFX/" + name + ".wav", null, ResourceLoader.CacheMode.Reuse);
 		AudioPlayer.Play();

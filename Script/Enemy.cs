@@ -64,8 +64,6 @@ public partial class Enemy : Character
     }
 
 
-
-
     public override void _PhysicsProcess(double delta)
     {
         StateMachineUpdate(delta);
@@ -75,16 +73,7 @@ public partial class Enemy : Character
     {
 
     }
-    private void OnPickUpCheck_AreaExited(Area2D area)
-    {
 
-    }
-
-
-    private void OnPickUpCheck_AreaEntered(Area2D area)
-    {
-
-    }
     private void OnDamageEmitter_AreaEntered(Area2D area)
     {
         if (area is DamageReceiver a)
@@ -119,7 +108,7 @@ public partial class Enemy : Character
             emitter?.AttackSuccess();
         }
     }
-    private partial class StateIdle : Node, IState
+    partial class StateIdle : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.Idle;
@@ -157,7 +146,7 @@ public partial class Enemy : Character
             return GetId;
         }
     }
-    private partial class StateWalk : Node, IState
+    partial class StateWalk : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.Walk;
@@ -234,7 +223,7 @@ public partial class Enemy : Character
             return GetId;
         }
     }
-    private partial class StateAttack : Node, IState
+    partial class StateAttack : Node, IState
     {
         Enemy character;
 
@@ -288,7 +277,7 @@ public partial class Enemy : Character
             SwitchState((int)State.Idle);
         }
     }
-    private partial class StateHurt : Node, IState
+    partial class StateHurt : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.Hurt;
@@ -326,7 +315,7 @@ public partial class Enemy : Character
         }
     }
 
-    private partial class StateCrouchDown : Node, IState
+    partial class StateCrouchDown : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.CrouchDown;
@@ -352,7 +341,7 @@ public partial class Enemy : Character
             return GetId;
         }
     }
-    private partial class StateKnockFly : Node, IState
+    partial class StateKnockFly : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.KnockFly;
@@ -385,7 +374,7 @@ public partial class Enemy : Character
             return GetId;
         }
     }
-    private partial class StateKnockFall : Node, IState
+    partial class StateKnockFall : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.KnockFall;
@@ -435,7 +424,7 @@ public partial class Enemy : Character
             SwitchState((int)State.CrouchDown);
         }
     }
-    private partial class StateKnockDown : Node, IState
+    partial class StateKnockDown : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.KnockDown;
@@ -461,7 +450,7 @@ public partial class Enemy : Character
             return GetId;
         }
     }
-    private partial class StateMeleeWeaponAttack : Node, IState
+    partial class StateMeleeWeaponAttack : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.MeleeWeaponAttack;
@@ -487,7 +476,7 @@ public partial class Enemy : Character
             return GetId;
         }
     }
-    private partial class StateRangedWeaponAttack : Node, IState
+    partial class StateRangedWeaponAttack : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.RangedWeaponAttack;
@@ -517,7 +506,7 @@ public partial class Enemy : Character
     {
         QueueFree();
     }
-    private partial class StateDeath : Node, IState
+    partial class StateDeath : Node, IState
     {
         Enemy character;
         public int GetId { get; } = (int)State.Death;

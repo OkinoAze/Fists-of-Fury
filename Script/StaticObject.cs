@@ -7,14 +7,14 @@ public partial class StaticObject : StaticBody2D
 	public float JumpSpeed = 0;
 	public float HeightSpeed = 0;
 	public float Height = 0;
-	public const float Gravity = 320;
+	protected const float Gravity = 320;
 	public Vector2 Direction = Vector2.Zero;
-	public Vector2 Velocity = Vector2.Zero;
-	public int StateID = 0;
-	public bool EnterEnd = false;
-	public IState[] States;
+	protected Vector2 Velocity = Vector2.Zero;
+	public int StateID { get; protected set; } = 0;
+	protected bool EnterEnd = false;
+	protected IState[] States;
 
-	public void StateMachineUpdate(double delta)
+	protected void StateMachineUpdate(double delta)
 	{
 		if (EnterEnd == false)
 		{
@@ -33,7 +33,7 @@ public partial class StaticObject : StaticBody2D
 		StateID = id;
 	}
 
-	public interface IState
+	protected interface IState
 	{
 		public int GetId { get; }
 
@@ -50,30 +50,6 @@ public partial class StaticObject : StaticBody2D
 			return GetId;
 		}
 
-	}
-
-	public partial class StateDefault : Node, IState
-	{
-		StaticObject character;
-		public int GetId { get; } = 0;//默认状态
-		public StateDefault(StaticObject c)
-		{
-			character = c;
-			character.States[GetId] = this;
-		}
-		public bool Enter()
-		{
-			return true;
-		}
-
-		public int Update(double delta)
-		{
-			return Exit();
-		}
-		public int Exit()
-		{
-			return GetId;
-		}
 	}
 
 }

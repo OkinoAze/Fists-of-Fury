@@ -25,7 +25,7 @@ public partial class PropGun : PropInstance
     {
         StateMachineUpdate(delta);
     }
-    public partial class StateIdle : Node, IState
+    partial class StateIdle : Node, IState
     {
         PropGun character;
         public int GetId { get; } = (int)State.Idle;
@@ -50,7 +50,7 @@ public partial class PropGun : PropInstance
             return GetId;
         }
     }
-    public partial class StateFall : Node, IState
+    partial class StateFall : Node, IState
     {
         PropGun character;
         public int GetId { get; } = (int)State.Fall;
@@ -86,7 +86,7 @@ public partial class PropGun : PropInstance
     {
         QueueFree();
     }
-    public partial class StateDestroyed : Node, IState
+    partial class StateDestroyed : Node, IState
     {
         PropGun character;
         public int GetId { get; } = (int)State.Destroyed;

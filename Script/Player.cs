@@ -5,8 +5,8 @@ using System.Linq;
 
 public partial class Player : Character
 {
-    public string[] AttackAnimationGroup = ["Punch", "Punch2", "Kick", "Kick2"];
-    public int[] CanNotInputStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall];
+    string[] AttackAnimationGroup = ["Punch", "Punch2", "Kick", "Kick2"];
+    int[] CanNotInputStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall];
     List<EnemySlot> EnemySlots = [];
     enum State
     {
@@ -79,7 +79,6 @@ public partial class Player : Character
 
         }
         StateMachineUpdate(delta);
-        GD.Print(CanPickUpProp);
     }
 
 
@@ -196,7 +195,7 @@ public partial class Player : Character
         }
     }
 
-    private partial class StateIdle : Node, IState
+    partial class StateIdle : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.Idle;
@@ -256,7 +255,7 @@ public partial class Player : Character
             return GetId;
         }
     }
-    private partial class StateWalk : Node, IState
+    partial class StateWalk : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.Walk;
@@ -326,7 +325,23 @@ public partial class Player : Character
             return GetId;
         }
     }
-    public partial class StateAttack : Node, IState
+    public void AttackEnd()
+    {
+        if (AttackID == 1 && CanPickUpProp != null)
+        {
+            AttackID = 0;
+            //TODO 拾取物品
+            PickUpProp(CanPickUpProp.Instance);
+            SwitchState((int)State.CrouchDown);
+            CanPickUpProp.QueueFree();
+            CanPickUpProp = null;
+        }
+        else
+        {
+            SwitchState((int)State.Idle);
+        }
+    }
+    partial class StateAttack : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.Attack;
@@ -341,12 +356,6 @@ public partial class Player : Character
             if (character.AttackBufferTimer.TimeLeft > 0)
             {
                 character.AttackID++;
-                if (character.AttackID == 1 && character.CanPickUpProp != null)
-                {
-                    character.AttackID = 0;
-                    //TODO 拾取物品
-                    character.SwitchState((int)State.CrouchDown);
-                }
                 if (character.AttackID >= character.AttackAnimationGroup.Length)
                 {
                     character.AttackID = 0;
@@ -373,7 +382,7 @@ public partial class Player : Character
             return GetId;
         }
     }
-    private partial class StateSkill : Node, IState
+    partial class StateSkill : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.Skill;
@@ -405,7 +414,7 @@ public partial class Player : Character
         }
     }
 
-    public partial class StateJump : Node, IState
+    partial class StateJump : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.Jump;
@@ -447,7 +456,7 @@ public partial class Player : Character
         }
     }
 
-    public partial class StateJumpKick : Node, IState
+    partial class StateJumpKick : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.JumpKick;
@@ -495,7 +504,7 @@ public partial class Player : Character
             SwitchState((int)State.Idle);
         }
     }
-    private partial class StateHurt : Node, IState
+    partial class StateHurt : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.Hurt;
@@ -535,7 +544,7 @@ public partial class Player : Character
             return GetId;
         }
     }
-    private partial class StateKnockFly : Node, IState
+    partial class StateKnockFly : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.KnockFly;
@@ -571,7 +580,7 @@ public partial class Player : Character
             return GetId;
         }
     }
-    private partial class StateKnockFall : Node, IState
+    partial class StateKnockFall : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.KnockFall;
@@ -619,7 +628,7 @@ public partial class Player : Character
             SwitchState((int)State.CrouchDown);
         }
     }
-    private partial class StateKnockDown : Node, IState
+    partial class StateKnockDown : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.KnockDown;
@@ -648,7 +657,7 @@ public partial class Player : Character
             return GetId;
         }
     }
-    private partial class StateCrouchDown : Node, IState
+    partial class StateCrouchDown : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.CrouchDown;
@@ -661,6 +670,7 @@ public partial class Player : Character
         {
             character.Velocity = Vector2.Zero;
             character.AnimationPlayer.Play("CrouchDown");
+            GD.Print("CrouchDown");
             return true;
         }
 
@@ -674,7 +684,7 @@ public partial class Player : Character
             return GetId;
         }
     }
-    private partial class StateMeleeWeaponAttack : Node, IState
+    partial class StateMeleeWeaponAttack : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.MeleeWeaponAttack;
@@ -701,7 +711,7 @@ public partial class Player : Character
             return GetId;
         }
     }
-    private partial class StateRangedWeaponAttack : Node, IState
+    partial class StateRangedWeaponAttack : Node, IState
     {
         Player character;
         public int GetId { get; } = (int)State.RangedWeaponAttack;

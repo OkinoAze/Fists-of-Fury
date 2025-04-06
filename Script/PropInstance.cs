@@ -6,16 +6,16 @@ public partial class PropInstance : Node2D
     public Prop Instance;
     public float Height = 10;
     public float HeightSpeed = 60;
-    public const float Gravity = 320;
+    protected const float Gravity = 320;
     public int StateID = 0;
     public bool EnterEnd = false;
-    public IState[] States;
+    protected IState[] States;
     public Sprite2D ShadowSprite;
     public Sprite2D Sprite;
     public AnimationPlayer AnimationPlayer;
     public Area2D PickUpArea;
 
-    public void AccessingResources()
+    protected void AccessingResources()
     {
         Sprite = GetNode<Sprite2D>("Sprite2D");
         ShadowSprite = GetNode<Sprite2D>("ShadowSprite");
@@ -24,7 +24,7 @@ public partial class PropInstance : Node2D
 
     }
 
-    public void StateMachineUpdate(double delta)
+    protected void StateMachineUpdate(double delta)
     {
         if (EnterEnd == false)
         {
@@ -42,7 +42,7 @@ public partial class PropInstance : Node2D
         EnterEnd = enter;
         StateID = id;
     }
-    public interface IState
+    protected interface IState
     {
         public int GetId { get; }
 
@@ -60,7 +60,7 @@ public partial class PropInstance : Node2D
         }
 
     }
-    public partial class StateDefault : Node, IState
+    partial class StateDefault : Node, IState
     {
         PropInstance character;
         public int GetId { get; } = 0;//默认状态

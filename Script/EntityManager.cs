@@ -19,8 +19,10 @@ public partial class EntityManager : Node
     }
     public Prop GetProp(Props prop)
     {
+
         var path = "res://Scene/Props/" + Enum.GetName(prop) + ".tres";
         return ResourceLoader.Load<Prop>(path);
+
     }
     public static EntityManager Instance { get; private set; }
     public enum EnemyType

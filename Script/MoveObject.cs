@@ -9,9 +9,9 @@ public partial class MoveObject : CharacterBody2D
 	public float Height = 0;
 	public const float Gravity = 320;
 	public Vector2 Direction = Vector2.Zero;
-	public int StateID = 0;
-	public bool EnterEnd = false;
-	public IState[] States;
+	public int StateID { get; protected set; } = 0;
+	protected bool EnterEnd = false;
+	protected IState[] States;
 
 	public void StateMachineUpdate(double delta)
 	{
@@ -49,30 +49,6 @@ public partial class MoveObject : CharacterBody2D
 			return GetId;
 		}
 
-	}
-
-	public partial class StateDefault : Node, IState
-	{
-		MoveObject character;
-		public int GetId { get; } = 0;//默认状态
-		public StateDefault(MoveObject c)
-		{
-			character = c;
-			character.States[GetId] = this;
-		}
-		public bool Enter()
-		{
-			return true;
-		}
-
-		public int Update(double delta)
-		{
-			return Exit();
-		}
-		public int Exit()
-		{
-			return GetId;
-		}
 	}
 
 
