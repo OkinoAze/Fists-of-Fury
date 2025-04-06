@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://duogckgw1pxm0"]
 
-[ext_resource type="Script" uid="uid://0flyjgrkp5h7" path="res://Script/PropInstance.cs" id="1_edubm"]
+[ext_resource type="Script" uid="uid://0flyjgrkp5h7" path="res://Script/Prop.cs" id="1_edubm"]
 
 [node name="Prop" type="Node2D"]
 script = ExtResource("1_edubm")

@@ -12,13 +12,18 @@ public partial class ActorContainer : Node2D
 
     }
 
-    private void OnGenerateProp(Character sender, Prop prop, Vector2 position)
+    private void OnGenerateProp(Prop propInstance, Vector2 position)
     {
-
+        var path = "res://Scene/Prefab/" + propInstance.GetType().Name + ".tscn";
+        var propScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);
+        var prop = propScene.Instantiate<Prop>();
+        prop.Durability = propInstance.Durability;
+        prop.Position = position;
+        AddChild(prop);
     }
 
 
-    private void OnGenerateBullet(Character sender, int damage, Vector2 direction, Vector2 position, Vector2 shotPosition)
+    private void OnGenerateBullet(int damage, Vector2 direction, Vector2 position, Vector2 shotPosition)
     {
         var path = "res://Scene/Prefab/Bullet.tscn";
         var bulletScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);

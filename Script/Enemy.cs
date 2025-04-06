@@ -52,6 +52,8 @@ public partial class Enemy : Character
         Health = 5;
         AccessingResources();
 
+        PickUpProp += OnPickUpProp;
+        DropWeapon += OnDropWeapon;
 
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
@@ -63,6 +65,34 @@ public partial class Enemy : Character
     public override void _PhysicsProcess(double delta)
     {
         StateMachineUpdate(delta);
+    }
+    void OnPickUpProp(Prop prop)
+    {
+        Health = Mathf.Clamp(Health + prop.RestoreHealth, 0, MaxHealth);
+        if (prop.Property == Prop.Properties.MeleeWeapon || prop.Property == Prop.Properties.RangedWeapon)
+        {
+            Weapon = prop;
+            if (prop is PropKnife)
+            {
+                WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/enemy_knife.png");
+            }
+            else if (prop is PropGun)
+            {
+                WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/enemy_gun.png");
+            }
+            WeaponSprite.Visible = true;
+        }
+    }
+
+    void OnDropWeapon()
+    {
+        if (Weapon != null)
+        {
+            WeaponSprite.Texture = null;
+            WeaponSprite.Visible = false;
+            EntityManager.Instance.GenerateProp(Weapon, Position);
+            Weapon = null;
+        }
     }
 
     private void OnDamageEmitter_AttackSuccess()

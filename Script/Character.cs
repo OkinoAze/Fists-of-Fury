@@ -28,7 +28,7 @@ public partial class Character : MoveObject
 	protected AudioStreamPlayer AudioPlayer;
 	protected Timer AttackBufferTimer;
 	protected Prop Weapon;
-	protected PropInstance CanPickUpProp;
+	protected Prop CanPickUpProp;
 
 	protected Area2D PickUpCheck;
 	protected int[] InvincibleStates;
@@ -58,7 +58,7 @@ public partial class Character : MoveObject
 
 	protected void OnPickUpCheck_AreaEntered(Area2D area)
 	{
-		if (area.Owner is PropInstance p)
+		if (area.Owner is Prop p)
 		{
 			CanPickUpProp = p;
 		}

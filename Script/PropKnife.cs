@@ -1,9 +1,8 @@
 using Godot;
 using System;
 
-public partial class PropGun : Prop
+public partial class PropKnife : Prop
 {
-
     enum State
     {
         Idle,
@@ -26,9 +25,9 @@ public partial class PropGun : Prop
     }
     partial class StateIdle : Node, IState
     {
-        PropGun character;
+        PropKnife character;
         public int GetId { get; } = (int)State.Idle;
-        public StateIdle(PropGun c)
+        public StateIdle(PropKnife c)
         {
             character = c;
             character.States[GetId] = this;
@@ -42,22 +41,22 @@ public partial class PropGun : Prop
 
         public int Update(double delta)
         {
-            if (character.Durability <= 0)
-            {
-                return (int)State.Destroyed;
-            }
             return Exit();
         }
         public int Exit()
         {
+            if (character.Durability <= 0)
+            {
+                return (int)State.Destroyed;
+            }
             return GetId;
         }
     }
     partial class StateFall : Node, IState
     {
-        PropGun character;
+        PropKnife character;
         public int GetId { get; } = (int)State.Fall;
-        public StateFall(PropGun c)
+        public StateFall(PropKnife c)
         {
             character = c;
             character.States[GetId] = this;
@@ -91,9 +90,9 @@ public partial class PropGun : Prop
     }
     partial class StateDestroyed : Node, IState
     {
-        PropGun character;
+        PropKnife character;
         public int GetId { get; } = (int)State.Destroyed;
-        public StateDestroyed(PropGun c)
+        public StateDestroyed(PropKnife c)
         {
             character = c;
             character.States[GetId] = this;

@@ -152,11 +152,11 @@ public partial class Player : Character
         if (prop.Property == Prop.Properties.MeleeWeapon || prop.Property == Prop.Properties.RangedWeapon)
         {
             Weapon = prop;
-            if (prop.ID == 2)
+            if (prop is PropKnife)
             {
                 WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/player_knife.png");
             }
-            else if (prop.ID == 3)
+            else if (prop is PropGun)
             {
                 WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/player_gun.png");
             }
@@ -170,6 +170,7 @@ public partial class Player : Character
         {
             WeaponSprite.Texture = null;
             WeaponSprite.Visible = false;
+            EntityManager.Instance.GenerateProp(Weapon, Position);
             Weapon = null;
         }
     }
@@ -332,7 +333,7 @@ public partial class Player : Character
             AttackID = 0;
             //TODO 拾取物品
             SwitchState((int)State.CrouchDown);
-            PickUpProp(CanPickUpProp.Instance);
+            PickUpProp(CanPickUpProp);
             CanPickUpProp.QueueFree();
         }
         else
@@ -394,6 +395,7 @@ public partial class Player : Character
         {
             character.Direction = Vector2.Zero;
             character.AnimationPlayer.Play("Idle");
+            character.DropWeapon();
             return true;
         }
 
@@ -405,10 +407,7 @@ public partial class Player : Character
         }
         public int Exit()
         {
-            if (true)
-            {
-                return (int)State.Idle;
-            }
+            return (int)State.Idle;
             return GetId;
         }
     }
@@ -718,10 +717,18 @@ public partial class Player : Character
         {
             character.Direction = Vector2.Zero;
             character.AnimationPlayer.Play("GunShot");
-            character.PlayAudio("click");
-            var d = (Vector2.Right * character._DamageEmitter.Scale.X).Normalized();
-            var p = new Vector2(character.Weapon.ShotPosition.X * d.X, character.Weapon.ShotPosition.Y);
-            EntityManager.Instance.GenerateBullet(character, character.Weapon.Damage, d, new Vector2(character.Position.X + p.X, character.Position.Y), new Vector2(0, p.Y));
+            if (character.Weapon.Durability > 0)
+            {
+                character.Weapon.Durability--;
+                character.PlayAudio("click");
+                var d = (Vector2.Right * character._DamageEmitter.Scale.X).Normalized();
+                var p = new Vector2(character.Weapon.ShotPosition.X * d.X, character.Weapon.ShotPosition.Y);
+                EntityManager.Instance.GenerateBullet(character.Weapon.Damage, d, new Vector2(character.Position.X + p.X, character.Position.Y), new Vector2(0, p.Y));
+            }
+            else
+            {
+                character.DropWeapon();
+            }
             return true;
         }
 
