@@ -6,7 +6,7 @@ using System.Linq;
 public partial class Player : Character
 {
     string[] AttackAnimationGroup = ["Punch", "Punch2", "Kick", "Kick2"];
-    int[] CanNotInputStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall];
+    int[] CanNotInputStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
     List<EnemySlot> EnemySlots = [];
     enum State
     {
@@ -58,8 +58,7 @@ public partial class Player : Character
         _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
 
-        PickUpProp += OnPickUpProp;
-        DropWeapon += OnDropWeapon;
+
 
 
         var slots = GetNodeOrNull("EnemySlots")?.GetChildren();
@@ -76,15 +75,23 @@ public partial class Player : Character
         if (!CanNotInputStates.Contains(StateID))
         {
             Direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
-
+        }
+        if (InvincibleStates.Contains(StateID))
+        {
+            _DamageReceiver.Monitorable = false;
+        }
+        else
+        {
+            _DamageReceiver.Monitorable = true;
         }
         StateMachineUpdate(delta);
+
     }
 
 
     private void OnDamageEmitter_AttackSuccess()
     {
-        if (Weapon?.Property == Prop.Properties.MeleeWeapon)
+        if (Weapon?.Property == Prop.Properties.MeleeWeapon && StateID == (int)State.MeleeWeaponAttack)
         {
             Weapon.Durability--;
         }
@@ -107,20 +114,14 @@ public partial class Player : Character
                     return;
                 }
 
-                if (Weapon != null)
+                if (StateID == (int)State.MeleeWeaponAttack)
                 {
-                    if (Weapon.Property == Prop.Properties.MeleeWeapon)
-                    {
-                        e = new(direction, 3);
-                        a.DamageReceived(_DamageEmitter, e);
-                        return;
-                    }
-                    else if (Weapon.Property == Prop.Properties.RangedWeapon)
-                    {
-                        return;
-                    }
+                    e = new(direction, Weapon.Damage);
                 }
-                e = new(direction);
+                else
+                {
+                    e = new(direction);
+                }
                 a.DamageReceived(_DamageEmitter, e);
             }
         }
@@ -130,54 +131,24 @@ public partial class Player : Character
 
     private void OnDamageReceiver_DamageReceived(DamageEmitter emitter, DamageReceiver.DamageReceivedEventArgs e)
     {
-        if (!InvincibleStates.Contains(StateID))
+
+        Direction = e.Direction;
+        Repel = e.Repel;
+        HeightSpeed = e.HeightSpeed;
+        if (e.Type == DamageReceiver.HitType.Normal)
         {
-            Direction = e.Direction;
-            Repel = e.Repel;
-            HeightSpeed = e.HeightSpeed;
-            if (e.Type == DamageReceiver.HitType.Normal)
-            {
-                AnimationPlayer.Stop();
-                SwitchState((int)State.Hurt);
-            }
-            else if (e.Type == DamageReceiver.HitType.knockDown)
-            {
-                AnimationPlayer.Stop();
-                SwitchState((int)State.KnockFly);
-            }
-            Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
-            emitter?.AttackSuccess();
+            AnimationPlayer.Stop();
+            SwitchState((int)State.Hurt);
         }
+        else if (e.Type == DamageReceiver.HitType.knockDown)
+        {
+            AnimationPlayer.Stop();
+            SwitchState((int)State.KnockFly);
+        }
+        Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
+        emitter?.AttackSuccess();
     }
 
-    void OnPickUpProp(Prop prop)
-    {
-        Health = Mathf.Clamp(Health + prop.RestoreHealth, 0, MaxHealth);
-        if (prop.Property == Prop.Properties.MeleeWeapon || prop.Property == Prop.Properties.RangedWeapon)
-        {
-            Weapon = prop;
-            if (prop is PropKnife)
-            {
-                WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/player_knife.png");
-            }
-            else if (prop is PropGun)
-            {
-                WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/player_gun.png");
-            }
-            WeaponSprite.Visible = true;
-        }
-    }
-
-    void OnDropWeapon()
-    {
-        if (Weapon != null)
-        {
-            WeaponSprite.Texture = null;
-            WeaponSprite.Visible = false;
-            EntityManager.Instance.GenerateProp(Weapon, Position);
-            Weapon = null;
-        }
-    }
 
 
     public EnemySlot ReserveSlot(Enemy enemy)
@@ -528,7 +499,7 @@ public partial class Player : Character
                 character.PlayAudio("hit-1");
             }
             character.Velocity = character.Direction * character.Repel;
-            character.OnDropWeapon();
+            character.DropWeapon();
             return true;
         }
 
@@ -561,7 +532,7 @@ public partial class Player : Character
             //TODO 摇晃动画,粒子特效
 
             character.Velocity = character.Direction * character.Repel;
-            character.OnDropWeapon();
+            character.DropWeapon();
             return true;
         }
 

@@ -21,6 +21,7 @@ public partial class Main : Node
             EntityManager.Instance.GenerateBullet = null;
             EntityManager.Instance.GenerateActor = null;
             EntityManager.Instance.GenerateProp = null;
+            EntityManager.Instance.GeneratePropName = null;
             GetTree().ReloadCurrentScene();
         }
     }

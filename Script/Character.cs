@@ -4,11 +4,6 @@ using Godot;
 public partial class Character : MoveObject
 {
 
-	public delegate void PickUpPropReceiver(Prop prop);
-	public delegate void DropWeaponReceiver();
-
-	public PickUpPropReceiver PickUpProp;
-	public DropWeaponReceiver DropWeapon;
 
 	public int MaxHealth = 1;
 	public int Health = 1;
@@ -64,6 +59,38 @@ public partial class Character : MoveObject
 		}
 	}
 
+	public void PickUpProp(Prop prop)
+	{
+		if (prop.RestoreHealth > 0)
+		{
+			PlayAudio("eat-food");
+			Health = Mathf.Clamp(Health + prop.RestoreHealth, 0, MaxHealth);
+		}
+		if (prop.Property == Prop.Properties.MeleeWeapon || prop.Property == Prop.Properties.RangedWeapon)
+		{
+			Weapon = prop;
+			if (prop is PropKnife)
+			{
+				WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/player_knife.png");
+			}
+			else if (prop is PropGun)
+			{
+				WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/player_gun.png");
+			}
+			WeaponSprite.Visible = true;
+		}
+	}
+
+	public void DropWeapon()
+	{
+		if (Weapon != null)
+		{
+			WeaponSprite.Texture = null;
+			WeaponSprite.Visible = false;
+			EntityManager.Instance.GenerateProp(Weapon, Position);
+			Weapon = null;
+		}
+	}
 	protected bool AttackRange(Vector2 position)
 	{
 		if (position.Y > Position.Y - _AttackRange && position.Y < Position.Y + _AttackRange)

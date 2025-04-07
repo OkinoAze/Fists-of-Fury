@@ -4,8 +4,11 @@ using System.Linq;
 public partial class Enemy : Character
 {
     Player _Player;
-    Timer AttackTimer;
+    Timer WaitTimer;
+    Timer AttackWaitTimer;
+    Timer MoveTimer;
     EnemySlot Slot = null;
+    Vector2 MovePoint = Vector2.Zero;
     public string[] AttackAnimationGroup = ["Punch", "Punch2"];
 
     enum State
@@ -22,7 +25,12 @@ public partial class Enemy : Character
         MeleeWeaponAttack,
         RangedWeaponAttack,
         Death,
-
+        Patrol,
+        MoveToSlot,
+        MoveToEdge,
+        Regress,
+        PickUpWeapon,
+        EnterScene,
     }
     public override void _Ready()
     {
@@ -40,20 +48,22 @@ public partial class Enemy : Character
         _ = new StateMeleeWeaponAttack(this);
         _ = new StateRangedWeaponAttack(this);
         _ = new StateDeath(this);
+        _ = new StatePatrol(this);
+        _ = new StateMoveToSlot(this);
+        _ = new StateMoveToEdge(this);
+        _ = new StateRegress(this);
+        _ = new StatePickUpWeapon(this);
+        _ = new StateEnterScene(this);
 
 
         _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
-        AttackTimer = GetNode<Timer>("AttackTimer");
-
-        AttackTimer.WaitTime = GD.RandRange(3f, 6f);
+        WaitTimer = GetNode<Timer>("WaitTimer");
+        AttackWaitTimer = GetNode<Timer>("AttackWaitTimer");
 
 
         MaxHealth = 10;
         Health = 5;
         AccessingResources();
-
-        PickUpProp += OnPickUpProp;
-        DropWeapon += OnDropWeapon;
 
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
@@ -64,40 +74,51 @@ public partial class Enemy : Character
 
     public override void _PhysicsProcess(double delta)
     {
-        StateMachineUpdate(delta);
-    }
-    void OnPickUpProp(Prop prop)
-    {
-        Health = Mathf.Clamp(Health + prop.RestoreHealth, 0, MaxHealth);
-        if (prop.Property == Prop.Properties.MeleeWeapon || prop.Property == Prop.Properties.RangedWeapon)
+        if (InvincibleStates.Contains(StateID))
         {
-            Weapon = prop;
-            if (prop is PropKnife)
-            {
-                WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/enemy_knife.png");
-            }
-            else if (prop is PropGun)
-            {
-                WeaponSprite.Texture = ResourceLoader.Load<Texture2D>("res://Art/Characters/enemy_gun.png");
-            }
-            WeaponSprite.Visible = true;
+            _DamageReceiver.Monitorable = false;
         }
-    }
-
-    void OnDropWeapon()
-    {
-        if (Weapon != null)
+        else
         {
-            WeaponSprite.Texture = null;
-            WeaponSprite.Visible = false;
-            EntityManager.Instance.GenerateProp(Weapon, Position);
-            Weapon = null;
+            _DamageReceiver.Monitorable = true;
+        }
+        StateMachineUpdate(delta);
+        GD.Print((State)StateID);
+    }
+    public bool CanAttackPlayer(float distance = 20)
+    {
+        if (Position.DistanceTo(_Player.Position) < distance && AttackWaitTimer.TimeLeft <= 0 && AttackRange(_Player.Position))
+        {
+            return true;
+        }
+        return false;
+    }
+    public void FaceToPlayer()
+    {
+        if (Position.X < _Player.Position.X)
+        {
+            if (CharacterSprite.FlipH == true)
+            {
+                CharacterSprite.FlipH = !CharacterSprite.FlipH;
+                _DamageEmitter.Scale *= -1;
+            }
+        }
+        else if (Position.X > _Player.Position.X)
+        {
+            if (CharacterSprite.FlipH == false)
+            {
+                CharacterSprite.FlipH = !CharacterSprite.FlipH;
+                _DamageEmitter.Scale *= -1;
+            }
         }
     }
 
     private void OnDamageEmitter_AttackSuccess()
     {
-
+        if (Weapon?.Property == Prop.Properties.MeleeWeapon && StateID == (int)State.MeleeWeaponAttack)
+        {
+            Weapon.Durability--;
+        }
     }
 
     private void OnDamageEmitter_AreaEntered(Area2D area)
@@ -106,8 +127,18 @@ public partial class Enemy : Character
         {
             if (AttackRange((a.Owner as Node2D).Position))
             {
+                DamageReceiver.DamageReceivedEventArgs e;
                 Vector2 direction = (Vector2.Right * _DamageEmitter.Scale.X).Normalized();
-                DamageReceiver.DamageReceivedEventArgs e = new(direction);
+
+                if (StateID == (int)State.MeleeWeaponAttack)
+                {
+                    e = new(direction, Weapon.Damage);
+                }
+                else
+                {
+                    e = new(direction);
+                }
+
                 a.DamageReceived(_DamageEmitter, e);
             }
         }
@@ -115,24 +146,21 @@ public partial class Enemy : Character
     }
     private void OnDamageReceiver_DamageReceived(DamageEmitter emitter, DamageReceiver.DamageReceivedEventArgs e)
     {
-        if (!InvincibleStates.Contains(StateID))
+        Direction = e.Direction;
+        Repel = e.Repel;
+        HeightSpeed = e.HeightSpeed;
+        if (e.Type == DamageReceiver.HitType.Normal)
         {
-            Direction = e.Direction;
-            Repel = e.Repel;
-            HeightSpeed = e.HeightSpeed;
-            if (e.Type == DamageReceiver.HitType.Normal)
-            {
-                AnimationPlayer.Stop();
-                SwitchState((int)State.Hurt);
-            }
-            else if (e.Type == DamageReceiver.HitType.knockDown)
-            {
-                AnimationPlayer.Stop();
-                SwitchState((int)State.KnockFly);
-            }
-            Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
-            emitter?.AttackSuccess();
+            AnimationPlayer.Stop();
+            SwitchState((int)State.Hurt);
         }
+        else if (e.Type == DamageReceiver.HitType.knockDown)
+        {
+            AnimationPlayer.Stop();
+            SwitchState((int)State.KnockFly);
+        }
+        Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
+        emitter?.AttackSuccess();
     }
     partial class StateIdle : Node, IState
     {
@@ -146,6 +174,7 @@ public partial class Enemy : Character
         public bool Enter()
         {
             character.Direction = Vector2.Zero;
+            character.MovePoint = Vector2.Zero;
             character.AnimationPlayer.Play("Idle");
             return true;
         }
@@ -153,21 +182,18 @@ public partial class Enemy : Character
         public int Update(double delta)
         {
             character.Slot ??= character._Player.ReserveSlot(character);
-            if (character.Slot != null && character.Position.DistanceTo(character._Player.Position) > 20)
-            {
-                character.Direction = (character.Slot.GlobalPosition - character.GlobalPosition).Normalized();
-            }
+
             return Exit();
         }
         public int Exit()
         {
-            if (character.Position.DistanceTo(character._Player.Position) < 15 && character.AttackTimer.TimeLeft == 0 && character.AttackRange(character._Player.Position))
+            if (character.CanAttackPlayer())
             {
                 return (int)State.Attack;
             }
-            if (character.Direction != Vector2.Zero)
+            if (character.Slot != null && character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) > 10)
             {
-                return (int)State.Walk;
+                return (int)State.MoveToSlot;
             }
             return GetId;
         }
@@ -189,11 +215,12 @@ public partial class Enemy : Character
 
         public int Update(double delta)
         {
-
-            if (character.Slot != null)
+            GD.Print(character.MovePoint);
+            if (character.IsOnWall())
             {
-                character.Direction = (character.Slot.GlobalPosition - character.GlobalPosition).Normalized();
-                //TODO 碰到障碍增加角度离开障碍后恢复原方向
+                character.MovePoint = character.MovePoint.Rotated(Mathf.Pi / 16);
+                character.Direction = character.MovePoint.Normalized();
+                character.WaitTimer.Start();
             }
             if (character.Direction.X < 0)
             {
@@ -217,35 +244,14 @@ public partial class Enemy : Character
 
         public int Exit()
         {
-            if (character.Position.DistanceTo(character._Player.Position) < 15 && character.AttackTimer.TimeLeft == 0 && character.AttackRange(character._Player.Position))
+            if (character.CanAttackPlayer())
             {
                 return (int)State.Attack;
             }
-            if (character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) < 2)
+            if (!character.IsOnWall() && character.WaitTimer.TimeLeft <= 0)
             {
-                if (character.Position.X < character._Player.Position.X)
-                {
-                    if (character.CharacterSprite.FlipH == true)
-                    {
-                        character.CharacterSprite.FlipH = !character.CharacterSprite.FlipH;
-                        character._DamageEmitter.Scale *= -1;
-                    }
-                }
-                else if (character.Position.X > character._Player.Position.X)
-                {
-                    if (character.CharacterSprite.FlipH == false)
-                    {
-                        character.CharacterSprite.FlipH = !character.CharacterSprite.FlipH;
-                        character._DamageEmitter.Scale *= -1;
-                    }
-                }
                 return (int)State.Idle;
             }
-            if (character.AttackRange(character._Player.Position))
-            {
-                // return (int)State.Attack;
-            }
-
             return GetId;
         }
     }
@@ -261,8 +267,7 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-            character.AttackTimer.Start();
-
+            character.AttackWaitTimer.Start();
             if (character.AttackBufferTimer.TimeLeft > 0)
             {
                 character.AttackID++;
@@ -488,7 +493,16 @@ public partial class Enemy : Character
         public bool Enter()
         {
             character.Direction = Vector2.Zero;
-            character.AnimationPlayer.Play("KnifeAttack");
+            if (character.Weapon.Durability > 0)
+            {
+                character.AnimationPlayer.Play("KnifeAttack");
+                character.PlayAudio("miss");
+            }
+            else
+            {
+                character.DropWeapon();
+                character.SwitchState((int)State.Idle);
+            }
             return true;
         }
 
@@ -515,7 +529,19 @@ public partial class Enemy : Character
         {
             character.Direction = Vector2.Zero;
             character.AnimationPlayer.Play("GunShot");
-            character.PlayAudio("gunshot");
+            if (character.Weapon.Durability > 0)
+            {
+                character.Weapon.Durability--;
+                character.PlayAudio("click");
+                var d = (Vector2.Right * character._DamageEmitter.Scale.X).Normalized();
+                var p = new Vector2(character.Weapon.ShotPosition.X * d.X, character.Weapon.ShotPosition.Y);
+                EntityManager.Instance.GenerateBullet(character.Weapon.Damage, d, new Vector2(character.Position.X + p.X, character.Position.Y), new Vector2(0, p.Y));
+            }
+            else
+            {
+                character.DropWeapon();
+                character.SwitchState((int)State.Idle);
+            }
             return true;
         }
 
@@ -554,6 +580,195 @@ public partial class Enemy : Character
         }
         public int Exit()
         {
+            return GetId;
+        }
+    }
+    partial class StatePatrol : Node, IState
+    {
+        Enemy character;
+        public int GetId { get; } = (int)State.Patrol;
+        public StatePatrol(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            //TODO 没有装备武器时巡逻
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            return Exit();
+        }
+        public int Exit()
+        {
+
+            return GetId;
+        }
+    }
+
+    partial class StateMoveToSlot : Node, IState
+    {
+        Enemy character;
+        public int GetId { get; } = (int)State.MoveToSlot;
+        public StateMoveToSlot(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            character.AnimationPlayer.Play("Walk");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            if (character.Slot != null)
+            {
+                character.MovePoint = character.Slot.GlobalPosition;
+                character.Direction = character.GlobalPosition.DirectionTo(character.Slot.GlobalPosition);
+            }
+            if (character.Direction.X < 0)
+            {
+                character.CharacterSprite.FlipH = true;
+                character.WeaponSprite.FlipH = true;
+
+                character._DamageEmitter.Scale = new Vector2(-1, 1);
+            }
+            else if (character.Direction.X > 0)
+            {
+                character.CharacterSprite.FlipH = false;
+                character.WeaponSprite.FlipH = false;
+                character._DamageEmitter.Scale = new Vector2(1, 1);
+            }
+
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
+
+            return Exit();
+        }
+
+        public int Exit()
+        {
+            if (character.IsOnWall())
+            {
+                return (int)State.Walk;
+            }
+            if (character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) < 2)
+            {
+                character.FaceToPlayer();
+                return (int)State.Idle;
+            }
+
+            return GetId;
+        }
+    }
+    partial class StateMoveToEdge : Node, IState
+    {
+        Enemy character;
+        public int GetId { get; } = (int)State.MoveToEdge;
+        public StateMoveToEdge(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            //TODO 移动到边缘射击
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            return Exit();
+        }
+        public int Exit()
+        {
+
+            return GetId;
+        }
+    }
+    partial class StateRegress : Node, IState
+    {
+        Enemy character;
+        public int GetId { get; } = (int)State.Regress;
+        public StateRegress(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            return Exit();
+        }
+        public int Exit()
+        {
+
+            return GetId;
+        }
+    }
+    partial class StatePickUpWeapon : Node, IState
+    {
+        Enemy character;
+        public int GetId { get; } = (int)State.PickUpWeapon;
+        public StatePickUpWeapon(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            return Exit();
+        }
+        public int Exit()
+        {
+
+            return GetId;
+        }
+    }
+    partial class StateEnterScene : Node, IState
+    {
+        Enemy character;
+        public int GetId { get; } = (int)State.EnterScene;
+        public StateEnterScene(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            character.Direction = character.Position.DirectionTo(character._Player.Position);
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            return Exit();
+        }
+        public int Exit()
+        {
+
             return GetId;
         }
     }

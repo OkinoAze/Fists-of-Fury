@@ -652,11 +652,15 @@ libraries = {
 }
 autoplay = "Idle"
 
-[node name="AttackTimer" type="Timer" parent="." index="6"]
+[node name="WaitTimer" type="Timer" parent="." index="6"]
+process_callback = 0
+wait_time = 0.5
+one_shot = true
+
+[node name="AttackWaitTimer" type="Timer" parent="." index="7"]
 process_callback = 0
 wait_time = 2.0
 one_shot = true
-autostart = true
 
 [node name="CollisionShape2D" parent="PickUpCheck" index="0"]
 shape = SubResource("RectangleShape2D_2dswq")

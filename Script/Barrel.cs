@@ -5,6 +5,8 @@ public partial class Barrel : StaticObject
 {
     [Export]
     int Health = 1;
+    [Export]
+    string HasProp = "";
     Sprite2D Sprite;
     DamageReceiver DamageReceiver;
     AudioStreamPlayer AudioPlayer;
@@ -25,6 +27,7 @@ public partial class Barrel : StaticObject
 
         _ = new StateIdle(this);
         _ = new StateDestroyed(this);
+
     }
 
     public override void _PhysicsProcess(double delta)
@@ -35,7 +38,7 @@ public partial class Barrel : StaticObject
     {
         Health -= e.Damage;
         emitter?.AttackSuccess();
-        if (e.Type == DamageReceiver.HitType.knockDown)
+        if (e.Type == DamageReceiver.HitType.knockDown || Health <= 0)
         {
             PlayAudio("hit-2");
         }
@@ -47,9 +50,7 @@ public partial class Barrel : StaticObject
         {
             Sprite.Frame = 1;
             Sprite.FlipH = e.Direction.X < 0;
-            HeightSpeed = MoveSpeed * 3;
             Velocity = e.Direction.Normalized() * MoveSpeed;
-            SwitchState((int)State.Destroyed);
         }
     }
     public void PlayAudio(string name)
@@ -68,6 +69,7 @@ public partial class Barrel : StaticObject
         }
         public bool Enter()
         {
+
             return true;
         }
 
@@ -77,6 +79,10 @@ public partial class Barrel : StaticObject
         }
         public int Exit()
         {
+            if (character.Health <= 0)
+            {
+                return (int)State.Destroyed;
+            }
             return GetId;
         }
     }
@@ -91,6 +97,11 @@ public partial class Barrel : StaticObject
         }
         public bool Enter()
         {
+            character.HeightSpeed = character.MoveSpeed * 3;
+            if (character.HasProp != "")
+            {
+                EntityManager.Instance.GeneratePropName(character.HasProp, character.Position);
+            }
             return true;
         }
 

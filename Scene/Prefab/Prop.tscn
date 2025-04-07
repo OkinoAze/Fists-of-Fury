@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://0flyjgrkp5h7" path="res://Script/Prop.cs" id="1_edubm"]
 
-[node name="Prop" type="Node2D"]
+[node name="Prop" type="Node2D" groups=["Prop"]]
 script = ExtResource("1_edubm")
 
 [node name="ShadowSprite" type="Sprite2D" parent="."]
