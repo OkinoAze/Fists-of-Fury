@@ -58,7 +58,52 @@ public partial class Character : MoveObject
 			CanPickUpProp = p;
 		}
 	}
+	public Rect2 GetCrimeaRect()
+	{
+		var viewportRect = GetViewportRect();
+		var position = GetViewport().GetCamera2D().Position;
+		var size = viewportRect.Size / 2;
+		return new Rect2(position.X - size.X, position.Y - size.Y, position.X + size.X, position.Y + size.Y);
+	}
+	public void FaceToDirection()
+	{
+		if (Direction.X < 0)
+		{
+			CharacterSprite.FlipH = true;
+			WeaponSprite.FlipH = true;
+			_DamageEmitter.Scale = new Vector2(-1, 1);
+		}
+		else if (Direction.X > 0)
+		{
+			CharacterSprite.FlipH = false;
+			WeaponSprite.FlipH = false;
+			_DamageEmitter.Scale = new Vector2(1, 1);
+		}
 
+	}
+	public void FaceToPosition(Vector2 position)
+	{
+		if (Position.X < position.X)
+		{
+			if (CharacterSprite.FlipH == true)
+			{
+				CharacterSprite.FlipH = !CharacterSprite.FlipH;
+				WeaponSprite.FlipH = CharacterSprite.FlipH;
+				_DamageEmitter.Scale = new Vector2(1, 1);
+
+			}
+		}
+		else if (Position.X > position.X)
+		{
+			if (CharacterSprite.FlipH == false)
+			{
+				CharacterSprite.FlipH = !CharacterSprite.FlipH;
+				WeaponSprite.FlipH = CharacterSprite.FlipH;
+				_DamageEmitter.Scale = new Vector2(-1, 1);
+
+			}
+		}
+	}
 	public void PickUpProp(Prop prop)
 	{
 		if (prop.RestoreHealth > 0)
@@ -79,6 +124,7 @@ public partial class Character : MoveObject
 			}
 			WeaponSprite.Visible = true;
 		}
+		prop.QueueFree();
 	}
 
 	public void DropWeapon()

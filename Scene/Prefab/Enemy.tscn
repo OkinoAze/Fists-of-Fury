@@ -219,8 +219,8 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0.3),
 "transitions": PackedFloat32Array(1),
 "values": [{
-"args": [0, false],
-"method": &"SwitchState"
+"args": [],
+"method": &"AttackEnd"
 }]
 }
 tracks/1/type = "value"
@@ -377,8 +377,8 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.2),
 "transitions": PackedFloat32Array(1),
 "values": [{
-"args": [0, false],
-"method": &"SwitchState"
+"args": [],
+"method": &"AttackEnd"
 }]
 }
 tracks/2/type = "value"
@@ -432,8 +432,8 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0.2),
 "transitions": PackedFloat32Array(1),
 "values": [{
-"args": [0, false],
-"method": &"SwitchState"
+"args": [],
+"method": &"AttackEnd"
 }]
 }
 tracks/1/type = "value"
@@ -608,7 +608,7 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2dswq"]
-size = Vector2(4, 4)
+size = Vector2(40, 10)
 
 [node name="Enemy" groups=["Enemy"] instance=ExtResource("1_hcc6n")]
 collision_layer = 4
@@ -652,14 +652,16 @@ libraries = {
 }
 autoplay = "Idle"
 
+[node name="AttackBufferTimer" parent="." index="5"]
+wait_time = 4.0
+
 [node name="WaitTimer" type="Timer" parent="." index="6"]
 process_callback = 0
-wait_time = 0.5
 one_shot = true
 
 [node name="AttackWaitTimer" type="Timer" parent="." index="7"]
 process_callback = 0
-wait_time = 2.0
+wait_time = 3.0
 one_shot = true
 
 [node name="CollisionShape2D" parent="PickUpCheck" index="0"]

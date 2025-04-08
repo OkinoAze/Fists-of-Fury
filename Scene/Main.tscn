@@ -44,21 +44,21 @@ shape = SubResource("RectangleShape2D_h175a")
 y_sort_enabled = true
 script = ExtResource("3_aan6j")
 
-[node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
-position = Vector2(84, 40)
-
 [node name="Player" parent="ActorContainer" instance=ExtResource("1_xhtwi")]
 position = Vector2(36, 52)
 motion_mode = 0
 
 [node name="Barrel" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(59, 40)
+position = Vector2(56, 45)
 HasProp = "PropGun"
 
 [node name="Barrel2" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(73, 57)
+position = Vector2(91, 58)
 HasProp = "PropKnife"
 
 [node name="Barrel3" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(92, 48)
+position = Vector2(77, 34)
 HasProp = "PropChicken"
+
+[node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(91, 48)

@@ -8,7 +8,7 @@ public partial class Enemy : Character
     Timer AttackWaitTimer;
     Timer MoveTimer;
     EnemySlot Slot = null;
-    Vector2 MovePoint = Vector2.Zero;
+    Vector2 MovePoint = Vector2.Zero; //使用全局坐标
     public string[] AttackAnimationGroup = ["Punch", "Punch2"];
 
     enum State
@@ -31,11 +31,14 @@ public partial class Enemy : Character
         Regress,
         PickUpWeapon,
         EnterScene,
+        EdgeLock,
+        NearLock,
+
     }
     public override void _Ready()
     {
         States = new IState[Enum.GetNames(typeof(State)).Length];
-        InvincibleStates = [(int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown, (int)State.Death];
+        InvincibleStates = [(int)State.EnterScene, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown, (int)State.Death];
 
         _ = new StateIdle(this);
         _ = new StateWalk(this);
@@ -54,6 +57,8 @@ public partial class Enemy : Character
         _ = new StateRegress(this);
         _ = new StatePickUpWeapon(this);
         _ = new StateEnterScene(this);
+        _ = new StateEdgeLock(this);
+        _ = new StateNearLock(this);
 
 
         _Player = GetTree().GetNodesInGroup("Player")[0] as Player;
@@ -68,7 +73,6 @@ public partial class Enemy : Character
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
         _DamageEmitter.AttackSuccess += OnDamageEmitter_AttackSuccess;
         _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
-
     }
 
 
@@ -83,7 +87,7 @@ public partial class Enemy : Character
             _DamageReceiver.Monitorable = true;
         }
         StateMachineUpdate(delta);
-        GD.Print((State)StateID);
+        //GD.Print((State)StateID);
     }
     public bool CanAttackPlayer(float distance = 20)
     {
@@ -93,25 +97,7 @@ public partial class Enemy : Character
         }
         return false;
     }
-    public void FaceToPlayer()
-    {
-        if (Position.X < _Player.Position.X)
-        {
-            if (CharacterSprite.FlipH == true)
-            {
-                CharacterSprite.FlipH = !CharacterSprite.FlipH;
-                _DamageEmitter.Scale *= -1;
-            }
-        }
-        else if (Position.X > _Player.Position.X)
-        {
-            if (CharacterSprite.FlipH == false)
-            {
-                CharacterSprite.FlipH = !CharacterSprite.FlipH;
-                _DamageEmitter.Scale *= -1;
-            }
-        }
-    }
+
 
     private void OnDamageEmitter_AttackSuccess()
     {
@@ -156,7 +142,7 @@ public partial class Enemy : Character
         }
         else if (e.Type == DamageReceiver.HitType.knockDown)
         {
-            AnimationPlayer.Stop();
+            FaceToPosition((emitter.Owner as Node2D).Position);
             SwitchState((int)State.KnockFly);
         }
         Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
@@ -164,6 +150,7 @@ public partial class Enemy : Character
     }
     partial class StateIdle : Node, IState
     {
+        Rect2 rect;
         Enemy character;
         public int GetId { get; } = (int)State.Idle;
         public StateIdle(Enemy c)
@@ -173,6 +160,8 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
+            character.WaitTimer.Start();
+            rect = character.GetCrimeaRect().Grow(-15);
             character.Direction = Vector2.Zero;
             character.MovePoint = Vector2.Zero;
             character.AnimationPlayer.Play("Idle");
@@ -187,14 +176,56 @@ public partial class Enemy : Character
         }
         public int Exit()
         {
-            if (character.CanAttackPlayer())
+            if (character.Weapon == null)
             {
-                return (int)State.Attack;
+                if (character?.CanPickUpProp?.Property == Prop.Properties.MeleeWeapon || character?.CanPickUpProp?.Property == Prop.Properties.RangedWeapon)
+                {
+                    return (int)State.PickUpWeapon;
+                }
             }
-            if (character.Slot != null && character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) > 10)
+
+            if (character.CanAttackPlayer() && character.AttackWaitTimer.TimeLeft <= 0)
+            {
+                character.FaceToPosition(character._Player.Position);
+                if (character.Weapon == null || character?.Weapon?.Property == Prop.Properties.MeleeWeapon)
+                {
+                    return (int)State.NearLock;
+                }
+            }
+
+            if (character.IsOnWall())
+            {
+                return (int)State.Patrol;
+            }
+            else if (character.Slot == null)
+            {
+                if (character.WaitTimer.TimeLeft <= 0)
+                {
+                    return (int)State.Patrol;
+
+                }
+                else
+                {
+                    return GetId;
+                }
+            }
+            else if (character?.Weapon?.Property == Prop.Properties.RangedWeapon)
+            {
+                character.Slot.FreeUp();
+                if (rect.HasPoint(character.GlobalPosition))
+                {
+                    return (int)State.MoveToEdge;
+                }
+                else
+                {
+                    return (int)State.EdgeLock;
+                }
+            }
+            else if (character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) > 10)
             {
                 return (int)State.MoveToSlot;
             }
+
             return GetId;
         }
     }
@@ -215,26 +246,14 @@ public partial class Enemy : Character
 
         public int Update(double delta)
         {
-            GD.Print(character.MovePoint);
             if (character.IsOnWall())
             {
-                character.MovePoint = character.MovePoint.Rotated(Mathf.Pi / 16);
+                character.MovePoint = character.MovePoint.Rotated(Mathf.Pi / 8);
                 character.Direction = character.MovePoint.Normalized();
                 character.WaitTimer.Start();
             }
-            if (character.Direction.X < 0)
-            {
-                character.CharacterSprite.FlipH = true;
-                character.WeaponSprite.FlipH = true;
 
-                character._DamageEmitter.Scale = new Vector2(-1, 1);
-            }
-            else if (character.Direction.X > 0)
-            {
-                character.CharacterSprite.FlipH = false;
-                character.WeaponSprite.FlipH = false;
-                character._DamageEmitter.Scale = new Vector2(1, 1);
-            }
+            character.FaceToDirection();
 
             character.Velocity = character.Direction * character.MoveSpeed;
             character.MoveAndSlide();
@@ -244,16 +263,25 @@ public partial class Enemy : Character
 
         public int Exit()
         {
-            if (character.CanAttackPlayer())
+            if (character.CanAttackPlayer() && character.AttackWaitTimer.TimeLeft <= 0)
             {
-                return (int)State.Attack;
+                character.FaceToPosition(character._Player.Position);
+                if (character.Weapon == null || character?.Weapon?.Property == Prop.Properties.MeleeWeapon)
+                {
+                    return (int)State.NearLock;
+                }
             }
+
             if (!character.IsOnWall() && character.WaitTimer.TimeLeft <= 0)
             {
                 return (int)State.Idle;
             }
             return GetId;
         }
+    }
+    public void AttackEnd()
+    {
+        SwitchState((int)State.Regress);
     }
     partial class StateAttack : Node, IState
     {
@@ -320,6 +348,7 @@ public partial class Enemy : Character
         public bool Enter()
         {
             character._DamageEmitter.Monitoring = false;
+            character.DropWeapon();
             character.AnimationPlayer.Play("Hurt");
             if (character.Health <= 0)
             {
@@ -330,7 +359,6 @@ public partial class Enemy : Character
                 character.PlayAudio("hit-1");
             }
             character.Velocity = character.Direction * character.Repel;
-
             return true;
         }
 
@@ -383,6 +411,8 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
+            character.DropWeapon();
+            character._DamageEmitter.Monitoring = false;
             character.AnimationPlayer.Play("KnockFly");
             character.PlayAudio("hit-2");
             character.Velocity = character.Direction * character.Repel;
@@ -447,7 +477,7 @@ public partial class Enemy : Character
     {
         if (Health <= 0)
         {
-            _Player.FreeSlot(this);
+            Slot?.FreeUp();
             SwitchState((int)State.Death);
         }
         else
@@ -492,6 +522,7 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
+            character.AttackWaitTimer.Start();
             character.Direction = Vector2.Zero;
             if (character.Weapon.Durability > 0)
             {
@@ -527,6 +558,7 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
+            character.AttackWaitTimer.Start();
             character.Direction = Vector2.Zero;
             character.AnimationPlayer.Play("GunShot");
             if (character.Weapon.Durability > 0)
@@ -594,18 +626,40 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-            //TODO 没有装备武器时巡逻
+            character.WaitTimer.Start();
+            var r = GD.RandRange(-15, 15);
+            character.MovePoint = character._Player.Position.Rotated(r);
+            character.Direction = character.Position.DirectionTo(character.MovePoint);
+            character.AnimationPlayer.Play("Walk");
             return true;
         }
 
         public int Update(double delta)
         {
+            character.FaceToDirection();
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
 
             return Exit();
         }
         public int Exit()
         {
+            if (character.Weapon == null)
+            {
+                if (character?.CanPickUpProp?.Property == Prop.Properties.MeleeWeapon || character?.CanPickUpProp?.Property == Prop.Properties.RangedWeapon)
+                {
+                    return (int)State.PickUpWeapon;
+                }
+            }
+            if (character.IsOnWall())
+            {
+                return (int)State.Walk;
 
+            }
+            if (character.WaitTimer.TimeLeft <= 0)
+            {
+                return (int)State.Idle;
+            }
             return GetId;
         }
     }
@@ -633,19 +687,8 @@ public partial class Enemy : Character
                 character.MovePoint = character.Slot.GlobalPosition;
                 character.Direction = character.GlobalPosition.DirectionTo(character.Slot.GlobalPosition);
             }
-            if (character.Direction.X < 0)
-            {
-                character.CharacterSprite.FlipH = true;
-                character.WeaponSprite.FlipH = true;
 
-                character._DamageEmitter.Scale = new Vector2(-1, 1);
-            }
-            else if (character.Direction.X > 0)
-            {
-                character.CharacterSprite.FlipH = false;
-                character.WeaponSprite.FlipH = false;
-                character._DamageEmitter.Scale = new Vector2(1, 1);
-            }
+            character.FaceToDirection();
 
             character.Velocity = character.Direction * character.MoveSpeed;
             character.MoveAndSlide();
@@ -661,7 +704,7 @@ public partial class Enemy : Character
             }
             if (character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) < 2)
             {
-                character.FaceToPlayer();
+                character.FaceToPosition(character._Player.Position);
                 return (int)State.Idle;
             }
 
@@ -670,6 +713,7 @@ public partial class Enemy : Character
     }
     partial class StateMoveToEdge : Node, IState
     {
+        Rect2 rect;
         Enemy character;
         public int GetId { get; } = (int)State.MoveToEdge;
         public StateMoveToEdge(Enemy c)
@@ -679,18 +723,33 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-            //TODO 移动到边缘射击
+            rect = character.GetCrimeaRect().Grow(-15);
+            character.FaceToPosition(character._Player.Position);
+            character.AnimationPlayer.Play("Walk");
             return true;
         }
 
         public int Update(double delta)
         {
+            var y = Mathf.Clamp(character._Player.GlobalPosition.Y, rect.Position.Y, rect.End.Y);
+            character.MovePoint = new Vector2(rect.End.X, y);
+            character.Direction = character.GlobalPosition.DirectionTo(character.MovePoint);
+
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
 
             return Exit();
         }
         public int Exit()
         {
-
+            if (character.IsOnWall())
+            {
+                return (int)State.Idle;
+            }
+            if (character.GlobalPosition.DistanceTo(character.MovePoint) < 2)
+            {
+                return (int)State.EdgeLock;
+            }
             return GetId;
         }
     }
@@ -705,18 +764,24 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-
+            character.WaitTimer.Start();
+            character.Direction *= character._DamageEmitter.Scale.X;
+            character.AnimationPlayer.Play("Walk");
             return true;
         }
 
         public int Update(double delta)
         {
-
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
             return Exit();
         }
         public int Exit()
         {
-
+            if (character.IsOnWall() || character.WaitTimer.TimeLeft <= 0)
+            {
+                return (int)State.Idle;
+            }
             return GetId;
         }
     }
@@ -731,18 +796,39 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-
+            character.AnimationPlayer.Play("Walk");
+            if (character.CanPickUpProp != null)
+            {
+                character.MovePoint = character.CanPickUpProp.GlobalPosition;
+                character.Direction = character.GlobalPosition.DirectionTo(character.CanPickUpProp.GlobalPosition);
+            }
+            else
+            {
+                character.MovePoint = Vector2.Zero;
+                character.Direction = Vector2.Zero;
+            }
             return true;
         }
 
         public int Update(double delta)
         {
+            character.FaceToDirection();
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
 
             return Exit();
         }
         public int Exit()
         {
-
+            if (character.CanPickUpProp == null || character.IsOnWall())
+            {
+                return (int)State.Idle;
+            }
+            if (character.GlobalPosition.DistanceTo(character.CanPickUpProp.GlobalPosition) <= 2)
+            {
+                character.PickUpProp(character.CanPickUpProp);
+                return (int)State.CrouchDown;
+            }
             return GetId;
         }
     }
@@ -757,18 +843,138 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-            character.Direction = character.Position.DirectionTo(character._Player.Position);
+            character.SetCollisionMaskValue(0, false);
+
+            var rect = character.GetCrimeaRect().Grow(-5);
+            var x = Mathf.Clamp(character.GlobalPosition.X, rect.Position.X, rect.End.X);
+            var y = Mathf.Clamp(character.GlobalPosition.Y, rect.Position.Y, rect.End.Y);
+            character.MovePoint = new Vector2(x, y);
+            character.Direction = character.GlobalPosition.DirectionTo(character.MovePoint);
+
+            character.AnimationPlayer.Play("Walk");
             return true;
         }
 
         public int Update(double delta)
         {
 
+            character.FaceToDirection();
+
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
+
             return Exit();
         }
         public int Exit()
         {
+            if (character.IsOnWall())
+            {
+                character.SetCollisionMaskValue(0, true);
 
+                return (int)State.Walk;
+            }
+            if (character.GlobalPosition.DistanceTo(character.MovePoint) < 2)
+            {
+                character.SetCollisionMaskValue(0, true);
+
+                return (int)State.Idle;
+            }
+
+            return GetId;
+        }
+    }
+    partial class StateEdgeLock : Node, IState
+    {
+        Rect2 rect;
+        Enemy character;
+        public int GetId { get; } = (int)State.EdgeLock;
+        public StateEdgeLock(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+            character.FaceToPosition(character._Player.Position);
+            var p = character._Player.Position.Y - character.Position.Y;
+            if (Mathf.Abs(p) <= 2)
+            {
+                character.AnimationPlayer.Play("Idle");
+                character.Direction = Vector2.Zero;
+            }
+            else
+            {
+                character.AnimationPlayer.Play("Walk");
+                character.Direction = new Vector2(0, Mathf.Sign(p)).Normalized();
+            }
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
+
+            return Exit();
+        }
+        public int Exit()
+        {
+            if (character.IsOnWall())
+            {
+                return (int)State.Idle;
+            }
+            if (Mathf.Abs(character._Player.Position.Y - character.Position.Y) < 2 && character.AttackWaitTimer.TimeLeft <= 0)
+            {
+                return (int)State.RangedWeaponAttack;
+            }
+            return GetId;
+        }
+    }
+    partial class StateNearLock : Node, IState
+    {
+        Rect2 rect;
+        Enemy character;
+        public int GetId { get; } = (int)State.NearLock;
+        public StateNearLock(Enemy c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            character.AnimationPlayer.Play("Walk");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            character.Direction = character.Position.DirectionTo(character._Player.Position).Normalized();
+            character.Velocity = character.Direction * character.MoveSpeed;
+            character.MoveAndSlide();
+
+            return Exit();
+        }
+        public int Exit()
+        {
+            if (character.IsOnWall())
+            {
+                return (int)State.Idle;
+            }
+            if (Mathf.Abs(character._Player.Position.Y - character.Position.Y) < 2)
+            {
+                if (Mathf.Abs(character._Player.Position.Y - character.Position.Y) < 8 && character.AttackWaitTimer.TimeLeft <= 0)
+                {
+                    if (character?.Weapon?.Property == Prop.Properties.MeleeWeapon)
+                    {
+                        return (int)State.MeleeWeaponAttack;
+                    }
+                    else
+                    {
+                        return (int)State.Attack;
+                    }
+                }
+            }
             return GetId;
         }
     }

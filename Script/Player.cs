@@ -142,7 +142,6 @@ public partial class Player : Character
         }
         else if (e.Type == DamageReceiver.HitType.knockDown)
         {
-            AnimationPlayer.Stop();
             SwitchState((int)State.KnockFly);
         }
         Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
@@ -248,18 +247,7 @@ public partial class Player : Character
 
         public int Update(double delta)
         {
-            if (character.Direction.X < 0)
-            {
-                character.CharacterSprite.FlipH = true;
-                character.WeaponSprite.FlipH = true;
-                character._DamageEmitter.Scale = new Vector2(-1, 1);
-            }
-            else if (character.Direction.X > 0)
-            {
-                character.CharacterSprite.FlipH = false;
-                character.WeaponSprite.FlipH = false;
-                character._DamageEmitter.Scale = new Vector2(1, 1);
-            }
+            character.FaceToDirection();
 
             character.Velocity = character.Direction * character.MoveSpeed;
             character.MoveAndSlide();
@@ -308,7 +296,6 @@ public partial class Player : Character
             AttackID = 0;
             SwitchState((int)State.CrouchDown);
             PickUpProp(CanPickUpProp);
-            CanPickUpProp.QueueFree();
         }
         else
         {
@@ -488,6 +475,7 @@ public partial class Player : Character
         public bool Enter()
         {
             character._DamageEmitter.Monitoring = false;
+            character.DropWeapon();
             character.AnimationPlayer.Play("Hurt");
             if (character.Health <= 0)
             {
@@ -499,7 +487,6 @@ public partial class Player : Character
                 character.PlayAudio("hit-1");
             }
             character.Velocity = character.Direction * character.Repel;
-            character.DropWeapon();
             return true;
         }
 
@@ -527,6 +514,8 @@ public partial class Player : Character
         }
         public bool Enter()
         {
+            character._DamageEmitter.Monitoring = false;
+            character.DropWeapon();
             character.AnimationPlayer.Play("KnockFly");
             character.PlayAudio("hit-2");
             //TODO 摇晃动画,粒子特效
