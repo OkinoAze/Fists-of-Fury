@@ -62,3 +62,4 @@ HasProp = "PropChicken"
 
 [node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
 position = Vector2(91, 48)
+HasWeapon = "PropGun"

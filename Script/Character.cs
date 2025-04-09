@@ -8,6 +8,8 @@ public partial class Character : MoveObject
 	public int MaxHealth = 1;
 	public int Health = 1;
 	public int Damage = 1;
+	[Export]
+	public string HasWeapon = "";
 	protected const float _AttackRange = 5;
 	protected float Repel = 0;
 	public int AttackID { get; protected set; } = 0;
@@ -45,6 +47,21 @@ public partial class Character : MoveObject
 		PickUpCheck.AreaEntered += OnPickUpCheck_AreaEntered;
 		PickUpCheck.AreaExited += OnPickUpCheck_AreaExited;
 
+		if (HasWeapon != "")
+		{
+			GetWeapon(HasWeapon);
+		}
+
+	}
+	protected void GetWeapon(string weaponName)
+	{
+		var path = "res://Scene/Prefab/" + weaponName + ".tscn";
+		bool exists = ResourceLoader.Exists(path);
+		if (exists)
+		{
+			var weapon = ResourceLoader.Load<PackedScene>(path).Instantiate();
+			PickUpProp(weapon as Prop);
+		}
 	}
 	protected void OnPickUpCheck_AreaExited(Area2D area)
 	{

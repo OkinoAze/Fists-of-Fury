@@ -176,12 +176,10 @@ public partial class Enemy : Character
         }
         public int Exit()
         {
-            if (character.Weapon == null)
+
+            if (character.IsOnWall())
             {
-                if (character?.CanPickUpProp?.Property == Prop.Properties.MeleeWeapon || character?.CanPickUpProp?.Property == Prop.Properties.RangedWeapon)
-                {
-                    return (int)State.PickUpWeapon;
-                }
+                return (int)State.Patrol;
             }
 
             if (character.CanAttackPlayer() && character.AttackWaitTimer.TimeLeft <= 0)
@@ -192,40 +190,38 @@ public partial class Enemy : Character
                     return (int)State.NearLock;
                 }
             }
-
-            if (character.IsOnWall())
+            if (character.Weapon == null)
             {
+                if (character?.CanPickUpProp?.Property == Prop.Properties.MeleeWeapon || character?.CanPickUpProp?.Property == Prop.Properties.RangedWeapon)
+                {
+                    return (int)State.PickUpWeapon;
+                }
+            }
+
+            if (character.Slot != null)
+            {
+                if (character?.Weapon?.Property == Prop.Properties.RangedWeapon)
+                {
+                    character.Slot.FreeUp();
+                    if (rect.HasPoint(character.GlobalPosition))
+                    {
+                        return (int)State.MoveToEdge;
+                    }
+                    else
+                    {
+                        return (int)State.EdgeLock;
+                    }
+                }
+                if (character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) > 10)
+                {
+                    return (int)State.MoveToSlot;
+                }
+            }
+            else if (character.WaitTimer.TimeLeft <= 0)
+            {
+
                 return (int)State.Patrol;
             }
-            else if (character.Slot == null)
-            {
-                if (character.WaitTimer.TimeLeft <= 0)
-                {
-                    return (int)State.Patrol;
-
-                }
-                else
-                {
-                    return GetId;
-                }
-            }
-            else if (character?.Weapon?.Property == Prop.Properties.RangedWeapon)
-            {
-                character.Slot.FreeUp();
-                if (rect.HasPoint(character.GlobalPosition))
-                {
-                    return (int)State.MoveToEdge;
-                }
-                else
-                {
-                    return (int)State.EdgeLock;
-                }
-            }
-            else if (character.GlobalPosition.DistanceTo(character.Slot.GlobalPosition) > 10)
-            {
-                return (int)State.MoveToSlot;
-            }
-
             return GetId;
         }
     }
@@ -644,17 +640,17 @@ public partial class Enemy : Character
         }
         public int Exit()
         {
+            if (character.IsOnWall())
+            {
+                return (int)State.Walk;
+
+            }
             if (character.Weapon == null)
             {
                 if (character?.CanPickUpProp?.Property == Prop.Properties.MeleeWeapon || character?.CanPickUpProp?.Property == Prop.Properties.RangedWeapon)
                 {
                     return (int)State.PickUpWeapon;
                 }
-            }
-            if (character.IsOnWall())
-            {
-                return (int)State.Walk;
-
             }
             if (character.WaitTimer.TimeLeft <= 0)
             {

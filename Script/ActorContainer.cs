@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.IO;
 
 public partial class ActorContainer : Node2D
 {
@@ -79,5 +80,10 @@ public partial class ActorContainer : Node2D
         }
     }
 
+    struct EnemyPunk
+    {
+        string Name;
+        int Damage;
 
+    }
 }
