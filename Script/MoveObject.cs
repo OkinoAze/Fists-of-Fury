@@ -3,7 +3,9 @@ using Godot;
 
 public partial class MoveObject : CharacterBody2D
 {
+	[Export]
 	public float MoveSpeed = 35;
+	[Export]
 	public float JumpSpeed = 100;
 	public float HeightSpeed = 0;
 	public float Height = 0;

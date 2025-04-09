@@ -61,14 +61,14 @@ public partial class ActorContainer : Node2D
     }
 
 
-    private void OnGenerateActor(EntityManager.EnemyType type, Vector2 position, float height, float heightSpeed, Prop[] props)
+    private Character OnGenerateActor(EntityManager.EnemyType type, Vector2 position, float height, float heightSpeed, Prop[] props)
     {
-        var path = "res://Scene/Prefab/" + Enum.GetName(type) + ".tscn";
+        var path = "res://Scene/Prefab/Enemy" + Enum.GetName(type) + ".tscn";
         bool exists = ResourceLoader.Exists(path);
         if (exists)
         {
             var characterScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);
-            Enemy enemy = characterScene.Instantiate<Enemy>();
+            Character enemy = characterScene.Instantiate<Character>();
             enemy.Position = position;
             enemy.Height = height;
             enemy.HeightSpeed = heightSpeed;
@@ -77,13 +77,8 @@ public partial class ActorContainer : Node2D
             {
                 enemy.PickUpProp(item);
             }
+            return enemy;
         }
-    }
-
-    struct EnemyPunk
-    {
-        string Name;
-        int Damage;
-
+        return null;
     }
 }

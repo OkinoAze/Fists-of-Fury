@@ -4,9 +4,11 @@ using Godot;
 public partial class Character : MoveObject
 {
 
-
+	[Export]
 	public int MaxHealth = 1;
+	[Export]
 	public int Health = 1;
+	[Export]
 	public int Damage = 1;
 	[Export]
 	public string HasWeapon = "";

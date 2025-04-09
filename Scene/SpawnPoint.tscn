@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://uer0jyixw06t"]
+
+[ext_resource type="Script" uid="uid://u6rdeqj0xngi" path="res://Script/SpawnPoint.cs" id="1_8brt4"]
+
+[node name="SpawnPoint" type="Marker2D"]
+gizmo_extents = 3.0
+script = ExtResource("1_8brt4")
+
+[node name="MovePoint" type="Marker2D" parent="."]
+gizmo_extents = 3.0

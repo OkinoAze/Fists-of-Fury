@@ -65,9 +65,6 @@ public partial class Enemy : Character
         WaitTimer = GetNode<Timer>("WaitTimer");
         AttackWaitTimer = GetNode<Timer>("AttackWaitTimer");
 
-
-        MaxHealth = 10;
-        Health = 5;
         AccessingResources();
 
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;

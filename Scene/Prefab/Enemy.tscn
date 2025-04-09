@@ -614,6 +614,8 @@ size = Vector2(40, 10)
 collision_layer = 4
 collision_mask = 9
 script = ExtResource("2_uoh4s")
+MaxHealth = 8
+Health = 8
 
 [node name="CharacterSprite" parent="." index="1"]
 texture = ExtResource("3_67ah2")

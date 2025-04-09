@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://bacl472jw6i6x"]
+[gd_scene load_steps=9 format=3 uid="uid://bacl472jw6i6x"]
 
 [ext_resource type="Script" uid="uid://cuvv6fyqwfmts" path="res://Script/Main.cs" id="1_djkur"]
 [ext_resource type="PackedScene" uid="uid://ylrqp34rxwb0" path="res://Scene/Prefab/Player.tscn" id="1_xhtwi"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://btn0avr1vn85k" path="res://Script/ActorContainer.cs" id="3_aan6j"]
 [ext_resource type="PackedScene" uid="uid://d2tpt0iu7ow7h" path="res://Scene/Prefab/Barrel.tscn" id="4_h175a"]
 [ext_resource type="PackedScene" uid="uid://nneqhin7yi3j" path="res://Scene/Prefab/Enemy.tscn" id="4_togfq"]
+[ext_resource type="PackedScene" uid="uid://uer0jyixw06t" path="res://Scene/SpawnPoint.tscn" id="7_h3nmf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h175a"]
 size = Vector2(5, 66)
@@ -63,3 +64,11 @@ HasProp = "PropChicken"
 [node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
 position = Vector2(91, 48)
 HasWeapon = "PropGun"
+
+[node name="SpawnPoint" parent="." instance=ExtResource("7_h3nmf")]
+position = Vector2(168, 37)
+
+[node name="MovePoint" parent="SpawnPoint" index="0"]
+position = Vector2(19, 13)
+
+[editable path="SpawnPoint"]

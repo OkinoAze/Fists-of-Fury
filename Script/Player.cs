@@ -46,12 +46,7 @@ public partial class Player : Character
         _ = new StateMeleeWeaponAttack(this);
         _ = new StateRangedWeaponAttack(this);
 
-
-        MaxHealth = 10;
-        Health = 10;
-
         AvatarName = "Player";
-
 
         AccessingResources();
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
