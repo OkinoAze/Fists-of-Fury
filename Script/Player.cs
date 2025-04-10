@@ -8,7 +8,7 @@ public partial class Player : Character
     string[] AttackAnimationGroup = ["Punch", "Punch2", "Kick", "Kick2"];
     int[] CanNotInputStates = [(int)State.Hurt, (int)State.KnockDown, (int)State.KnockFly, (int)State.KnockFall, (int)State.CrouchDown];
     List<EnemySlot> EnemySlots = [];
-    enum State
+    public enum State
     {
         Idle,
         Walk,

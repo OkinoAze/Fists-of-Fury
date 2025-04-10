@@ -5,8 +5,9 @@ using System.Collections.Generic;
 public partial class BattleArea : Area2D
 {
     [Export]
-    public Color LineColor = Colors.Red;
+    Color LineColor = Colors.Red;
     public List<SpawnPoint> SpawnPoints = [];
+    public List<Enemy> EnemyInstances = [];
     public override void _Ready()
     {
         var children = GetChildren();
@@ -22,11 +23,7 @@ public partial class BattleArea : Area2D
 
     private void OnBodyEntered(Node2D body)
     {
-        if (body is Player player)
-        {
-            Monitoring = false;
-
-        }
+        SetDeferred("monitoring", false);
     }
 
 
@@ -36,10 +33,11 @@ public partial class BattleArea : Area2D
         {
             foreach (var item in SpawnPoints)
             {
-                if (item?.Enemies?.Count > 0)
+                if (item?.Enemies.Count > 0)
                 {
                     var e = EntityManager.Instance.GenerateActor(item.Enemies[0], item.GlobalPosition, item.MovePoint.GlobalPosition);
                     item.Enemies.RemoveAt(0);
+                    GD.Print(e);
                 }
             }
         }

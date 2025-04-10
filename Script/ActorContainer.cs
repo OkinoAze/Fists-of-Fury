@@ -61,18 +61,16 @@ public partial class ActorContainer : Node2D
     }
 
 
-    private Enemy OnGenerateActor(PackedScene packedScene, Vector2 position, Vector2 movePoint, float height, float heightSpeed, Prop[] props)
+    private Enemy OnGenerateActor(PackedScene packedScene, Vector2 position, Vector2 movePoint, float height, float heightSpeed, string weaponName)
     {
         var enemy = packedScene.Instantiate<Enemy>();
+        enemy.StateID = (int)Enemy.State.EnterScene;
         enemy.Position = position;
         enemy.MovePoint = movePoint;
         enemy.Height = height;
         enemy.HeightSpeed = heightSpeed;
+        enemy.HasWeapon = weaponName;
         AddChild(enemy);
-        foreach (var item in props)
-        {
-            enemy.PickUpProp(item);
-        }
         return enemy;
 
     }

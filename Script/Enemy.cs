@@ -11,7 +11,7 @@ public partial class Enemy : Character
     public Vector2 MovePoint = Vector2.Zero; //使用全局坐标
     public string[] AttackAnimationGroup = ["Punch", "Punch2"];
 
-    enum State
+    public enum State
     {
         Idle,
         Walk,
@@ -836,7 +836,7 @@ public partial class Enemy : Character
         }
         public bool Enter()
         {
-            character.SetCollisionMaskValue(0, false);
+            character.SetCollisionMaskValue(1, false);
 
             character.Direction = character.GlobalPosition.DirectionTo(character.MovePoint);
             character.AnimationPlayer.Play("Walk");
@@ -857,13 +857,13 @@ public partial class Enemy : Character
         {
             if (character.IsOnWall())
             {
-                character.SetCollisionMaskValue(0, true);
+                character.SetCollisionMaskValue(1, true);
 
                 return (int)State.Walk;
             }
             if (character.GlobalPosition.DistanceTo(character.MovePoint) < 2)
             {
-                character.SetCollisionMaskValue(0, true);
+                character.SetCollisionMaskValue(1, true);
 
                 return (int)State.Idle;
             }

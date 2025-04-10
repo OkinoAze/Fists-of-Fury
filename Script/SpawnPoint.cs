@@ -4,7 +4,7 @@ using System;
 public partial class SpawnPoint : Marker2D
 {
     [Export]
-    public Color LineColor = Colors.Red;
+    Color LineColor = Colors.Red;
     public Marker2D MovePoint;
     [Export]
     public Godot.Collections.Array<PackedScene> Enemies;

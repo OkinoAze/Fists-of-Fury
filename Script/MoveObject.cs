@@ -11,7 +11,7 @@ public partial class MoveObject : CharacterBody2D
 	public float Height = 0;
 	public const float Gravity = 320;
 	public Vector2 Direction = Vector2.Zero;
-	public int StateID { get; protected set; } = 0;
+	public int StateID = 0;
 	protected bool EnterEnd = false;
 	protected IState[] States;
 
