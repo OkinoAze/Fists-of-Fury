@@ -3,7 +3,7 @@ using System;
 
 public partial class EntityManager : Node
 {
-    public delegate Character GenerateActorReceiver(PackedScene packedScene, Vector2 position, Vector2 movePoint, float height = 0, float heightSpeed = 0, string weaponName = "");
+    public delegate Enemy GenerateActorReceiver(PackedScene packedScene, Vector2 position, Vector2 movePoint, float height = 0, float heightSpeed = 0, string weaponName = "");
     public delegate void GenerateBulletReceiver(int damage, Vector2 direction, Vector2 position, Vector2 shotPosition);
     public delegate void GeneratePropReceiver(Prop propInstance, Vector2 position);
     public delegate void GeneratePropNameReceiver(string propName, Vector2 position);
@@ -11,6 +11,13 @@ public partial class EntityManager : Node
     public GenerateBulletReceiver GenerateBullet;
     public GeneratePropReceiver GenerateProp;
     public GeneratePropNameReceiver GeneratePropName;
+
+
+    public delegate void EnterBattleAreaReceiver(BattleArea battleArea);
+    public EnterBattleAreaReceiver EnterBattleArea;
+    public delegate void ExitBattleAreaReceiver(BattleArea battleArea);
+    public ExitBattleAreaReceiver ExitBattleArea;
+
 
     public static EntityManager Instance { get; private set; }
     public enum EnemyType

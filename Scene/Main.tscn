@@ -21,14 +21,21 @@ Camera = NodePath("Camera")
 metadata/_edit_lock_ = true
 
 [node name="BattleArea" parent="Stage-1" instance=ExtResource("7_h3nmf")]
-position = Vector2(76, 31)
+position = Vector2(61, 31)
 
 [node name="SpawnPoint" parent="Stage-1/BattleArea" instance=ExtResource("4_hueuk")]
-position = Vector2(60, 19)
+position = Vector2(60, 14)
 Enemies = [ExtResource("4_togfq")]
 
 [node name="MovePoint" parent="Stage-1/BattleArea/SpawnPoint" index="0"]
-position = Vector2(-23, 3)
+position = Vector2(-29, -2)
+
+[node name="SpawnPoint2" parent="Stage-1/BattleArea" instance=ExtResource("4_hueuk")]
+position = Vector2(-61, 26)
+Enemies = [ExtResource("4_togfq")]
+
+[node name="MovePoint" parent="Stage-1/BattleArea/SpawnPoint2" index="0"]
+position = Vector2(24, 0)
 
 [node name="Camera" type="Camera2D" parent="."]
 position = Vector2(50, 32)
@@ -73,8 +80,5 @@ HasProp = "PropKnife"
 position = Vector2(77, 34)
 HasProp = "PropChicken"
 
-[node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
-position = Vector2(91, 48)
-HasWeapon = "PropGun"
-
 [editable path="Stage-1/BattleArea/SpawnPoint"]
+[editable path="Stage-1/BattleArea/SpawnPoint2"]

@@ -7,14 +7,28 @@ public partial class Main : Node
     public Player _Player;
     [Export]
     public Camera2D Camera;
+    bool StopCamera = false;
+    public override void _Ready()
+    {
+        EntityManager.Instance.EnterBattleArea += OnEnterBattleArea;
+        EntityManager.Instance.ExitBattleArea += OnExitBattleArea;
+    }
 
+    private void OnEnterBattleArea(BattleArea battleArea)
+    {
+        StopCamera = true;
+    }
+
+    private void OnExitBattleArea(BattleArea battleArea)
+    {
+        StopCamera = false;
+    }
 
     public override void _PhysicsProcess(double delta)
     {
-        if (_Player.Position.X > Camera.Position.X)
+        if (StopCamera = false && _Player.Position.X > Camera.Position.X)
         {
             Camera.Position = new Vector2(_Player.Position.X, Camera.Position.Y);
-
         }
         if (Input.IsActionPressed("ui_filedialog_refresh"))
         {

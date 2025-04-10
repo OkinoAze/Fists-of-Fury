@@ -6,8 +6,15 @@ public partial class BattleArea : Area2D
 {
     [Export]
     Color LineColor = Colors.Red;
+    [Export]
+    public bool AutoStart = false;
+    public int RemainingEnemies = 0;
     public List<SpawnPoint> SpawnPoints = [];
-    public List<Enemy> EnemyInstances = [];
+    public int MaxEnemies = 5;
+
+    public bool Spawn = false;
+
+
     public override void _Ready()
     {
         var children = GetChildren();
@@ -24,24 +31,44 @@ public partial class BattleArea : Area2D
     private void OnBodyEntered(Node2D body)
     {
         SetDeferred("monitoring", false);
+        EntityManager.Instance.EnterBattleArea(this);
     }
 
 
     public override void _PhysicsProcess(double delta)
     {
-        if (Monitoring == false)
+        if (!Engine.IsEditorHint() && AutoStart == true)
         {
-            foreach (var item in SpawnPoints)
+            var EnemyCount = GetTree().GetNodesInGroup("Enemy").Count;
+
+            if (EnemyCount == 0)
             {
-                if (item?.Enemies.Count > 0)
+                Spawn = true;
+            }
+
+            if (Monitoring == false && Spawn == true)
+            {
+                RemainingEnemies = 0;
+                foreach (var item in SpawnPoints)
                 {
-                    var e = EntityManager.Instance.GenerateActor(item.Enemies[0], item.GlobalPosition, item.MovePoint.GlobalPosition);
-                    item.Enemies.RemoveAt(0);
-                    GD.Print(e);
+                    if (item.Enemies.Count > 0 && EnemyCount <= MaxEnemies)
+                    {
+                        var e = EntityManager.Instance.GenerateActor(item.Enemies[0], item.GlobalPosition, item.MovePoint.GlobalPosition);
+                        item.Enemies.RemoveAt(0);
+                    }
+                    RemainingEnemies += item.Enemies.Count;
                 }
+
+                Spawn = false;
+            }
+
+            if (RemainingEnemies == 0)
+            {
+                EntityManager.Instance.ExitBattleArea(this);
             }
         }
     }
+
     public override void _Draw()
     {
         if (Engine.IsEditorHint())
