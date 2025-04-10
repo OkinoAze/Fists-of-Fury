@@ -59,7 +59,10 @@ public partial class Player : Character
         var slots = GetNodeOrNull("EnemySlots")?.GetChildren();
         foreach (var item in slots)
         {
-            EnemySlots.Add((EnemySlot)item);
+            if (item is EnemySlot slot)
+            {
+                EnemySlots.Add(slot);
+            }
         }
 
     }

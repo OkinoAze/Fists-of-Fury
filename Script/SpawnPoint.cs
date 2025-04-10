@@ -6,7 +6,8 @@ public partial class SpawnPoint : Marker2D
     [Export]
     public Color LineColor = Colors.Red;
     public Marker2D MovePoint;
-    public
+    [Export]
+    public Godot.Collections.Array<PackedScene> Enemies;
     public override void _Ready()
     {
         MovePoint = GetNode<Marker2D>("MovePoint");

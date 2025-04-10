@@ -8,7 +8,7 @@ public partial class Enemy : Character
     Timer AttackWaitTimer;
     Timer MoveTimer;
     EnemySlot Slot = null;
-    Vector2 MovePoint = Vector2.Zero; //使用全局坐标
+    public Vector2 MovePoint = Vector2.Zero; //使用全局坐标
     public string[] AttackAnimationGroup = ["Punch", "Punch2"];
 
     enum State

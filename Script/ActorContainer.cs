@@ -61,24 +61,19 @@ public partial class ActorContainer : Node2D
     }
 
 
-    private Character OnGenerateActor(EntityManager.EnemyType type, Vector2 position, float height, float heightSpeed, Prop[] props)
+    private Enemy OnGenerateActor(PackedScene packedScene, Vector2 position, Vector2 movePoint, float height, float heightSpeed, Prop[] props)
     {
-        var path = "res://Scene/Prefab/Enemy" + Enum.GetName(type) + ".tscn";
-        bool exists = ResourceLoader.Exists(path);
-        if (exists)
+        var enemy = packedScene.Instantiate<Enemy>();
+        enemy.Position = position;
+        enemy.MovePoint = movePoint;
+        enemy.Height = height;
+        enemy.HeightSpeed = heightSpeed;
+        AddChild(enemy);
+        foreach (var item in props)
         {
-            var characterScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);
-            Character enemy = characterScene.Instantiate<Character>();
-            enemy.Position = position;
-            enemy.Height = height;
-            enemy.HeightSpeed = heightSpeed;
-            AddChild(enemy);
-            foreach (var item in props)
-            {
-                enemy.PickUpProp(item);
-            }
-            return enemy;
+            enemy.PickUpProp(item);
         }
-        return null;
+        return enemy;
+
     }
 }

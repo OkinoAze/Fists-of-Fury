@@ -36,8 +36,11 @@ public partial class BattleArea : Area2D
         {
             foreach (var item in SpawnPoints)
             {
-                var e = EntityManager.Instance.GenerateActor(EntityManager.EnemyType.Punk, item.GlobalPosition);
-
+                if (item?.Enemies?.Count > 0)
+                {
+                    var e = EntityManager.Instance.GenerateActor(item.Enemies[0], item.GlobalPosition, item.MovePoint.GlobalPosition);
+                    item.Enemies.RemoveAt(0);
+                }
             }
         }
     }
