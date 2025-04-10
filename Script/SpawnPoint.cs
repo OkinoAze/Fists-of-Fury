@@ -6,6 +6,7 @@ public partial class SpawnPoint : Marker2D
     [Export]
     public Color LineColor = Colors.Red;
     public Marker2D MovePoint;
+    public
     public override void _Ready()
     {
         MovePoint = GetNode<Marker2D>("MovePoint");

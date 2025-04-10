@@ -838,12 +838,7 @@ public partial class Enemy : Character
         {
             character.SetCollisionMaskValue(0, false);
 
-            var rect = character.GetCrimeaRect().Grow(-5);
-            var x = Mathf.Clamp(character.GlobalPosition.X, rect.Position.X, rect.End.X);
-            var y = Mathf.Clamp(character.GlobalPosition.Y, rect.Position.Y, rect.End.Y);
-            character.MovePoint = new Vector2(x, y);
             character.Direction = character.GlobalPosition.DirectionTo(character.MovePoint);
-
             character.AnimationPlayer.Play("Walk");
             return true;
         }

@@ -6,7 +6,7 @@ public partial class BattleArea : Area2D
 {
     [Export]
     public Color LineColor = Colors.Red;
-    public List<SpawnPoint> SpawnPoints;
+    public List<SpawnPoint> SpawnPoints = [];
     public override void _Ready()
     {
         var children = GetChildren();
@@ -36,7 +36,8 @@ public partial class BattleArea : Area2D
         {
             foreach (var item in SpawnPoints)
             {
-                EntityManager.Instance.GenerateActor(EntityManager.EnemyType.Punk, item.GlobalPosition);
+                var e = EntityManager.Instance.GenerateActor(EntityManager.EnemyType.Punk, item.GlobalPosition);
+
             }
         }
     }

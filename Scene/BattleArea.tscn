@@ -6,12 +6,12 @@
 a = Vector2(0, -32)
 b = Vector2(0, 32)
 
-[node name="BattleArea" type="Area2D" node_paths=PackedStringArray("SpawnMarkers")]
+[node name="BattleArea" type="Area2D"]
+z_index = 1
 collision_layer = 0
 collision_mask = 2
 monitorable = false
 script = ExtResource("1_q3cl7")
-SpawnMarkers = []
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("SegmentShape2D_isv64")
