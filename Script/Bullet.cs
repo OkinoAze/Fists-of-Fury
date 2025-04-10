@@ -38,7 +38,7 @@ public partial class Bullet : ShotObject
             if (AttackRange((a.Owner as Node2D).Position))
             {
                 DamageReceiver.DamageReceivedEventArgs e;
-                e = new(Direction, Damage, 30);
+                e = new(_DamageEmitter.GetNode<CollisionShape2D>("CollisionShape2D").GlobalPosition, Direction, Damage, 30);
                 a.DamageReceived(_DamageEmitter, e);
                 SwitchState((int)State.Destroyed);
             }

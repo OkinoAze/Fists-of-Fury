@@ -37,13 +37,14 @@ public partial class BattleArea : Area2D
 
     public override void _PhysicsProcess(double delta)
     {
-        if (!Engine.IsEditorHint() && AutoStart == true)
+        if (!Engine.IsEditorHint() && AutoStart == true && Monitoring == false)
         {
             var EnemyCount = GetTree().GetNodesInGroup("Enemy").Count;
 
             if (EnemyCount == 0)
             {
                 Spawn = true;
+
             }
 
             if (Monitoring == false && Spawn == true)
@@ -62,7 +63,9 @@ public partial class BattleArea : Area2D
                 Spawn = false;
             }
 
-            if (RemainingEnemies == 0)
+            EnemyCount = GetTree().GetNodesInGroup("Enemy").Count;
+
+            if (RemainingEnemies == 0 && EnemyCount == 0)
             {
                 EntityManager.Instance.ExitBattleArea(this);
             }

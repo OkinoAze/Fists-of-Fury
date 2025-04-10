@@ -26,7 +26,7 @@ public partial class Main : Node
 
     public override void _PhysicsProcess(double delta)
     {
-        if (StopCamera = false && _Player.Position.X > Camera.Position.X)
+        if (StopCamera == false && _Player.Position.X > Camera.Position.X)
         {
             Camera.Position = new Vector2(_Player.Position.X, Camera.Position.Y);
         }
@@ -36,6 +36,7 @@ public partial class Main : Node
             EntityManager.Instance.GenerateActor = null;
             EntityManager.Instance.GenerateProp = null;
             EntityManager.Instance.GeneratePropName = null;
+            EntityManager.Instance.GenerateParticle = null;
             GetTree().ReloadCurrentScene();
         }
     }

@@ -1,9 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://dnn3cawehq8m7"]
+[gd_scene load_steps=3 format=3 uid="uid://dnn3cawehq8m7"]
 
 [ext_resource type="SpriteFrames" uid="uid://dqbuknmlrhaqs" path="res://Art/Particles/Particles.tres" id="1_nopsd"]
+[ext_resource type="Script" uid="uid://b7b8gwc3upvjq" path="res://Script/Particle.cs" id="2_sanpq"]
 
 [node name="Particle" type="AnimatedSprite2D"]
+z_index = 1
 sprite_frames = ExtResource("1_nopsd")
 animation = &"Spark"
 autoplay = "Spark"
-frame_progress = 0.0345273
+frame = 3
+frame_progress = 1.0
+script = ExtResource("2_sanpq")

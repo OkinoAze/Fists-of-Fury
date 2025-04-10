@@ -1,0 +1,5 @@
+{
+    "Codegeex.Chat.fontSize": 13,
+    "Codegeex.CompletionDelay": 1,
+    "Codegeex.GenerationPreference": "line by line"
+}

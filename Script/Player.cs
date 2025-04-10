@@ -107,18 +107,18 @@ public partial class Player : Character
                 DamageReceiver.DamageReceivedEventArgs e;
                 if (StateID == (int)State.JumpKick || AttackID == AttackAnimationGroup.Length - 1)
                 {
-                    e = new(direction, 2, 100, 100, DamageReceiver.HitType.knockDown);
+                    e = new(_DamageEmitter.GetNode<CollisionShape2D>("CollisionShape2D").GlobalPosition, direction, 2, 100, 100, DamageReceiver.HitType.knockDown);
                     a.DamageReceived(_DamageEmitter, e);
                     return;
                 }
 
                 if (StateID == (int)State.MeleeWeaponAttack)
                 {
-                    e = new(direction, Weapon.Damage);
+                    e = new(_DamageEmitter.GetNode<CollisionShape2D>("CollisionShape2D").GlobalPosition, direction, Weapon.Damage);
                 }
                 else
                 {
-                    e = new(direction);
+                    e = new(_DamageEmitter.GetNode<CollisionShape2D>("CollisionShape2D").GlobalPosition, direction);
                 }
                 a.DamageReceived(_DamageEmitter, e);
             }
@@ -140,10 +140,17 @@ public partial class Player : Character
         }
         else if (e.Type == DamageReceiver.HitType.knockDown)
         {
+
             SwitchState((int)State.KnockFly);
         }
+
         Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
         emitter?.AttackSuccess();
+
+        if (Health <= 0 || e.Type == DamageReceiver.HitType.knockDown)
+        {
+            EntityManager.Instance.GenerateParticle(e.Position, e.Direction.X < 0);
+        }
     }
 
 
@@ -479,6 +486,7 @@ public partial class Player : Character
             {
                 character.PlayAudio("hit-2");
                 //TODO 摇晃动画,粒子特效
+
             }
             else
             {

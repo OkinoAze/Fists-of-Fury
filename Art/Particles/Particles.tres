@@ -33,7 +33,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_7rcfj")
 }],
-"loop": true,
+"loop": false,
 "name": &"Spark",
-"speed": 10.0
+"speed": 12.0
 }]

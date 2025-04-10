@@ -18,8 +18,6 @@ public partial class Character : MoveObject
 	protected Sprite2D CharacterSprite;
 	protected Sprite2D WeaponSprite;
 	protected Sprite2D ShadowSprite;
-	protected AnimatedSprite2D Particle;
-
 	protected AnimationPlayer AnimationPlayer;
 	public DamageEmitter _DamageEmitter;
 	public DamageReceiver _DamageReceiver;
@@ -44,7 +42,6 @@ public partial class Character : MoveObject
 		AudioPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
 		AttackBufferTimer = GetNode<Timer>("AttackBufferTimer");
 		PickUpCheck = GetNode<Area2D>("PickUpCheck");
-		Particle = GetNode<AnimatedSprite2D>("Particle");
 
 		PickUpCheck.AreaEntered += OnPickUpCheck_AreaEntered;
 		PickUpCheck.AreaExited += OnPickUpCheck_AreaExited;

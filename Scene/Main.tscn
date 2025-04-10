@@ -21,21 +21,21 @@ Camera = NodePath("Camera")
 metadata/_edit_lock_ = true
 
 [node name="BattleArea" parent="Stage-1" instance=ExtResource("7_h3nmf")]
-position = Vector2(61, 31)
+position = Vector2(168, 31)
 
 [node name="SpawnPoint" parent="Stage-1/BattleArea" instance=ExtResource("4_hueuk")]
-position = Vector2(60, 14)
+position = Vector2(63, 14)
 Enemies = [ExtResource("4_togfq")]
 
 [node name="MovePoint" parent="Stage-1/BattleArea/SpawnPoint" index="0"]
-position = Vector2(-29, -2)
+position = Vector2(-26, -2)
 
 [node name="SpawnPoint2" parent="Stage-1/BattleArea" instance=ExtResource("4_hueuk")]
-position = Vector2(-61, 26)
+position = Vector2(-61, 17)
 Enemies = [ExtResource("4_togfq")]
 
 [node name="MovePoint" parent="Stage-1/BattleArea/SpawnPoint2" index="0"]
-position = Vector2(24, 0)
+position = Vector2(21, 5)
 
 [node name="Camera" type="Camera2D" parent="."]
 position = Vector2(50, 32)
@@ -68,12 +68,18 @@ script = ExtResource("3_aan6j")
 position = Vector2(36, 52)
 motion_mode = 0
 
+[node name="Enemy" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(16, 38)
+
+[node name="Enemy2" parent="ActorContainer" instance=ExtResource("4_togfq")]
+position = Vector2(91, 44)
+
 [node name="Barrel" parent="ActorContainer" instance=ExtResource("4_h175a")]
 position = Vector2(56, 45)
 HasProp = "PropGun"
 
 [node name="Barrel2" parent="ActorContainer" instance=ExtResource("4_h175a")]
-position = Vector2(91, 58)
+position = Vector2(84, 56)
 HasProp = "PropKnife"
 
 [node name="Barrel3" parent="ActorContainer" instance=ExtResource("4_h175a")]

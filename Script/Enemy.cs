@@ -115,11 +115,11 @@ public partial class Enemy : Character
 
                 if (StateID == (int)State.MeleeWeaponAttack)
                 {
-                    e = new(direction, Weapon.Damage);
+                    e = new(_DamageEmitter.GetNode<CollisionShape2D>("CollisionShape2D").GlobalPosition, direction, Weapon.Damage);
                 }
                 else
                 {
-                    e = new(direction);
+                    e = new(_DamageEmitter.GetNode<CollisionShape2D>("CollisionShape2D").GlobalPosition, direction);
                 }
 
                 a.DamageReceived(_DamageEmitter, e);
@@ -142,8 +142,14 @@ public partial class Enemy : Character
             FaceToPosition((emitter.Owner as Node2D).Position);
             SwitchState((int)State.KnockFly);
         }
+
         Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
         emitter?.AttackSuccess();
+
+        if (Health <= 0 || e.Type == DamageReceiver.HitType.knockDown)
+        {
+            EntityManager.Instance.GenerateParticle(e.Position, e.Direction.X < 0);
+        }
     }
     partial class StateIdle : Node, IState
     {

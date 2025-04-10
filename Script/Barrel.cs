@@ -41,6 +41,8 @@ public partial class Barrel : StaticObject
         if (e.Type == DamageReceiver.HitType.knockDown || Health <= 0)
         {
             PlayAudio("hit-2");
+            EntityManager.Instance.GenerateParticle(e.Position, e.Direction.X < 0);
+
         }
         else
         {

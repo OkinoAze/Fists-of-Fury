@@ -10,8 +10,19 @@ public partial class ActorContainer : Node2D
         EntityManager.Instance.GenerateBullet += OnGenerateBullet;
         EntityManager.Instance.GenerateProp += OnGenerateProp;
         EntityManager.Instance.GeneratePropName += OnGeneratePropName;
+        EntityManager.Instance.GenerateParticle += OnGenerateParticle;
 
     }
+
+    private void OnGenerateParticle(Vector2 position, bool flipH = false)
+    {
+        var path = "res://Scene/Prefab/Particle.tscn";
+        var particle = (Particle)ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse).Instantiate();
+        particle.GlobalPosition = position;
+        particle.FlipH = flipH;
+        AddChild(particle);
+    }
+
 
     private void OnGeneratePropName(string propName, Vector2 position)
     {
@@ -74,4 +85,5 @@ public partial class ActorContainer : Node2D
         return enemy;
 
     }
+
 }
