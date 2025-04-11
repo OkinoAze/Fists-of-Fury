@@ -72,7 +72,7 @@ public partial class ActorContainer : Node2D
     }
 
 
-    private Enemy OnGenerateActor(PackedScene packedScene, Vector2 position, Vector2 movePoint, float height, float heightSpeed, string weaponName)
+    private Enemy OnGenerateActor(PackedScene packedScene, Vector2 position, Vector2 movePoint, float height, float heightSpeed)
     {
         var enemy = packedScene.Instantiate<Enemy>();
         enemy.StateID = (int)Enemy.State.EnterScene;
@@ -80,7 +80,6 @@ public partial class ActorContainer : Node2D
         enemy.MovePoint = movePoint;
         enemy.Height = height;
         enemy.HeightSpeed = heightSpeed;
-        enemy.HasWeapon = weaponName;
         AddChild(enemy);
         return enemy;
 

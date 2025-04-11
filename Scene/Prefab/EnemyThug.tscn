@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://1mrxxn5y8fax"]
+
+[ext_resource type="PackedScene" uid="uid://nneqhin7yi3j" path="res://Scene/Prefab/Enemy.tscn" id="1_vfm1l"]
+[ext_resource type="Texture2D" uid="uid://ck4i7gsxcl6ne" path="res://Art/Characters/enemy_thug.png" id="2_vfm1l"]
+
+[node name="EnemyThug" instance=ExtResource("1_vfm1l")]
+MaxHealth = 6
+Health = 6
+HasWeapon = 2
+
+[node name="CharacterSprite" parent="." index="1"]
+texture = ExtResource("2_vfm1l")
+
+[editable path="CharacterSprite/DamageEmitter"]
+[editable path="CharacterSprite/DamageReceiver"]

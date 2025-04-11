@@ -75,16 +75,7 @@ public partial class Enemy : Character
 
     public override void _PhysicsProcess(double delta)
     {
-        if (InvincibleStates.Contains(StateID))
-        {
-            _DamageReceiver.Monitorable = false;
-        }
-        else
-        {
-            _DamageReceiver.Monitorable = true;
-        }
         StateMachineUpdate(delta);
-        //GD.Print((State)StateID);
     }
     public bool CanAttackPlayer(float distance = 20)
     {
@@ -129,27 +120,31 @@ public partial class Enemy : Character
     }
     private void OnDamageReceiver_DamageReceived(DamageEmitter emitter, DamageReceiver.DamageReceivedEventArgs e)
     {
-        Direction = e.Direction;
-        Repel = e.Repel;
-        HeightSpeed = e.HeightSpeed;
-        if (e.Type == DamageReceiver.HitType.Normal)
+        if (!InvincibleStates.Contains(StateID))
         {
-            AnimationPlayer.Stop();
-            SwitchState((int)State.Hurt);
-        }
-        else if (e.Type == DamageReceiver.HitType.knockDown)
-        {
-            FaceToPosition((emitter.Owner as Node2D).Position);
-            SwitchState((int)State.KnockFly);
+            Direction = e.Direction;
+            Repel = e.Repel;
+            HeightSpeed = e.HeightSpeed;
+            if (e.Type == DamageReceiver.HitType.Normal)
+            {
+                SwitchState((int)State.Hurt);
+            }
+            else if (e.Type == DamageReceiver.HitType.knockDown)
+            {
+                FaceToPosition((emitter.Owner as Node2D).Position);
+                SwitchState((int)State.KnockFly);
+            }
+
+            Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
+            emitter?.AttackSuccess();
+
+            if (Health <= 0 || e.Type == DamageReceiver.HitType.knockDown)
+            {
+                EntityManager.Instance.ShackCamera();
+                EntityManager.Instance.GenerateParticle(e.Position, e.Direction.X < 0);
+            }
         }
 
-        Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
-        emitter?.AttackSuccess();
-
-        if (Health <= 0 || e.Type == DamageReceiver.HitType.knockDown)
-        {
-            EntityManager.Instance.GenerateParticle(e.Position, e.Direction.X < 0);
-        }
     }
     partial class StateIdle : Node, IState
     {
@@ -187,9 +182,9 @@ public partial class Enemy : Character
 
             if (character.CanAttackPlayer() && character.AttackWaitTimer.TimeLeft <= 0)
             {
-                character.FaceToPosition(character._Player.Position);
                 if (character.Weapon == null || character?.Weapon?.Property == Prop.Properties.MeleeWeapon)
                 {
+                    character.FaceToPosition(character._Player.Position);
                     return (int)State.NearLock;
                 }
             }
@@ -626,7 +621,7 @@ public partial class Enemy : Character
         public bool Enter()
         {
             character.WaitTimer.Start();
-            var r = GD.RandRange(-15, 15);
+            var r = GD.RandRange(-10, 10);
             character.MovePoint = character._Player.Position.Rotated(r);
             character.Direction = character.Position.DirectionTo(character.MovePoint);
             character.AnimationPlayer.Play("Walk");
@@ -646,7 +641,6 @@ public partial class Enemy : Character
             if (character.IsOnWall())
             {
                 return (int)State.Walk;
-
             }
             if (character.Weapon == null)
             {
@@ -764,7 +758,7 @@ public partial class Enemy : Character
         public bool Enter()
         {
             character.WaitTimer.Start();
-            character.Direction *= character._DamageEmitter.Scale.X;
+            character.Direction = new Vector2(-character._DamageEmitter.Scale.X, 0);
             character.AnimationPlayer.Play("Walk");
             return true;
         }
@@ -777,7 +771,7 @@ public partial class Enemy : Character
         }
         public int Exit()
         {
-            if (character.IsOnWall() || character.WaitTimer.TimeLeft <= 0)
+            if (character.IsOnWall() || character.WaitTimer.TimeLeft <= character.WaitTimer.WaitTime / 2)
             {
                 return (int)State.Idle;
             }
@@ -904,9 +898,9 @@ public partial class Enemy : Character
             else
             {
                 character.AnimationPlayer.Play("Walk");
-                character.Direction = new Vector2(0, Mathf.Sign(p)).Normalized();
+                character.Direction = new Vector2(0, p).Normalized();
             }
-            character.Velocity = character.Direction * character.MoveSpeed;
+            character.Velocity = character.Direction * character.MoveSpeed * 2 / 3;
             character.MoveAndSlide();
 
             return Exit();

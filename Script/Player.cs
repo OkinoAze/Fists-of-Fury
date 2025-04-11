@@ -74,14 +74,9 @@ public partial class Player : Character
         {
             Direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
         }
-        if (InvincibleStates.Contains(StateID))
-        {
-            _DamageReceiver.Monitorable = false;
-        }
-        else
-        {
-            _DamageReceiver.Monitorable = true;
-        }
+
+
+
         StateMachineUpdate(delta);
 
     }
@@ -129,27 +124,28 @@ public partial class Player : Character
 
     private void OnDamageReceiver_DamageReceived(DamageEmitter emitter, DamageReceiver.DamageReceivedEventArgs e)
     {
-
-        Direction = e.Direction;
-        Repel = e.Repel;
-        HeightSpeed = e.HeightSpeed;
-        if (e.Type == DamageReceiver.HitType.Normal)
+        if (!InvincibleStates.Contains(StateID))
         {
-            AnimationPlayer.Stop();
-            SwitchState((int)State.Hurt);
-        }
-        else if (e.Type == DamageReceiver.HitType.knockDown)
-        {
+            Direction = e.Direction;
+            Repel = e.Repel;
+            HeightSpeed = e.HeightSpeed;
+            if (e.Type == DamageReceiver.HitType.Normal)
+            {
+                SwitchState((int)State.Hurt);
+            }
+            else if (e.Type == DamageReceiver.HitType.knockDown)
+            {
+                SwitchState((int)State.KnockFly);
+            }
 
-            SwitchState((int)State.KnockFly);
-        }
+            Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
+            emitter?.AttackSuccess();
 
-        Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
-        emitter?.AttackSuccess();
-
-        if (Health <= 0 || e.Type == DamageReceiver.HitType.knockDown)
-        {
-            EntityManager.Instance.GenerateParticle(e.Position, e.Direction.X < 0);
+            if (Health <= 0 || e.Type == DamageReceiver.HitType.knockDown)
+            {
+                EntityManager.Instance.ShackCamera();
+                EntityManager.Instance.GenerateParticle(e.Position, e.Direction.X < 0);
+            }
         }
     }
 
@@ -485,8 +481,6 @@ public partial class Player : Character
             if (character.Health <= 0)
             {
                 character.PlayAudio("hit-2");
-                //TODO 摇晃动画,粒子特效
-
             }
             else
             {
@@ -524,7 +518,6 @@ public partial class Player : Character
             character.DropWeapon();
             character.AnimationPlayer.Play("KnockFly");
             character.PlayAudio("hit-2");
-            //TODO 摇晃动画,粒子特效
 
             character.Velocity = character.Direction * character.Repel;
             character.DropWeapon();

@@ -3,6 +3,7 @@ using System;
 
 public partial class EnemySlot : Node2D
 {
+    [Export]
     public Enemy Occupant = null;
     public bool IsFree()
     {

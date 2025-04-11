@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://083sxnmllett"]
+
+[ext_resource type="PackedScene" uid="uid://nneqhin7yi3j" path="res://Scene/Prefab/Enemy.tscn" id="1_36vkm"]
+[ext_resource type="Texture2D" uid="uid://l6wwrr18cju6" path="res://Art/Characters/enemy_punk.png" id="2_g63s6"]
+
+[node name="EnemyPunk" instance=ExtResource("1_36vkm")]
+MaxHealth = 10
+Health = 10
+
+[node name="CharacterSprite" parent="." index="1"]
+texture = ExtResource("2_g63s6")
+
+[editable path="CharacterSprite/DamageEmitter"]
+[editable path="CharacterSprite/DamageReceiver"]

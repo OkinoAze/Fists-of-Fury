@@ -8,7 +8,7 @@ public partial class Barrel : StaticObject
     [Export]
     string HasProp = "";
     Sprite2D Sprite;
-    DamageReceiver DamageReceiver;
+    DamageReceiver _DamageReceiver;
     AudioStreamPlayer AudioPlayer;
     enum State
     {
@@ -21,9 +21,9 @@ public partial class Barrel : StaticObject
 
         Sprite = GetNode<Sprite2D>("Sprite2D");
         AudioPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
-        DamageReceiver = GetNode<DamageReceiver>("DamageReceiver");
+        _DamageReceiver = GetNode<DamageReceiver>("DamageReceiver");
 
-        DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
+        _DamageReceiver.DamageReceived += OnDamageReceiver_DamageReceived;
 
         _ = new StateIdle(this);
         _ = new StateDestroyed(this);
@@ -99,6 +99,7 @@ public partial class Barrel : StaticObject
         }
         public bool Enter()
         {
+            character._DamageReceiver.Monitorable = false;
             character.HeightSpeed = character.MoveSpeed * 3;
             if (character.HasProp != "")
             {

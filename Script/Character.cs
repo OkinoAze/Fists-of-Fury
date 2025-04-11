@@ -11,7 +11,7 @@ public partial class Character : MoveObject
 	[Export]
 	public int Damage = 1;
 	[Export]
-	public string HasWeapon = "";
+	public EntityManager.WeaponType HasWeapon = EntityManager.WeaponType.Default;
 	protected const float _AttackRange = 5;
 	protected float Repel = 0;
 	public int AttackID { get; protected set; } = 0;
@@ -46,15 +46,15 @@ public partial class Character : MoveObject
 		PickUpCheck.AreaEntered += OnPickUpCheck_AreaEntered;
 		PickUpCheck.AreaExited += OnPickUpCheck_AreaExited;
 
-		if (HasWeapon != "")
+		if (HasWeapon != EntityManager.WeaponType.Default)
 		{
 			GetWeapon(HasWeapon);
 		}
 
 	}
-	protected void GetWeapon(string weaponName)
+	protected void GetWeapon(EntityManager.WeaponType weaponType)
 	{
-		var path = "res://Scene/Prefab/" + weaponName + ".tscn";
+		var path = "res://Scene/Prefab/" + Enum.GetName(weaponType) + ".tscn";
 		bool exists = ResourceLoader.Exists(path);
 		if (exists)
 		{

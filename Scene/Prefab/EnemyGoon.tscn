@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://dfvo3ht4wl7lo"]
+
+[ext_resource type="PackedScene" uid="uid://nneqhin7yi3j" path="res://Scene/Prefab/Enemy.tscn" id="1_maoqw"]
+[ext_resource type="Texture2D" uid="uid://ctw7s6aimfyb5" path="res://Art/Characters/enemy_goon.png" id="2_maoqw"]
+
+[node name="EnemyGoon" instance=ExtResource("1_maoqw")]
+HasWeapon = 1
+
+[node name="CharacterSprite" parent="." index="1"]
+texture = ExtResource("2_maoqw")
+
+[editable path="CharacterSprite/DamageEmitter"]
+[editable path="CharacterSprite/DamageReceiver"]
