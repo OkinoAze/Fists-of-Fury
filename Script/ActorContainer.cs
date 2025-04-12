@@ -27,8 +27,7 @@ public partial class ActorContainer : Node2D
     private void OnGeneratePropName(string propName, Vector2 position)
     {
         var path = "res://Scene/Prefab/" + propName + ".tscn";
-        bool exists = ResourceLoader.Exists(path);
-        if (exists)
+        if (ResourceLoader.Exists(path))
         {
             var propScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);
             var prop = propScene.Instantiate<Prop>();
@@ -42,8 +41,7 @@ public partial class ActorContainer : Node2D
     private void OnGenerateProp(Prop propInstance, Vector2 position)
     {
         var path = "res://Scene/Prefab/" + propInstance.GetType().Name + ".tscn";
-        bool exists = ResourceLoader.Exists(path);
-        if (exists)
+        if (ResourceLoader.Exists(path))
         {
             var propScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);
             var prop = propScene.Instantiate<Prop>();
@@ -55,13 +53,13 @@ public partial class ActorContainer : Node2D
     }
 
 
-    private void OnGenerateBullet(int damage, Vector2 direction, Vector2 position, Vector2 shotPosition)
+    private void OnGenerateBullet(Character character, int damage, Vector2 direction, Vector2 position, Vector2 shotPosition)
     {
         var path = "res://Scene/Prefab/Bullet.tscn";
         var bulletScene = ResourceLoader.Load<PackedScene>(path, null, ResourceLoader.CacheMode.Reuse);
         Bullet bullet = bulletScene.Instantiate<Bullet>();
 
-
+        bullet.SpawnThisCharacter = character;
         bullet.Damage = damage;
         bullet.Position = position;
         bullet.Direction = direction;

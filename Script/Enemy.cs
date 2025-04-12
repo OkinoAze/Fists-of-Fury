@@ -76,6 +76,14 @@ public partial class Enemy : Character
     public override void _PhysicsProcess(double delta)
     {
         StateMachineUpdate(delta);
+        if (!InvincibleStates.Contains(StateID))
+        {
+            _DamageReceiver.Monitorable = true;
+        }
+        else
+        {
+            _DamageReceiver.Monitorable = false;
+        }
     }
     public bool CanAttackPlayer(float distance = 20)
     {
@@ -87,7 +95,7 @@ public partial class Enemy : Character
     }
 
 
-    private void OnDamageEmitter_AttackSuccess()
+    private void OnDamageEmitter_AttackSuccess(Character character)
     {
         if (Weapon?.Property == Prop.Properties.MeleeWeapon && StateID == (int)State.MeleeWeaponAttack)
         {
@@ -136,7 +144,7 @@ public partial class Enemy : Character
             }
 
             Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
-            emitter?.AttackSuccess();
+            emitter?.AttackSuccess(this);
 
             if (Health <= 0 || e.Type == DamageReceiver.HitType.knockDown)
             {
@@ -561,7 +569,7 @@ public partial class Enemy : Character
                 character.PlayAudio("click");
                 var d = (Vector2.Right * character._DamageEmitter.Scale.X).Normalized();
                 var p = new Vector2(character.Weapon.ShotPosition.X * d.X, character.Weapon.ShotPosition.Y);
-                EntityManager.Instance.GenerateBullet(character.Weapon.Damage, d, new Vector2(character.Position.X + p.X, character.Position.Y), new Vector2(0, p.Y));
+                EntityManager.Instance.GenerateBullet(character, character.Weapon.Damage, d, new Vector2(character.Position.X + p.X, character.Position.Y), new Vector2(0, p.Y));
             }
             else
             {

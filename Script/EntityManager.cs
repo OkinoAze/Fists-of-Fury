@@ -4,7 +4,7 @@ using System;
 public partial class EntityManager : Node
 {
     public delegate Enemy GenerateActorReceiver(PackedScene packedScene, Vector2 position, Vector2 movePoint, float height = 0, float heightSpeed = 0);
-    public delegate void GenerateBulletReceiver(int damage, Vector2 direction, Vector2 position, Vector2 shotPosition);
+    public delegate void GenerateBulletReceiver(Character character, int damage, Vector2 direction, Vector2 position, Vector2 shotPosition);
     public delegate void GeneratePropReceiver(Prop propInstance, Vector2 position);
     public delegate void GeneratePropNameReceiver(string propName, Vector2 position);
     public delegate void GenerateParticleReceiver(Vector2 position, bool flipH = false);

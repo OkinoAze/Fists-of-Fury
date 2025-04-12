@@ -5,6 +5,7 @@
 
 [node name="EnemyGoon" instance=ExtResource("1_maoqw")]
 HasWeapon = 1
+AvatarName = "goon"
 
 [node name="CharacterSprite" parent="." index="1"]
 texture = ExtResource("2_maoqw")

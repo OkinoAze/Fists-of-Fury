@@ -4,7 +4,7 @@ using System;
 public partial class Bullet : ShotObject
 {
     new public float MoveSpeed = 150;
-
+    public Character SpawnThisCharacter = null;
     enum State
     {
         Idle,
@@ -26,9 +26,9 @@ public partial class Bullet : ShotObject
 
     }
 
-    private void OnDamageEmitter_AttackSuccess()
+    private void OnDamageEmitter_AttackSuccess(Character character)
     {
-
+        SpawnThisCharacter._DamageEmitter.AttackSuccess(character);
     }
 
     private void OnDamageEmitter_AreaEntered(Area2D area)

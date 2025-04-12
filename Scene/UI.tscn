@@ -1,0 +1,181 @@
+[gd_scene load_steps=12 format=3 uid="uid://lpxhwv4iyom2"]
+
+[ext_resource type="Texture2D" uid="uid://chm4dutxqkpma" path="res://Art/UI/Avatars/avatar-player.png" id="1_fau5c"]
+[ext_resource type="Texture2D" uid="uid://b6u8qrmygda0t" path="res://Art/UI/1x1.png" id="2_nq5m3"]
+[ext_resource type="Texture2D" uid="uid://bgqobml0oitp" path="res://Art/UI/healthbar-tick.png" id="3_hskja"]
+[ext_resource type="FontFile" uid="uid://bofvn2hl5vy1s" path="res://Fonts/my 3x5 tiny mono pixel font.ttf" id="4_f6k66"]
+[ext_resource type="Texture2D" uid="uid://dshu0jylxk5t8" path="res://Art/UI/Avatars/avatar-punk.png" id="5_fv4t1"]
+[ext_resource type="Texture2D" uid="uid://c7b24p2y7ldbd" path="res://Art/UI/go-go-go.png" id="6_nq5m3"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nq5m3"]
+texture = ExtResource("2_nq5m3")
+modulate_color = Color(0.539063, 0.109497, 0.109497, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hskja"]
+texture = ExtResource("3_hskja")
+
+[sub_resource type="Animation" id="Animation_hskja"]
+resource_name = "GoGoGo"
+length = 1.7
+step = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GO:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.333333, 0.666667, 1, 1.33333, 1.66667, 2, 2.33333),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_f6k66"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GO:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fv4t1"]
+_data = {
+&"GoGoGo": SubResource("Animation_hskja"),
+&"RESET": SubResource("Animation_f6k66")
+}
+
+[node name="UI" type="CanvasLayer"]
+
+[node name="HUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 8
+
+[node name="Player" type="Control" parent="HUD"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 20.0
+
+[node name="Avatar" type="TextureRect" parent="HUD/Player"]
+layout_mode = 1
+offset_right = 11.0
+offset_bottom = 11.0
+texture = ExtResource("1_fau5c")
+
+[node name="HealthBarRect" type="TextureRect" parent="HUD/Player"]
+layout_mode = 1
+offset_left = 12.0
+offset_top = 7.0
+offset_right = 34.0
+offset_bottom = 11.0
+texture = ExtResource("2_nq5m3")
+
+[node name="HealthBar" type="ProgressBar" parent="HUD/Player"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 8.0
+offset_right = 33.0
+offset_bottom = 10.0
+theme_override_fonts/font = ExtResource("4_f6k66")
+theme_override_font_sizes/font_size = 6
+theme_override_styles/background = SubResource("StyleBoxTexture_nq5m3")
+theme_override_styles/fill = SubResource("StyleBoxTexture_hskja")
+step = 1.0
+value = 20.0
+rounded = true
+show_percentage = false
+
+[node name="Combo" type="Label" parent="HUD/Player"]
+layout_mode = 1
+offset_left = 12.0
+offset_top = 1.0
+offset_right = 34.0
+offset_bottom = 7.0
+theme_override_fonts/font = ExtResource("4_f6k66")
+theme_override_font_sizes/font_size = 6
+horizontal_alignment = 2
+
+[node name="Enemy" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 20.0
+grow_horizontal = 0
+
+[node name="Avatar" type="TextureRect" parent="HUD/Enemy"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -11.0
+offset_bottom = 11.0
+grow_horizontal = 0
+texture = ExtResource("5_fv4t1")
+flip_h = true
+
+[node name="HealthBarRect" type="TextureRect" parent="HUD/Enemy"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = 7.0
+offset_right = -12.0
+offset_bottom = 11.0
+grow_horizontal = 0
+texture = ExtResource("2_nq5m3")
+
+[node name="HealthBar" type="ProgressBar" parent="HUD/Enemy"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -13.0
+offset_top = 8.0
+offset_right = 7.0
+offset_bottom = 10.0
+grow_horizontal = 0
+scale = Vector2(-1, 1)
+theme_override_fonts/font = ExtResource("4_f6k66")
+theme_override_font_sizes/font_size = 6
+theme_override_styles/background = SubResource("StyleBoxTexture_nq5m3")
+theme_override_styles/fill = SubResource("StyleBoxTexture_hskja")
+step = 1.0
+value = 20.0
+rounded = true
+show_percentage = false
+
+[node name="GO" type="TextureRect" parent="HUD"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -8.0
+offset_bottom = 8.0
+grow_horizontal = 0
+grow_vertical = 2
+texture = ExtResource("6_nq5m3")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="HUD/GO"]
+root_node = NodePath("../..")
+libraries = {
+&"": SubResource("AnimationLibrary_fv4t1")
+}

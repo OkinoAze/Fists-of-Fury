@@ -6,6 +6,7 @@
 [node name="EnemyPunk" instance=ExtResource("1_36vkm")]
 MaxHealth = 10
 Health = 10
+AvatarName = "punk"
 
 [node name="CharacterSprite" parent="." index="1"]
 texture = ExtResource("2_g63s6")

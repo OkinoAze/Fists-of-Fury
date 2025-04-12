@@ -37,7 +37,6 @@ public partial class Barrel : StaticObject
     private void OnDamageReceiver_DamageReceived(DamageEmitter emitter, DamageReceiver.DamageReceivedEventArgs e)
     {
         Health -= e.Damage;
-        emitter?.AttackSuccess();
         if (e.Type == DamageReceiver.HitType.knockDown || Health <= 0)
         {
             PlayAudio("hit-2");

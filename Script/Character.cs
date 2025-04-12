@@ -29,6 +29,7 @@ public partial class Character : MoveObject
 
 	protected Area2D PickUpCheck;
 	protected int[] InvincibleStates;
+	[Export]
 	public string AvatarName { get; protected set; }
 
 	public void AccessingResources()
