@@ -28,9 +28,14 @@ public partial class Main : Node
     TextureRect EnemyAvatar;
     ProgressBar EnemyHealthBar;
 
-
-
+    AudioStreamPlayer SFX;
     AnimationPlayer GO;
+
+
+    Control ReSpawn;
+    Label ReSpawnTime;
+    Label ReSpawnCaption;
+    Timer PlayerReSpawnTimer;
 
     public override void _Ready()
     {
@@ -43,15 +48,37 @@ public partial class Main : Node
 
         GO = GetTree().Root.GetNode<AnimationPlayer>("UI/HUD/GO/AnimationPlayer");
 
+
+        ReSpawn = GetTree().Root.GetNode<Control>("UI/ReSpawn");
+
+
+        SFX = GetNode<AudioStreamPlayer>("SFX");
+
+        PlayerReSpawnTimer = GetNode<Timer>("PlayerReSpawnTimer");
+        ReSpawnTime = ReSpawn.GetNode<Label>("Time");
+        ReSpawnCaption = ReSpawn.GetNode<Label>("Caption");
+
+
+
         EntityManager.Instance.EnterBattleArea += OnEnterBattleArea;
         EntityManager.Instance.ExitBattleArea += OnExitBattleArea;
         EntityManager.Instance.ShackCamera += OnShackCamera;
+        EntityManager.Instance.ReSpawnPlayer += OnReSpawnPlayer;
 
         _Player._DamageEmitter.AttackSuccess += OnAttackSuccess;
 
+
         EnemyHUD.Visible = false;
+        ReSpawn.Visible = false;
+    }
+
+    private void OnReSpawnPlayer()
+    {
+        PlayerReSpawnTimer.Start();
+        ReSpawn.Visible = true;
 
     }
+
 
     public async void OnAttackSuccess(Character character)
     {
@@ -91,6 +118,7 @@ public partial class Main : Node
     {
         StopCamera = false;
         GO.Play("GoGoGo");
+        SFX.Play();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -112,6 +140,7 @@ public partial class Main : Node
         {
             Camera.Position = new Vector2(_Player.Position.X, Camera.Position.Y);
         }
+
         if (ShackCamera == true && ShackNowTime < ShackTime)
         {
             ShackNowTime += (float)delta;
@@ -123,6 +152,28 @@ public partial class Main : Node
             ShackNowTime = 0;
             Camera.Offset = new Vector2(0, 0);
         }
+
+        if (ReSpawn.Visible == true)
+        {
+            if (PlayerReSpawnTimer.TimeLeft <= 0)
+            {
+                ReSpawnCaption.Text = "GameOver";
+                ReSpawnTime.Text = "";
+            }
+            else
+            {
+                ReSpawnCaption.Text = "ReSpawn";
+                ReSpawnTime.Text = ((int)PlayerReSpawnTimer.TimeLeft).ToString();
+
+                if (Input.IsActionJustPressed("attack"))
+                {
+                    _Player.Health = _Player.MaxHealth;
+                    _Player.SwitchState((int)Player.State.EnterScene);
+                    ReSpawn.Visible = false;
+                }
+            }
+        }
+
         if (Input.IsActionPressed("ui_filedialog_refresh"))
         {
             EntityManager.Instance.GenerateBullet = null;
@@ -131,6 +182,10 @@ public partial class Main : Node
             EntityManager.Instance.GeneratePropName = null;
             EntityManager.Instance.GenerateParticle = null;
             EntityManager.Instance.ShackCamera = null;
+            EntityManager.Instance.EnterBattleArea = null;
+            EntityManager.Instance.ExitBattleArea = null;
+            EntityManager.Instance.ReSpawnPlayer = null;
+
             GetTree().ReloadCurrentScene();
         }
     }

@@ -23,7 +23,7 @@ public partial class Player : Character
         KnockDown,
         MeleeWeaponAttack,
         RangedWeaponAttack,
-
+        EnterScene,
     }
 
     public override void _Ready()
@@ -45,8 +45,7 @@ public partial class Player : Character
         _ = new StateCrouchDown(this);
         _ = new StateMeleeWeaponAttack(this);
         _ = new StateRangedWeaponAttack(this);
-
-        AvatarName = "Player";
+        _ = new StateEnterScene(this);
 
         AccessingResources();
         _DamageEmitter.AreaEntered += OnDamageEmitter_AreaEntered;
@@ -141,6 +140,7 @@ public partial class Player : Character
             }
             else if (e.Type == DamageReceiver.HitType.knockDown)
             {
+                FaceToPosition((emitter.Owner as Node2D).Position);
                 SwitchState((int)State.KnockFly);
             }
 
@@ -399,8 +399,8 @@ public partial class Player : Character
 
         public int Update(double delta)
         {
-            character.Height += character.HeightSpeed * (float)delta;
             character.HeightSpeed -= Gravity * (float)delta;
+            character.Height += character.HeightSpeed * (float)delta;
             character.CharacterSprite.Position = Vector2.Up * character.Height;
 
             character.MoveAndSlide();
@@ -440,8 +440,8 @@ public partial class Player : Character
 
         public int Update(double delta)
         {
-            character.Height += character.HeightSpeed * (float)delta;
             character.HeightSpeed -= Gravity * (float)delta;
+            character.Height += character.HeightSpeed * (float)delta;
             character.CharacterSprite.Position = Vector2.Up * character.Height;
 
             character.MoveAndSlide();
@@ -564,10 +564,9 @@ public partial class Player : Character
 
         public int Update(double delta)
         {
-            character.Height += character.HeightSpeed * (float)delta;
             character.HeightSpeed -= Gravity * (float)delta;
+            character.Height += character.HeightSpeed * (float)delta;
             character.CharacterSprite.Position = Vector2.Up * character.Height;
-
 
             character.MoveAndSlide();
             return Exit();
@@ -587,7 +586,7 @@ public partial class Player : Character
     {
         if (Health <= 0)
         {
-            //TODO 角色死亡
+            EntityManager.Instance.ReSpawnPlayer();
         }
         else
         {
@@ -716,6 +715,45 @@ public partial class Player : Character
         }
         public int Exit()
         {
+            return GetId;
+        }
+    }
+    partial class StateEnterScene : Node, IState
+    {
+        Player character;
+        public int GetId { get; } = (int)State.EnterScene;
+        public StateEnterScene(Player c)
+        {
+            character = c;
+            character.States[GetId] = this;
+        }
+        public bool Enter()
+        {
+            var cameraRect = character.GetCrimeaRect();
+            character.Height = cameraRect.Size.Y;
+            character.HeightSpeed = -cameraRect.Size.Y;
+            character.AnimationPlayer.Play("Jump");
+            return true;
+        }
+
+        public int Update(double delta)
+        {
+
+            character.HeightSpeed -= Gravity * (float)delta;
+            character.Height += character.HeightSpeed * (float)delta;
+            character.CharacterSprite.Position = Vector2.Up * character.Height;
+
+            return Exit();
+        }
+        public int Exit()
+        {
+            if (character.Height <= 0)
+            {
+                character.CharacterSprite.Position = Vector2.Zero;
+                character.Height = 0;
+
+                return (int)State.Idle;
+            }
             return GetId;
         }
     }

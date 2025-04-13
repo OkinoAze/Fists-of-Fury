@@ -23,6 +23,8 @@ public partial class EntityManager : Node
     public ExitBattleAreaReceiver ExitBattleArea;
     public delegate void ShackCameraReceiver();
     public ShackCameraReceiver ShackCamera;
+    public delegate void ReSpawnPlayerReceiver();
+    public ReSpawnPlayerReceiver ReSpawnPlayer;
 
 
     public static EntityManager Instance { get; private set; }

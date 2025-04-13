@@ -26,6 +26,7 @@ texture = ExtResource("2_ok56b")
 callback_mode_process = 0
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+bus = &"SFX"
 
 [node name="AttackBufferTimer" type="Timer" parent="."]
 wait_time = 0.5

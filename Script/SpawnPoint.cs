@@ -7,6 +7,10 @@ public partial class SpawnPoint : Marker2D
     Color LineColor = Colors.Red;
     public Marker2D MovePoint;
     [Export]
+    public float Height = 0;
+    [Export]
+    public float HeightSpeed = 0;
+    [Export]
     public Godot.Collections.Array<PackedScene> Enemies;
     public override void _Ready()
     {

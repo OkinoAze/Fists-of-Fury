@@ -806,6 +806,7 @@ collision_mask = 9
 script = ExtResource("2_oa1iy")
 MaxHealth = 10
 Health = 10
+AvatarName = "player"
 metadata/_edit_horizontal_guides_ = [-33.0]
 
 [node name="CharacterSprite" parent="." index="1"]

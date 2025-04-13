@@ -54,7 +54,7 @@ public partial class BattleArea : Area2D
                 {
                     if (item.Enemies.Count > 0 && EnemyCount <= MaxEnemies)
                     {
-                        var e = EntityManager.Instance.GenerateActor(item.Enemies[0], item.GlobalPosition, item.MovePoint.GlobalPosition);
+                        var e = EntityManager.Instance.GenerateActor(item.Enemies[0], item.GlobalPosition, item.MovePoint.GlobalPosition, item.Height, item.HeightSpeed);
                         item.Enemies.RemoveAt(0);
                     }
                     RemainingEnemies += item.Enemies.Count;
@@ -68,6 +68,7 @@ public partial class BattleArea : Area2D
             if (RemainingEnemies == 0 && EnemyCount == 0)
             {
                 EntityManager.Instance.ExitBattleArea(this);
+                QueueFree();
             }
         }
     }

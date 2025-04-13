@@ -15,7 +15,7 @@ public partial class Character : MoveObject
 	protected const float _AttackRange = 5;
 	protected float Repel = 0;
 	public int AttackID { get; protected set; } = 0;
-	protected Sprite2D CharacterSprite;
+	public Sprite2D CharacterSprite;
 	protected Sprite2D WeaponSprite;
 	protected Sprite2D ShadowSprite;
 	protected AnimationPlayer AnimationPlayer;
@@ -78,9 +78,9 @@ public partial class Character : MoveObject
 	public Rect2 GetCrimeaRect()
 	{
 		var viewportRect = GetViewportRect();
-		var position = GetViewport().GetCamera2D().Position;
+		var position = GetViewport().GetCamera2D().GlobalPosition;
 		var size = viewportRect.Size / 2;
-		return new Rect2(position.X - size.X, position.Y - size.Y, position.X + size.X, position.Y + size.Y);
+		return new Rect2(position.X - size.X, position.Y - size.Y, viewportRect.Size);
 	}
 	public void FaceToDirection()
 	{
@@ -154,7 +154,7 @@ public partial class Character : MoveObject
 			Weapon = null;
 		}
 	}
-	protected bool AttackRange(Vector2 position)
+	public bool AttackRange(Vector2 position)
 	{
 		if (position.Y > Position.Y - _AttackRange && position.Y < Position.Y + _AttackRange)
 		{
@@ -162,11 +162,7 @@ public partial class Character : MoveObject
 		}
 		return false;
 	}
-	protected string GetAvatarPath(string name)
-	{
-		return "res://Art/UI/Avatar/avatar_" + name + ".png";
-	}
-	protected void PlayAudio(string name)
+	public void PlayAudio(string name)
 	{
 		AudioPlayer.Stream = ResourceLoader.Load<AudioStreamWav>("res://Music/SFX/" + name + ".wav", null, ResourceLoader.CacheMode.Reuse);
 		AudioPlayer.Play();
