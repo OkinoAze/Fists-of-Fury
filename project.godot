@@ -43,6 +43,7 @@ script/search_in_file_extensions=PackedStringArray("cs", "gd", "gdshader")
 Player=""
 Enemy=""
 Prop=""
+Boss=""
 
 [input]
 

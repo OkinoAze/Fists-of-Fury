@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://d2tpt0iu7ow7h"]
+[gd_scene load_steps=7 format=3 uid="uid://d2tpt0iu7ow7h"]
 
 [ext_resource type="Script" uid="uid://b0o1umbqcblsa" path="res://Script/Barrel.cs" id="1_acjb0"]
 [ext_resource type="Texture2D" uid="uid://fkoddoxehocp" path="res://Art/Props/barrel.png" id="1_u30hi"]
 [ext_resource type="Texture2D" uid="uid://dvrrqsggg1kiy" path="res://Art/Characters/shadow.png" id="2_0rxdo"]
 [ext_resource type="PackedScene" uid="uid://wahn30yxqe0y" path="res://Scene/Prefab/DamageReceiver.tscn" id="2_bbkcx"]
-[ext_resource type="PackedScene" uid="uid://dnn3cawehq8m7" path="res://Scene/Prefab/Particle.tscn" id="5_5j8if"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bbkcx"]
 radius = 3.0
@@ -39,8 +38,5 @@ position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_bbkcx")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-
-[node name="Particle" parent="." instance=ExtResource("5_5j8if")]
-visible = false
 
 [editable path="DamageReceiver"]

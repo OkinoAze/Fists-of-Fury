@@ -45,6 +45,8 @@ public partial class Main : Node
 
     AnimationPlayer TransitionAnimationPlayer;
 
+    Area2D ExitSceneArea;
+
     public override void _Ready()
     {
         PlayerHealthBar = GetTree().Root.GetNode<ProgressBar>("UI/HUD/Player/HealthBar");
@@ -77,7 +79,7 @@ public partial class Main : Node
 
         _Player._DamageEmitter.AttackSuccess += OnAttackSuccess;
 
-        var packedScene = ResourceLoader.Load<PackedScene>("res://Scene/stage-1.tscn");
+        var packedScene = ResourceLoader.Load<PackedScene>("res://Scene/Stage-1.tscn");
         EntityManager.Instance.SwitchScene(packedScene);
 
         EnemyHUD.Visible = false;
@@ -118,8 +120,19 @@ public partial class Main : Node
         _Player.Position = new Vector2(25, 45);
         TransitionAnimationPlayer.Play("StartTransition");
 
+        ExitSceneArea = newStage.GetNodeOrNull<Area2D>("ExitSceneArea");
+        if (ExitSceneArea != null)
+        {
+            ExitSceneArea.BodyEntered += OnExitSceneAreaEntered;
+        }
     }
 
+    private async void OnExitSceneAreaEntered(Node2D body)
+    {
+        TransitionAnimationPlayer.Play("EndTransition");
+        await ToSignal(GetTree().CreateTimer(4), SceneTreeTimer.SignalName.Timeout);
+        ReStartScene();
+    }
 
     private void OnReSpawnPlayer()
     {
@@ -248,19 +261,24 @@ public partial class Main : Node
 
         if (Input.IsActionPressed("ui_filedialog_refresh"))
         {
-            EntityManager.Instance.GenerateBullet = null;
-            EntityManager.Instance.GenerateActor = null;
-            EntityManager.Instance.GenerateProp = null;
-            EntityManager.Instance.GeneratePropName = null;
-            EntityManager.Instance.GenerateParticle = null;
-            EntityManager.Instance.ShackCamera = null;
-            EntityManager.Instance.EnterBattleArea = null;
-            EntityManager.Instance.ExitBattleArea = null;
-            EntityManager.Instance.ReSpawnPlayer = null;
-            EntityManager.Instance.SwitchScene = null;
-
-            GetTree().ReloadCurrentScene();
+            ReStartScene();
         }
+    }
+
+    void ReStartScene()
+    {
+        EntityManager.Instance.GenerateBullet = null;
+        EntityManager.Instance.GenerateActor = null;
+        EntityManager.Instance.GenerateProp = null;
+        EntityManager.Instance.GeneratePropName = null;
+        EntityManager.Instance.GenerateParticle = null;
+        EntityManager.Instance.ShackCamera = null;
+        EntityManager.Instance.EnterBattleArea = null;
+        EntityManager.Instance.ExitBattleArea = null;
+        EntityManager.Instance.ReSpawnPlayer = null;
+        EntityManager.Instance.SwitchScene = null;
+
+        GetTree().ReloadCurrentScene();
     }
     public class PositionXComparer : IComparer<Node2D>
     {

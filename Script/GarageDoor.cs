@@ -20,21 +20,21 @@ public partial class GarageDoor : Sprite2D
     {
         if (battleArea == BattleArea)
         {
-            BattleArea.AutoStart = true;
-            _AnimationPlayer.Play("OpenDoor");
             foreach (var spawnPoint in SpawnPoints)
             {
                 if (spawnPoint.Enemies.Count > 0)
                 {
                     var e = EntityManager.Instance.GenerateActor(spawnPoint.Enemies[0], spawnPoint.GlobalPosition, spawnPoint.MovePoint.GlobalPosition);
                     e.ZIndex = -1;
+                    e.Visible = true;
                     e.ProcessMode = ProcessModeEnum.Disabled;
                     BattleArea.ActiveEnemies.Add(e);
                     Enemies.Add(e);
                     spawnPoint.Enemies = spawnPoint.Enemies.Slice(1, spawnPoint.Enemies.Count);
                 }
             }
-
+            _AnimationPlayer.Play("OpenDoor");
+            BattleArea.AutoStart = true;
         }
     }
     public async void OpenDoorEnd()
@@ -44,8 +44,8 @@ public partial class GarageDoor : Sprite2D
             item.ZIndex = 0;
             item.ProcessMode = ProcessModeEnum.Inherit;
         }
-        await ToSignal(GetTree().CreateTimer(0.5), SceneTreeTimer.SignalName.Timeout);
         _AnimationPlayer.Play("CloseDoor");
+        await ToSignal(GetTree().CreateTimer(2), SceneTreeTimer.SignalName.Timeout);
         ProcessMode = ProcessModeEnum.Disabled;
     }
 }

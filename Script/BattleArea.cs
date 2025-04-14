@@ -8,7 +8,7 @@ public partial class BattleArea : Area2D
     Color LineColor = Colors.Red;
     [Export]
     public bool AutoStart = true;
-    public int RemainingEnemies = 0;
+    public int RemainingEnemies = 1;
     public List<SpawnPoint> SpawnPoints = [];
     [Export]
     public Godot.Collections.Array<Character> ActiveEnemies = [];
@@ -59,8 +59,8 @@ public partial class BattleArea : Area2D
                         {
                             var e = EntityManager.Instance.GenerateActor(item.Enemies[0], item.GlobalPosition, item.MovePoint.GlobalPosition, item.Height, item.HeightSpeed);
                             ActiveEnemies.Add(e);
-                            item.Enemies = item.Enemies.Slice(1, item.Enemies.Count);
 
+                            item.Enemies = item.Enemies.Slice(1, item.Enemies.Count);
                         }
                         RemainingEnemies += item.Enemies.Count;
 

@@ -83,7 +83,7 @@ public partial class Enemy : Character
         {
             _DamageReceiver.Monitorable = false;
         }
-        if (StateID != (int)State.EnterScene && !GetCameraRect().HasPoint(GlobalPosition))
+        if (StateID != (int)State.Death && StateID != (int)State.EnterScene && !GetCameraRect().HasPoint(GlobalPosition))
         {
             var rect = GetCameraRect().GrowSide(Side.Left, -10).GrowSide(Side.Right, -10);
             MovePoint = new Vector2(Mathf.Clamp(GlobalPosition.X, rect.Position.X, rect.End.X), GlobalPosition.Y);
@@ -903,9 +903,19 @@ public partial class Enemy : Character
             }
             if (character.GlobalPosition.DistanceTo(character.MovePoint) < 2 && character.Height == 0)
             {
-                character.SetCollisionMaskValue(1, true);
+                var rect = character.GetCameraRect();
+                if (rect.HasPoint(character.GlobalPosition))
+                {
+                    character.SetCollisionMaskValue(1, true);
 
-                return (int)State.Idle;
+                    return (int)State.Idle;
+                }
+                else
+                {
+                    rect = rect.GrowSide(Side.Left, -10).GrowSide(Side.Right, -10);
+                    var m = new Vector2(Mathf.Clamp(character.GlobalPosition.X, rect.Position.X, rect.End.X), character.GlobalPosition.Y);
+                    character.MovePoint = m;
+                }
             }
 
             return GetId;
