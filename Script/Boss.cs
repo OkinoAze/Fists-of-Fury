@@ -81,6 +81,12 @@ public partial class Boss : Character
         {
             _DamageReceiver.Monitorable = false;
         }
+        if (StateID != (int)State.EnterScene && !GetCameraRect().HasPoint(GlobalPosition))
+        {
+            var rect = GetCameraRect().GrowSide(Side.Left, -10).GrowSide(Side.Right, -10);
+            MovePoint = new Vector2(Mathf.Clamp(GlobalPosition.X, rect.Position.X, rect.End.X), GlobalPosition.Y);
+            SwitchState((int)State.EnterScene);
+        }
         //GD.Print((State)StateID);
     }
     public bool CanAttackPlayer(float distance = 20)
@@ -139,6 +145,11 @@ public partial class Boss : Character
                 FaceToPosition((emitter.Owner as Node2D).Position);
                 SwitchState((int)State.KnockFly);
             }
+            else if (e.Type == DamageReceiver.HitType.Power)
+            {
+                EntityManager.Instance.ShackCamera();
+                SwitchState((int)State.KnockFly);
+            }
 
             Health = Mathf.Clamp(Health - e.Damage, 0, MaxHealth);
             emitter?.AttackSuccess(this);
@@ -151,6 +162,16 @@ public partial class Boss : Character
         }
 
     }
+    public void PowerDamageReceived()
+    {
+        if (ProcessMode == ProcessModeEnum.Inherit)
+        {
+            FaceToPosition(_Player.Position);
+            DamageReceiver.DamageReceivedEventArgs e = new(Vector2.Zero, -Position.DirectionTo(_Player.Position), 0, 100, 100, DamageReceiver.HitType.Power);
+            OnDamageReceiver_DamageReceived(null, e);
+        }
+    }
+
     partial class StateIdle : Node, IState
     {
         Rect2 rect;
@@ -164,7 +185,7 @@ public partial class Boss : Character
         public bool Enter()
         {
             character.WaitTimer.Start();
-            rect = character.GetCrimeaRect().GrowSide(Side.Left, -10).GrowSide(Side.Right, -10);
+            rect = character.GetCameraRect().GrowSide(Side.Left, -10).GrowSide(Side.Right, -10);
             character.Direction = Vector2.Zero;
             character.MovePoint = Vector2.Zero;
             character.AnimationPlayer.Play("Idle");
@@ -568,7 +589,7 @@ public partial class Boss : Character
 
         public int Update(double delta)
         {
-            rect = character.GetCrimeaRect().GrowSide(Side.Left, -10).GrowSide(Side.Right, -10);
+            rect = character.GetCameraRect().GrowSide(Side.Left, -10).GrowSide(Side.Right, -10);
             character.MovePoint = new Vector2(rect.End.X, character._Player.GlobalPosition.Y);
             character.Direction = character.GlobalPosition.DirectionTo(character.MovePoint);
 

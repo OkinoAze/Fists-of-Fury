@@ -22,7 +22,6 @@ public partial class SpawnPoint : Marker2D
         {
             QueueRedraw();
         }
-
     }
     public override void _Draw()
     {

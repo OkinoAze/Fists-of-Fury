@@ -49,6 +49,10 @@ public partial class EntityManager : Node
         Instance = this;
     }
 
+    public void CallEnterBattleArea(BattleArea battleArea)
+    {
+        EnterBattleArea(battleArea);
+    }
 }
 
 

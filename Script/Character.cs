@@ -75,7 +75,7 @@ public partial class Character : MoveObject
 			CanPickUpProp = p;
 		}
 	}
-	public Rect2 GetCrimeaRect()
+	public Rect2 GetCameraRect()
 	{
 		var viewportRect = GetViewportRect();
 		var position = GetViewport().GetCamera2D().GlobalPosition;

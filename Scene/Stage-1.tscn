@@ -1,7 +1,20 @@
-[gd_scene load_steps=6 format=4 uid="uid://xsms1sdmxewg"]
+[gd_scene load_steps=15 format=4 uid="uid://xsms1sdmxewg"]
 
 [ext_resource type="Texture2D" uid="uid://cdwx6sbj6ksju" path="res://Art/Backgrounds/street-background.png" id="1_itqjf"]
-[ext_resource type="PackedScene" uid="uid://1mrxxn5y8fax" path="res://Scene/Prefab/EnemyThug.tscn" id="2_mduk2"]
+[ext_resource type="Texture2D" uid="uid://d1uvyyotpeult" path="res://Art/Backgrounds/bar-entrance.png" id="2_4uvg5"]
+[ext_resource type="PackedScene" uid="uid://d2tpt0iu7ow7h" path="res://Scene/Prefab/Barrel.tscn" id="3_4fiwb"]
+[ext_resource type="Texture2D" uid="uid://ci5b6x8fckrkc" path="res://Art/Backgrounds/bar-door.png" id="3_cb7y5"]
+[ext_resource type="PackedScene" uid="uid://qg4hdl7vpfml" path="res://Scene/GarageDoor.tscn" id="6_cb7y5"]
+[ext_resource type="PackedScene" uid="uid://b6mcvpqtq3iwk" path="res://Scene/BattleArea.tscn" id="7_gwqkw"]
+[ext_resource type="PackedScene" uid="uid://083sxnmllett" path="res://Scene/Prefab/EnemyPunk.tscn" id="7_s6iac"]
+[ext_resource type="PackedScene" uid="uid://dfvo3ht4wl7lo" path="res://Scene/Prefab/EnemyGoon.tscn" id="8_gwqkw"]
+[ext_resource type="PackedScene" uid="uid://b1unc825vwy1e" path="res://Scene/Prefab/Boss.tscn" id="10_ckym8"]
+
+[sub_resource type="Gradient" id="Gradient_v1kk2"]
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_s6iac"]
+gradient = SubResource("Gradient_v1kk2")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sk8bi"]
 size = Vector2(821.5, 33.5)
@@ -16,6 +29,14 @@ loop = true
 [node name="Stage-1" type="Node2D"]
 
 [node name="Background" type="Node2D" parent="."]
+z_index = -1
+metadata/_edit_lock_ = true
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Background"]
+position = Vector2(414, 43)
+scale = Vector2(3.69238, 220.875)
+texture = SubResource("GradientTexture1D_s6iac")
 
 [node name="Street-background" type="Sprite2D" parent="Background"]
 position = Vector2(200, 32)
@@ -25,7 +46,17 @@ texture = ExtResource("1_itqjf")
 position = Vector2(600, 32)
 texture = ExtResource("1_itqjf")
 
+[node name="Bar-entrance" type="Sprite2D" parent="Background"]
+position = Vector2(778, 32)
+texture = ExtResource("2_4uvg5")
+
+[node name="Bar-door" type="Sprite2D" parent="Background"]
+position = Vector2(810, 32)
+texture = ExtResource("3_cb7y5")
+
 [node name="StageColliders" type="Node2D" parent="."]
+visible = false
+metadata/_edit_group_ = true
 
 [node name="StaticBody2D" type="StaticBody2D" parent="StageColliders"]
 collision_mask = 0
@@ -41,12 +72,50 @@ collision_mask = 0
 position = Vector2(400, 80)
 shape = SubResource("RectangleShape2D_mduk2")
 
-[node name="ActorContainer" type="Node2D" parent="."]
+[node name="GarageDoor" parent="." node_paths=PackedStringArray("BattleArea") instance=ExtResource("6_cb7y5")]
+z_index = -1
+position = Vector2(253, 32)
+BattleArea = NodePath("../BattleArea")
 
-[node name="EnemyThug" parent="ActorContainer" instance=ExtResource("2_mduk2")]
-position = Vector2(86, 54)
+[node name="SpawnPoint" parent="GarageDoor" index="0"]
+Enemies = [ExtResource("7_s6iac")]
+
+[node name="SpawnPoint2" parent="GarageDoor" index="1"]
+Enemies = [ExtResource("8_gwqkw")]
+
+[node name="Door" parent="GarageDoor" index="2"]
+z_as_relative = false
+
+[node name="BattleArea" parent="." instance=ExtResource("7_gwqkw")]
+position = Vector2(253, 32)
+
+[node name="ActorContainer" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Barrel" parent="ActorContainer" instance=ExtResource("3_4fiwb")]
+position = Vector2(345, 56)
+HasProp = "PropGun"
+
+[node name="Barrel2" parent="ActorContainer" instance=ExtResource("3_4fiwb")]
+position = Vector2(34, 39)
+HasProp = "PropKnife"
+
+[node name="Barrel4" parent="ActorContainer" instance=ExtResource("3_4fiwb")]
+position = Vector2(30, 58)
+HasProp = "PropKnife"
+
+[node name="Barrel3" parent="ActorContainer" instance=ExtResource("3_4fiwb")]
+position = Vector2(316, 40)
+HasProp = "PropChicken"
+
+[node name="Boss" parent="ActorContainer" instance=ExtResource("10_ckym8")]
+position = Vector2(57, 46)
 
 [node name="Music" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamMP3_sk8bi")
 autoplay = true
 bus = &"Music"
+
+[editable path="GarageDoor"]
+[editable path="GarageDoor/SpawnPoint"]
+[editable path="GarageDoor/SpawnPoint2"]

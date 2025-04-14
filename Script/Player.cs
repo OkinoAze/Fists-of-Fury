@@ -729,7 +729,7 @@ public partial class Player : Character
         }
         public bool Enter()
         {
-            var cameraRect = character.GetCrimeaRect();
+            var cameraRect = character.GetCameraRect();
             character.Height = cameraRect.Size.Y;
             character.HeightSpeed = -cameraRect.Size.Y;
             character.AnimationPlayer.Play("Jump");

@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 public partial class Main : Node
@@ -39,6 +41,10 @@ public partial class Main : Node
 
     Node Stage;
 
+    List<Node2D> StaticNodeList = [];
+
+    AnimationPlayer TransitionAnimationPlayer;
+
     public override void _Ready()
     {
         PlayerHealthBar = GetTree().Root.GetNode<ProgressBar>("UI/HUD/Player/HealthBar");
@@ -61,7 +67,7 @@ public partial class Main : Node
         ReSpawnCaption = ReSpawn.GetNode<Label>("Caption");
 
         Stage = GetNode<Node>("Stage");
-
+        TransitionAnimationPlayer = GetNode<AnimationPlayer>("TransitionAnimationPlayer");
 
         EntityManager.Instance.EnterBattleArea += OnEnterBattleArea;
         EntityManager.Instance.ExitBattleArea += OnExitBattleArea;
@@ -71,7 +77,8 @@ public partial class Main : Node
 
         _Player._DamageEmitter.AttackSuccess += OnAttackSuccess;
 
-
+        var packedScene = ResourceLoader.Load<PackedScene>("res://Scene/stage-1.tscn");
+        EntityManager.Instance.SwitchScene(packedScene);
 
         EnemyHUD.Visible = false;
         ReSpawn.Visible = false;
@@ -79,6 +86,8 @@ public partial class Main : Node
 
     private void OnSwitchScene(PackedScene scene)
     {
+        _Player.ProcessMode = ProcessModeEnum.Disabled;
+
         var children = Stage.GetChildren();
         if (children.Count > 0)
         {
@@ -95,12 +104,20 @@ public partial class Main : Node
         {
             var mainActorContainer = GetNode<Node2D>("ActorContainer");
             var actorContainerChildren = actorContainer.GetChildren();
-            foreach (var item in actorContainerChildren)
+            foreach (Node2D item in actorContainerChildren.Cast<Node2D>())
             {
+                StaticNodeList.Add(item);
                 actorContainer.RemoveChild(item);
                 mainActorContainer.AddChild(item);
+                item.ProcessMode = ProcessModeEnum.Disabled;
             }
         }
+        StaticNodeList.Sort(new PositionXComparer());
+
+        _Player.ProcessMode = ProcessModeEnum.Inherit;
+        _Player.Position = new Vector2(25, 45);
+        TransitionAnimationPlayer.Play("StartTransition");
+
     }
 
 
@@ -108,9 +125,24 @@ public partial class Main : Node
     {
         PlayerReSpawnTimer.Start();
         ReSpawn.Visible = true;
-
     }
 
+    void ActiveNode()
+    {
+        if (StaticNodeList.Count > 0)
+        {
+            var item = StaticNodeList[0];
+            if (_Player.GetCameraRect().HasPoint(item.GlobalPosition))
+            {
+                item.ProcessMode = ProcessModeEnum.Inherit;
+                StaticNodeList.RemoveAt(0);
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
 
     public async void OnAttackSuccess(Character character)
     {
@@ -146,6 +178,7 @@ public partial class Main : Node
         StopCamera = true;
     }
 
+
     private void OnExitBattleArea(BattleArea battleArea)
     {
         StopCamera = false;
@@ -153,21 +186,8 @@ public partial class Main : Node
         SFX.Play();
     }
 
-    public override void _PhysicsProcess(double delta)
+    void CameraController(double delta)
     {
-        PlayerHealthBar.MaxValue = _Player.MaxHealth;
-        PlayerHealthBar.Value = _Player.Health;
-        if (ComboNowTime < ComboTime)
-        {
-            ComboNowTime += (float)delta;
-        }
-        else
-        {
-            Combo = 0;
-            PlayerCombo.Text = "";
-        }
-
-
         if (StopCamera == false && _Player.Position.X > Camera.Position.X)
         {
             Camera.Position = new Vector2(_Player.Position.X, Camera.Position.Y);
@@ -183,6 +203,22 @@ public partial class Main : Node
             ShackCamera = false;
             ShackNowTime = 0;
             Camera.Offset = new Vector2(0, 0);
+        }
+    }
+    public override void _PhysicsProcess(double delta)
+    {
+        CameraController(delta);
+        ActiveNode();
+        PlayerHealthBar.MaxValue = _Player.MaxHealth;
+        PlayerHealthBar.Value = _Player.Health;
+        if (ComboNowTime < ComboTime)
+        {
+            ComboNowTime += (float)delta;
+        }
+        else
+        {
+            Combo = 0;
+            PlayerCombo.Text = "";
         }
 
         if (ReSpawn.Visible == true)
@@ -201,6 +237,10 @@ public partial class Main : Node
                 {
                     _Player.Health = _Player.MaxHealth;
                     _Player.SwitchState((int)Player.State.EnterScene);
+                    //TODO 给所有敌人一击
+
+                    GetTree().CallGroup("Enemy", "PowerDamageReceived");
+
                     ReSpawn.Visible = false;
                 }
             }
@@ -217,8 +257,25 @@ public partial class Main : Node
             EntityManager.Instance.EnterBattleArea = null;
             EntityManager.Instance.ExitBattleArea = null;
             EntityManager.Instance.ReSpawnPlayer = null;
+            EntityManager.Instance.SwitchScene = null;
 
             GetTree().ReloadCurrentScene();
         }
+    }
+    public class PositionXComparer : IComparer<Node2D>
+    {
+        public int Compare(Node2D x, Node2D y)
+        {
+            if (x.Position.X == y.Position.X)
+            {
+                return x.Position.Y.CompareTo(y.Position.Y);
+            }
+            else
+            {
+                return x.Position.X.CompareTo(y.Position.X);
+            }
+
+        }
+
     }
 }
