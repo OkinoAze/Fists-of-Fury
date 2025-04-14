@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=4 uid="uid://xsms1sdmxewg"]
+[gd_scene load_steps=6 format=4 uid="uid://xsms1sdmxewg"]
 
 [ext_resource type="Texture2D" uid="uid://cdwx6sbj6ksju" path="res://Art/Backgrounds/street-background.png" id="1_itqjf"]
+[ext_resource type="PackedScene" uid="uid://1mrxxn5y8fax" path="res://Scene/Prefab/EnemyThug.tscn" id="2_mduk2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sk8bi"]
 size = Vector2(821.5, 33.5)
@@ -40,9 +41,10 @@ collision_mask = 0
 position = Vector2(400, 80)
 shape = SubResource("RectangleShape2D_mduk2")
 
-[node name="CheckPoints" type="Node2D" parent="."]
+[node name="ActorContainer" type="Node2D" parent="."]
 
-[node name="CheckPoint" type="Node2D" parent="CheckPoints"]
+[node name="EnemyThug" parent="ActorContainer" instance=ExtResource("2_mduk2")]
+position = Vector2(86, 54)
 
 [node name="Music" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamMP3_sk8bi")

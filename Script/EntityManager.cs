@@ -26,6 +26,9 @@ public partial class EntityManager : Node
     public delegate void ReSpawnPlayerReceiver();
     public ReSpawnPlayerReceiver ReSpawnPlayer;
 
+    public delegate void SwitchSceneReceiver(PackedScene scene);
+    public SwitchSceneReceiver SwitchScene;
+
 
     public static EntityManager Instance { get; private set; }
     public enum EnemyType

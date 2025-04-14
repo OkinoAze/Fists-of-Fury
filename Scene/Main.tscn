@@ -1,11 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://bacl472jw6i6x"]
+[gd_scene load_steps=8 format=3 uid="uid://bacl472jw6i6x"]
 
 [ext_resource type="Script" uid="uid://cuvv6fyqwfmts" path="res://Script/Main.cs" id="1_djkur"]
 [ext_resource type="PackedScene" uid="uid://ylrqp34rxwb0" path="res://Scene/Prefab/Player.tscn" id="1_xhtwi"]
 [ext_resource type="PackedScene" uid="uid://xsms1sdmxewg" path="res://Scene/Stage-1.tscn" id="2_djkur"]
 [ext_resource type="Script" uid="uid://btn0avr1vn85k" path="res://Script/ActorContainer.cs" id="3_aan6j"]
 [ext_resource type="PackedScene" uid="uid://d2tpt0iu7ow7h" path="res://Scene/Prefab/Barrel.tscn" id="4_h175a"]
-[ext_resource type="PackedScene" uid="uid://b1unc825vwy1e" path="res://Scene/Prefab/Boss.tscn" id="6_h3nmf"]
 [ext_resource type="AudioStream" uid="uid://cv7r5562vsjpk" path="res://Music/SFX/gogogo.wav" id="11_vm4ek"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h175a"]
@@ -16,7 +15,9 @@ script = ExtResource("1_djkur")
 _Player = NodePath("ActorContainer/Player")
 Camera = NodePath("Camera")
 
-[node name="Stage-1" parent="." instance=ExtResource("2_djkur")]
+[node name="Stage" type="Node" parent="."]
+
+[node name="Stage-1" parent="Stage" instance=ExtResource("2_djkur")]
 metadata/_edit_lock_ = true
 
 [node name="Camera" type="Camera2D" parent="."]
@@ -49,9 +50,6 @@ script = ExtResource("3_aan6j")
 [node name="Player" parent="ActorContainer" instance=ExtResource("1_xhtwi")]
 position = Vector2(26, 45)
 motion_mode = 0
-
-[node name="Boss" parent="ActorContainer" instance=ExtResource("6_h3nmf")]
-position = Vector2(59, 49)
 
 [node name="Barrel" parent="ActorContainer" instance=ExtResource("4_h175a")]
 position = Vector2(144, 55)

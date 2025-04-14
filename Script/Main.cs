@@ -37,6 +37,8 @@ public partial class Main : Node
     Label ReSpawnCaption;
     Timer PlayerReSpawnTimer;
 
+    Node Stage;
+
     public override void _Ready()
     {
         PlayerHealthBar = GetTree().Root.GetNode<ProgressBar>("UI/HUD/Player/HealthBar");
@@ -58,19 +60,49 @@ public partial class Main : Node
         ReSpawnTime = ReSpawn.GetNode<Label>("Time");
         ReSpawnCaption = ReSpawn.GetNode<Label>("Caption");
 
+        Stage = GetNode<Node>("Stage");
 
 
         EntityManager.Instance.EnterBattleArea += OnEnterBattleArea;
         EntityManager.Instance.ExitBattleArea += OnExitBattleArea;
         EntityManager.Instance.ShackCamera += OnShackCamera;
         EntityManager.Instance.ReSpawnPlayer += OnReSpawnPlayer;
+        EntityManager.Instance.SwitchScene += OnSwitchScene;
 
         _Player._DamageEmitter.AttackSuccess += OnAttackSuccess;
+
 
 
         EnemyHUD.Visible = false;
         ReSpawn.Visible = false;
     }
+
+    private void OnSwitchScene(PackedScene scene)
+    {
+        var children = Stage.GetChildren();
+        if (children.Count > 0)
+        {
+            foreach (var item in children)
+            {
+                item.QueueFree();
+            }
+        }
+        var newStage = scene.Instantiate();
+
+        Stage.AddChild(newStage);
+        var actorContainer = newStage.GetNodeOrNull<Node2D>("ActorContainer");
+        if (actorContainer != null)
+        {
+            var mainActorContainer = GetNode<Node2D>("ActorContainer");
+            var actorContainerChildren = actorContainer.GetChildren();
+            foreach (var item in actorContainerChildren)
+            {
+                actorContainer.RemoveChild(item);
+                mainActorContainer.AddChild(item);
+            }
+        }
+    }
+
 
     private void OnReSpawnPlayer()
     {
