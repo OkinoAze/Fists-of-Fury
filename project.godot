@@ -13,7 +13,8 @@ config_version=5
 config/name="Fists of Fury"
 run/main_scene="uid://bacl472jw6i6x"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
-config/icon="res://icon.svg"
+boot_splash/show_image=false
+config/icon="uid://chm4dutxqkpma"
 
 [autoload]
 

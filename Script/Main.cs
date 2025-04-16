@@ -69,7 +69,7 @@ public partial class Main : Node
         ReSpawnCaption = ReSpawn.GetNode<Label>("Caption");
 
         Stage = GetNode<Node>("Stage");
-        TransitionAnimationPlayer = GetNode<AnimationPlayer>("TransitionAnimationPlayer");
+        TransitionAnimationPlayer = GetTree().Root.GetNode<AnimationPlayer>("UI/TransitionAnimationPlayer");
 
         EntityManager.Instance.EnterBattleArea += OnEnterBattleArea;
         EntityManager.Instance.ExitBattleArea += OnExitBattleArea;
@@ -118,7 +118,7 @@ public partial class Main : Node
 
         _Player.ProcessMode = ProcessModeEnum.Inherit;
         _Player.Position = new Vector2(25, 45);
-        TransitionAnimationPlayer.Play("StartTransition");
+        TransitionAnimationPlayer.Play("Start");
 
         ExitSceneArea = newStage.GetNodeOrNull<Area2D>("ExitSceneArea");
         if (ExitSceneArea != null)
@@ -129,7 +129,7 @@ public partial class Main : Node
 
     private async void OnExitSceneAreaEntered(Node2D body)
     {
-        TransitionAnimationPlayer.Play("EndTransition");
+        TransitionAnimationPlayer.Play("End");
         await ToSignal(GetTree().CreateTimer(4), SceneTreeTimer.SignalName.Timeout);
         ReStartScene();
     }

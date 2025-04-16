@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://lpxhwv4iyom2"]
+[gd_scene load_steps=18 format=3 uid="uid://lpxhwv4iyom2"]
 
 [ext_resource type="Texture2D" uid="uid://chm4dutxqkpma" path="res://Art/UI/Avatars/avatar-player.png" id="1_fau5c"]
 [ext_resource type="Texture2D" uid="uid://b6u8qrmygda0t" path="res://Art/UI/1x1.png" id="2_nq5m3"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dshu0jylxk5t8" path="res://Art/UI/Avatars/avatar-punk.png" id="5_fv4t1"]
 [ext_resource type="Texture2D" uid="uid://c7b24p2y7ldbd" path="res://Art/UI/go-go-go.png" id="6_nq5m3"]
 [ext_resource type="FontFile" uid="uid://dmrqa2cexeo7m" path="res://Fonts/PressStart2P.ttf" id="7_hskja"]
+[ext_resource type="Texture2D" uid="uid://byexbmsj3xtjs" path="res://Art/UI/screen-transition.png" id="8_f6k66"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nq5m3"]
 texture = ExtResource("2_nq5m3")
@@ -51,6 +52,98 @@ tracks/0/keys = {
 _data = {
 &"GoGoGo": SubResource("Animation_hskja"),
 &"RESET": SubResource("Animation_f6k66")
+}
+
+[sub_resource type="Animation" id="Animation_fv4t1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Screen-transition:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(32, 32)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Screen-transition:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_jg4dc"]
+resource_name = "Start"
+length = 0.5
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Screen-transition:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(32, 32), Vector2(201, 32)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Screen-transition:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_xql8a"]
+resource_name = "End"
+length = 0.5
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Screen-transition:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(-100, 32), Vector2(68, 32)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Screen-transition:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pcf3q"]
+_data = {
+&"End": SubResource("Animation_xql8a"),
+&"RESET": SubResource("Animation_fv4t1"),
+&"Start": SubResource("Animation_jg4dc")
 }
 
 [node name="UI" type="CanvasLayer"]
@@ -227,3 +320,15 @@ theme_override_font_sizes/font_size = 8
 text = "19"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Screen-transition" type="Sprite2D" parent="."]
+visible = false
+self_modulate = Color(0, 0, 0, 1)
+z_index = 2
+position = Vector2(32, 32)
+texture = ExtResource("8_f6k66")
+
+[node name="TransitionAnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_pcf3q")
+}

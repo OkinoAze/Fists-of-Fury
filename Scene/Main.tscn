@@ -1,105 +1,12 @@
-[gd_scene load_steps=11 format=3 uid="uid://bacl472jw6i6x"]
+[gd_scene load_steps=6 format=3 uid="uid://bacl472jw6i6x"]
 
 [ext_resource type="Script" uid="uid://cuvv6fyqwfmts" path="res://Script/Main.cs" id="1_djkur"]
 [ext_resource type="PackedScene" uid="uid://ylrqp34rxwb0" path="res://Scene/Prefab/Player.tscn" id="1_xhtwi"]
 [ext_resource type="Script" uid="uid://btn0avr1vn85k" path="res://Script/ActorContainer.cs" id="3_aan6j"]
-[ext_resource type="Texture2D" uid="uid://byexbmsj3xtjs" path="res://Art/UI/screen-transition.png" id="3_h3nmf"]
 [ext_resource type="AudioStream" uid="uid://cv7r5562vsjpk" path="res://Music/SFX/gogogo.wav" id="11_vm4ek"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h175a"]
 size = Vector2(5, 66)
-
-[sub_resource type="Animation" id="Animation_yg4ot"]
-resource_name = "EndTransition"
-length = 0.4
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Camera/Screen-transition:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.4),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(-150, 0), Vector2(0, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Camera/Screen-transition:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-
-[sub_resource type="Animation" id="Animation_hueuk"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Camera/Screen-transition:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Camera/Screen-transition:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-
-[sub_resource type="Animation" id="Animation_6a8me"]
-resource_name = "StartTransition"
-length = 0.4
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Camera/Screen-transition:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.4),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(0, 0), Vector2(153, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Camera/Screen-transition:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.4),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [true, false]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_vm4ek"]
-_data = {
-&"EndTransition": SubResource("Animation_yg4ot"),
-&"RESET": SubResource("Animation_hueuk"),
-&"StartTransition": SubResource("Animation_6a8me")
-}
 
 [node name="Main" type="Node" node_paths=PackedStringArray("_Player", "Camera")]
 script = ExtResource("1_djkur")
@@ -131,12 +38,6 @@ collision_mask = 0
 position = Vector2(102, 31)
 shape = SubResource("RectangleShape2D_h175a")
 
-[node name="Screen-transition" type="Sprite2D" parent="Camera"]
-visible = false
-self_modulate = Color(0, 0, 0, 1)
-z_index = 2
-texture = ExtResource("3_h3nmf")
-
 [node name="ActorContainer" type="Node2D" parent="."]
 y_sort_enabled = true
 script = ExtResource("3_aan6j")
@@ -152,8 +53,3 @@ bus = &"SFX"
 [node name="PlayerReSpawnTimer" type="Timer" parent="."]
 wait_time = 10.0
 one_shot = true
-
-[node name="TransitionAnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_vm4ek")
-}
