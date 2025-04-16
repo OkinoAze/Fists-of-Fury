@@ -224,14 +224,14 @@ public partial class Main : Node
         ActiveNode();
         PlayerHealthBar.MaxValue = _Player.MaxHealth;
         PlayerHealthBar.Value = _Player.Health;
-        if (ComboNowTime < ComboTime)
-        {
-            ComboNowTime += (float)delta;
-        }
-        else
+        if (ComboNowTime >= ComboTime || _Player.StateID == (int)Player.State.Hurt || _Player.StateID == (int)Player.State.KnockFly)
         {
             Combo = 0;
             PlayerCombo.Text = "";
+        }
+        else
+        {
+            ComboNowTime += (float)delta;
         }
 
         if (ReSpawn.Visible == true)
@@ -250,10 +250,8 @@ public partial class Main : Node
                 {
                     _Player.Health = _Player.MaxHealth;
                     _Player.SwitchState((int)Player.State.EnterScene);
-                    //TODO 给所有敌人一击
 
                     GetTree().CallGroup("Enemy", "PowerDamageReceived");
-
                     ReSpawn.Visible = false;
                 }
             }
